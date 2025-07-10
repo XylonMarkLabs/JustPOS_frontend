@@ -1,13 +1,13 @@
 import './App.css'
-import {Button, ThemeProvider} from "@mui/material";
+import {ThemeProvider} from "@mui/material";
 import Theme from "./Theme/Theme.js";
+import Navbar from './Components/Navbar.jsx';
+
 
 function App() {
-
-
   return (
     <ThemeProvider theme={Theme}>
-
+      <Navbar/>
     </ThemeProvider>
   )
 }
