@@ -28,7 +28,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-[#292929] via-[#5c5b5a] to-[#FBF8EF]">
       <div className="flex h-1/2 w-auto shadow-md rounded-lg">
         {/* Left Logo Panel */}
         <div className="bg-secondary flex justify-center items-center rounded-l-lg px-5 w-96">
