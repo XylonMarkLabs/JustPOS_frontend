@@ -9,9 +9,9 @@ import Login from './Auth/Login.jsx';
 function App() {
   return (
     <ThemeProvider theme={Theme}>
-      {/* <Navbar/> */}
-      <Login/>
-      {/* <CashierView/> */}
+      <Navbar/>
+      {/* <Login/> */}
+      <CashierView/>
     </ThemeProvider>
   )
 }

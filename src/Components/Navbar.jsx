@@ -1,19 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  Box,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Menu,
-  MenuItem,
-  Avatar,
-  Chip
+    Box,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Menu,
+    MenuItem,
+    Avatar,
+    Chip,
+    useTheme
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import logo from '../assets/JUSTPOS_transparent.png';
+import ChangePasswordModal from './ChangePasswordModal';
 
 const Navbar = () => {
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const theme = useTheme();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [openPasswordModal, setOpenPasswordModal] = useState(false);
+
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -23,53 +28,98 @@ const Navbar = () => {
         setAnchorEl(null);
     };
 
+    const handlePasswordModalOpen = () => {
+        handleClose();
+        setOpenPasswordModal(true);
+    };
+
+    const handlePasswordModalClose = () => {
+        setOpenPasswordModal(false);
+        setPasswordForm({
+            oldPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+        });
+        setError('');
+    };
+
+    const handlePasswordChange = (event) => {
+        const { name, value } = event.target;
+        setPasswordForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmitPasswordChange = () => {
+        // Validate passwords
+        if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+            setError('All fields are required');
+            return;
+        }
+
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            setError('New passwords do not match');
+            return;
+        }
+
+        // TODO: Add API call to change password here
+        console.log('Password change submitted:', passwordForm);
+        handlePasswordModalClose();
+    };
+
     return (
         <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static" sx={{px: 4,  }}>
-            <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' ,}}>
-                {/* Logo */}
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <img src={logo} alt="JUSTPOS Logo" style={{ height: 45 }} />
-                </Box>
+            <AppBar position="static" sx={{ px: 4, }}>
+                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', }}>
+                    {/* Logo */}
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <img src={logo} alt="JUSTPOS Logo" style={{ height: 45 }} />
+                    </Box>
 
-                {/* Account Icon */}
-                <Box>
-                    <Chip label='Cashier' color='warning' variant="outlined"/>
-                    <IconButton
-                        size="large"
-                        edge="end"
-                        aria-label="account of current user"
-                        aria-controls="menu-appbar"
-                        aria-haspopup="true"
-                        onClick={handleMenu}
-                        color="inherit"
-                    >
-                    <Avatar>C</Avatar>
-                    </IconButton>
-                    <Menu
-                        id="menu-appbar"
-                        anchorEl={anchorEl}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                    >
-                        <MenuItem onClick={handleClose}>Change Password</MenuItem>
-                        <MenuItem onClick={handleClose} sx={{ color: 'red' }}>
-                        <LogoutIcon sx={{ mr: 1 }} />Logout
-                        </MenuItem>
+                    {/* Account Icon */}
+                    <Box>
+                        <Chip label='Cashier' color='warning' variant="outlined" />
+                        <IconButton
+                            size="large"
+                            edge="end"
+                            aria-label="account of current user"
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            onClick={handleMenu}
+                            color="inherit"
+                        >
+                            <Avatar>C</Avatar>
+                        </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorEl}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            <MenuItem onClick={handlePasswordModalOpen}>Change Password</MenuItem>
+                            <MenuItem onClick={handleClose} sx={{ color: 'red' }}>
+                                <LogoutIcon sx={{ mr: 1 }} />Logout
+                            </MenuItem>
+                        </Menu>
 
-                    </Menu>
-                </Box>
-            </Toolbar>
-        </AppBar>
+                        <ChangePasswordModal 
+                            open={openPasswordModal} 
+                            onClose={handlePasswordModalClose}
+                            logo={logo}
+                        />
+                    </Box>
+                </Toolbar>
+            </AppBar>
         </Box>
     );
 };
