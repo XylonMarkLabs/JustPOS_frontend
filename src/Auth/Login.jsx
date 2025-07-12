@@ -12,6 +12,7 @@ import {
 import logo from '../assets/JUSTPOS_transparent.png';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import axios from 'axios';
 
 const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -23,8 +24,16 @@ const Login = () => {
   const handleMouseUpPassword = (event) => event.preventDefault();
 
   const handleLogin = () => {
-    // Add your login logic here (API call, validation, etc.)
-    console.log('Logging in with', email, password);
+    axios.post('http://localhost:4000/api/user/login', {
+        username: email,
+        password: password  
+    })
+    .then(response => {
+        console.log('Login response:', response.data);
+    })
+    .catch( err => {
+        console.error('Login error:', err);
+    })
   };
 
   return (
