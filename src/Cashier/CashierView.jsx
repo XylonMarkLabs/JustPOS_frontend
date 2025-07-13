@@ -102,14 +102,14 @@ const CashierView = () => {
             {/* search bar */}
             <div className="relative flex-grow">
               <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <ManageSearchIcon color="secondary" fontSize='large' />
+                <ManageSearchIcon color="primary" fontSize='large' />
               </div>
               <input
                 type="text"
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
 
