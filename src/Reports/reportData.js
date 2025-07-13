@@ -10,7 +10,8 @@ export const salesData = {
     { name: 'Coffee - Americano', unitsSold: 156, revenue: 546.00 },
     { name: 'Sandwich - Club', unitsSold: 89, revenue: 800.11 },
     { name: 'Latte', unitsSold: 134, revenue: 569.50 },
-    { name: 'Muffin - Blueberry', unitsSold: 67, revenue: 200.33 }
+    { name: 'Muffin - Blueberry', unitsSold: 67, revenue: 200.33 },
+    { name: 'Croissant', unitsSold: 45, revenue: 135.00 }
   ]
 }
 

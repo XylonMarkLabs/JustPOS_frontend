@@ -12,8 +12,17 @@ import {
   MenuItem,
   Box,
   Typography,
-  Grid
+  Grid,
+  Avatar,
+  IconButton,
+  Card,
+  CardContent
 } from '@mui/material'
+import {
+  PhotoCamera as PhotoCameraIcon,
+  Delete as DeleteIcon,
+  Image as ImageIcon
+} from '@mui/icons-material'
 
 const AddProductModal = ({ open, onClose, onAddProduct }) => {
   const [formData, setFormData] = useState({
@@ -23,13 +32,53 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
     stock: '',
     minStock: '',
     barcode: '',
-    description: ''
+    description: '',
+    image: null,
+    imagePreview: null
   })
 
   const handleChange = (field) => (event) => {
     setFormData({
       ...formData,
       [field]: event.target.value
+    })
+  }
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)')
+        return
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024
+      if (file.size > maxSize) {
+        alert('Image file must be less than 5MB')
+        return
+      }
+
+      // Create preview URL
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          image: file,
+          imagePreview: reader.result
+        })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setFormData({
+      ...formData,
+      image: null,
+      imagePreview: null
     })
   }
 
@@ -56,7 +105,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       stock: parseInt(formData.stock),
       minStock: formData.minStock ? parseInt(formData.minStock) : 0,
       status: 'Active',
-      image: getCategoryEmoji(formData.category),
+      image: formData.imagePreview || getCategoryEmoji(formData.category),
       description: formData.description
     }
 
@@ -72,7 +121,9 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       stock: '',
       minStock: '',
       barcode: '',
-      description: ''
+      description: '',
+      image: null,
+      imagePreview: null
     })
     onClose()
   }
@@ -107,6 +158,79 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
 
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Product Image Upload */}
+          <Box>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+              Product Image
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 1.5, border: '1px dashed #d1d5db', borderRadius: 1, backgroundColor: '#f9fafb' }}>
+              {formData.imagePreview ? (
+                <Box sx={{ position: 'relative' }}>
+                  <Avatar
+                    src={formData.imagePreview}
+                    sx={{ 
+                      width: 50, 
+                      height: 50, 
+                      border: '2px solid #e5e7eb'
+                    }}
+                  />
+                  <IconButton
+                    onClick={handleRemoveImage}
+                    sx={{
+                      position: 'absolute',
+                      top: -6,
+                      right: -6,
+                      backgroundColor: '#ef4444',
+                      color: 'white',
+                      width: 18,
+                      height: 18,
+                      '&:hover': { backgroundColor: '#dc2626' }
+                    }}
+                  >
+                    <DeleteIcon sx={{ fontSize: 12 }} />
+                  </IconButton>
+                </Box>
+              ) : (
+                <Avatar sx={{ width: 50, height: 50, backgroundColor: '#e5e7eb' }}>
+                  <ImageIcon sx={{ fontSize: 24, color: '#9ca3af' }} />
+                </Avatar>
+              )}
+              
+              <Box sx={{ flex: 1 }}>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="image-upload"
+                  type="file"
+                  onChange={handleImageChange}
+                />
+                <label htmlFor="image-upload">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    size="small"
+                    startIcon={<PhotoCameraIcon />}
+                    sx={{
+                      textTransform: 'none',
+                      borderColor: '#d1d5db',
+                      color: '#6b7280',
+                      height: '32px',
+                      fontSize: '0.75rem',
+                      '&:hover': {
+                        borderColor: '#9ca3af',
+                        backgroundColor: '#f3f4f6'
+                      }
+                    }}
+                  >
+                    {formData.imagePreview ? 'Change' : 'Upload'}
+                  </Button>
+                </label>
+                <Typography variant="caption" display="block" sx={{ mt: 0.5, color: '#9ca3af', fontSize: '0.7rem' }}>
+                  PNG, JPG, GIF (max 5MB)
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
           {/* Product Name */}
           <Box>
             <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>

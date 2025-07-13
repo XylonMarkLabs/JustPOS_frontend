@@ -116,7 +116,7 @@ const InventoryReport = ({ data }) => {
                 </TableHead>
                 <TableBody>
                   {paginatedItems.map((item, index) => (
-                    <TableRow key={index} sx={{ 
+                    <TableRow key={index} sx={{
                       '&:hover': { backgroundColor: '#f9fafb' },
                       height: 40
                     }}>
@@ -141,18 +141,18 @@ const InventoryReport = ({ data }) => {
                           color={getStatusColor(item.status)}
                           variant="outlined"
                           size="small"
-                          sx={{ 
-                            height: 20, 
+                          sx={{
+                            height: 20,
                             fontSize: '0.7rem',
                             backgroundColor: getStatusColor(item.status) === 'success' ? '#bbf7d0' :
-                                           getStatusColor(item.status) === 'warning' ? '#fed7aa' :
-                                           getStatusColor(item.status) === 'error' ? '#fca5a5' : '#d1d5db',
+                              getStatusColor(item.status) === 'warning' ? '#fed7aa' :
+                                getStatusColor(item.status) === 'error' ? '#fca5a5' : '#d1d5db',
                             borderColor: getStatusColor(item.status) === 'success' ? '#86efac' :
-                                        getStatusColor(item.status) === 'warning' ? '#fb923c' :
-                                        getStatusColor(item.status) === 'error' ? '#f87171' : '#9ca3af',
+                              getStatusColor(item.status) === 'warning' ? '#fb923c' :
+                                getStatusColor(item.status) === 'error' ? '#f87171' : '#9ca3af',
                             color: getStatusColor(item.status) === 'success' ? '#047857' :
-                                  getStatusColor(item.status) === 'warning' ? '#9a3412' :
-                                  getStatusColor(item.status) === 'error' ? '#991b1b' : '#374151'
+                              getStatusColor(item.status) === 'warning' ? '#9a3412' :
+                                getStatusColor(item.status) === 'error' ? '#991b1b' : '#374151'
                           }}
                         />
                       </TableCell>
@@ -161,11 +161,10 @@ const InventoryReport = ({ data }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-            
+
             {/* Pagination */}
-            <Box sx={{ 
-              borderTop: '1px solid #e5e7eb', 
-              mt: 1
+            <Box sx={{
+
             }}>
               <TablePagination
                 component="div"
@@ -177,9 +176,10 @@ const InventoryReport = ({ data }) => {
                 rowsPerPageOptions={[5, 10, 25]}
                 sx={{
                   '& .MuiTablePagination-toolbar': {
-                    paddingLeft: 2,
-                    paddingRight: 2,
+                    paddingLeft: 0,
+                    paddingRight: 0,
                     minHeight: 50,
+                    margin: 0,
                   },
                   '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
                     fontSize: '0.875rem',
