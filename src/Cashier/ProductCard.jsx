@@ -16,10 +16,10 @@ const ProductCard = ({ product, onAddToCart }) => {
             alt={product.productName}
             className="w-full h-32 object-cover"
         />
-        <div className="p-4">
-            <div className='flex justify-between'>
+        <div className="px-4 pb-2">
+            <div className='flex justify-between items-end'>
                 <h3 className="font-semibold text-lg">{product.productName}</h3>
-                <Chip label={product.category} color='warning' variant="outlined" size="small" sx={{ fontSize: '0.70rem' }}/> 
+                <Chip label={product.category} color='warning' variant="outlined" size="small" sx={{ fontSize: '0.60rem' }}/> 
             </div>
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">

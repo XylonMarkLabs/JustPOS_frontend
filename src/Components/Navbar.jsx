@@ -69,9 +69,9 @@ const Navbar = () => {
     };
 
     return (
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static" sx={{ px: 4, }}>
-                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', }}>
+        <div className='px-5 pt-2'>
+            <AppBar position="static" sx={{ borderRadius: '8px', backgroundColor:'#FBF8EF', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     {/* Logo */}
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <img src={logo} alt="JUSTPOS Logo" style={{ height: 45 }} />
@@ -120,7 +120,7 @@ const Navbar = () => {
                     </Box>
                 </Toolbar>
             </AppBar>
-        </Box>
+        </div>
     );
 };
 

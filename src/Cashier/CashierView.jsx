@@ -1,30 +1,38 @@
-import { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
-import CartItem from "./CartItem";
-import ManageSearchIcon from "@mui/icons-material/ManageSearch";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
-import { Badge, IconButton, Tooltip } from "@mui/material";
+import { useEffect, useState } from 'react';
+import ProductCard from './ProductCard';
+import CartItem from './CartItem';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import ApiCall from "../Services/ApiCall";
 
 // Sample product data
-// const sampleProducts = [
-//   { id: 1, name: 'Espresso', price: 2.50, category: 'Coffee', image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e76?w=200&h=200&fit=crop', stock: 50, discount: 0.2 },
-//   { id: 2, name: 'Cappuccino', price: 3.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop', stock: 30, discount: 0 },
-//   { id: 3, name: 'Croissant', price: 2.25, category: 'Bakery', image: 'https://images.unsplash.com/photo-1555507036-ab794f4ade0a?w=200&h=200&fit=crop', stock: 25, discount: 0.15 },
-//   { id: 4, name: 'Latte', price: 4.00, category: 'Coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', stock: 40, discount: 0 },
-//   { id: 5, name: 'Muffin', price: 3.50, category: 'Bakery', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=200&h=200&fit=crop', stock: 20, discount: 0.1 },
-//   { id: 6, name: 'Americano', price: 2.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=200&h=200&fit=crop', stock: 35, discount: 0 },
-//   { id: 7, name: 'Bagel', price: 2.00, category: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop', stock: 15, discount: 0.25 },
-//   { id: 8, name: 'Green Tea', price: 2.25, category: 'Tea', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop', stock: 45, discount: 0 }
-// ];
+const sampleProducts = [
+  { id: 1, name: 'Espresso', price: 2.50, category: 'Coffee', image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e76?w=200&h=200&fit=crop', stock: 50, discount: 0.2 },
+  { id: 2, name: 'Cappuccino', price: 3.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop', stock: 30, discount: 0 },
+  { id: 3, name: 'Croissant', price: 2.25, category: 'Bakery', image: 'https://images.unsplash.com/photo-1555507036-ab794f4ade0a?w=200&h=200&fit=crop', stock: 25, discount: 0.15 },
+  { id: 4, name: 'Latte', price: 4.00, category: 'Coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', stock: 40, discount: 0 },
+  { id: 5, name: 'Muffin', price: 3.50, category: 'Bakery', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=200&h=200&fit=crop', stock: 20, discount: 0.1 },
+  { id: 6, name: 'Americano', price: 2.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=200&h=200&fit=crop', stock: 35, discount: 0 },
+  { id: 7, name: 'Bagel', price: 2.00, category: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop', stock: 15, discount: 0.25 },
+  { id: 8, name: 'Green Tea', price: 2.25, category: 'Tea', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop', stock: 45, discount: 0 },
+  { id: 9, name: 'Espresso', price: 2.50, category: 'Coffee', image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e76?w=200&h=200&fit=crop', stock: 50, discount: 0.2 },
+  { id: 10, name: 'Cappuccino', price: 3.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop', stock: 30, discount: 0 },
+  { id: 11, name: 'Croissant', price: 2.25, category: 'Bakery', image: 'https://images.unsplash.com/photo-1555507036-ab794f4ade0a?w=200&h=200&fit=crop', stock: 25, discount: 0.15 },
+  { id: 12, name: 'Latte', price: 4.00, category: 'Coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', stock: 40, discount: 0 },
+  { id: 13, name: 'Muffin', price: 3.50, category: 'Bakery', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=200&h=200&fit=crop', stock: 20, discount: 0.1 },
+  { id: 14, name: 'Americano', price: 2.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=200&h=200&fit=crop', stock: 35, discount: 0 },
+  { id: 15, name: 'Bagel', price: 2.00, category: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop', stock: 15, discount: 0.25 },
+  { id: 16, name: 'Green Tea', price: 2.25, category: 'Tea', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop', stock: 45, discount: 0 }
+];
 
 const CashierView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cart, setCart] = useState([]);
-  const [products, setProducts] = useState([]);
-  const categories = ["All", ...new Set(products.map((p) => p.category))];
+  const categories = ['All', ...new Set(products.map(p => p.category))];
+  const itemsPerPage = 10; // 2x5 grid
 
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const username = currentUser.username;
@@ -67,6 +75,17 @@ const CashierView = () => {
 
     await ApiCall.cart.addToCart(username, product.productCode);
     getCart();
+
+    // const existingItem = cart.find(item => item.product.id === product.id);
+    // if (existingItem) {
+    //   setCart(cart.map(item =>
+    //     item.product.id === product.id
+    //       ? { ...item, quantity: item.quantity + 1 }
+    //       : item
+    //   ));
+    // } else {
+    //   setCart([...cart, { product, quantity: 1 }]);
+    // }
 
   };
 
@@ -122,15 +141,28 @@ const CashierView = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // Calculate pagination
+  const pageCount = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+  
   return (
     <div className="lg:flex gap-5 h-screen p-5 ">
+
       <section className="space-y-5 border-primary  lg:w-[75%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg">
         {/*search bar and fltters  */}
-        <div className="mb-6">
+        <div className="flex-none mb-6">
+          <div className="flex gap-4 items-center">
           {/* search bar */}
-          <div className="relative mb-4">
+          <div className="relative flex-grow">
             <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <ManageSearchIcon color="secondary" fontSize="large" />
+              <ManageSearchIcon color="primary" fontSize='large' />
             </div>
             <input
               type="text"
@@ -142,37 +174,96 @@ const CashierView = () => {
           </div>
 
           {/* filters */}
-          <div className="flex gap-2 flex-wrap">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  selectedCategory === category
-                    ? "bg-surface text-primary shadow-md"
-                    : "bg-gray-100 text-gray-700 border border-gray-500 hover:bg-gray-200"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          <div className="w-64">
+              <FormControl fullWidth variant="filled" size="small">
+                <InputLabel 
+                  id="category-select-label"
+                  sx={{
+                    color: 'black',
+                    '&.Mui-focused': {
+                      color: 'black',
+                    }
+                  }}
+                >
+                  Filter by Category
+                </InputLabel>
+                <Select
+                  label="category-select-label"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="rounded-lg bg-gray-50"
+                  sx={{
+                    color: 'black',
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '16px',
+                      color: 'black',
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgb(243 244 246)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'rgb(243 244 246)',
+                    },
+                    '&:before': {
+                      borderColor: 'black',
+                    },
+                    '&:after': {
+                      borderColor: 'black',
+                    },
+                  }}
+                >
+                  {categories.map(category => (
+                    <MenuItem 
+                      key={category} 
+                      value={category}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'rgb(243 244 246)',
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: 'rgb(229 231 235)',
+                        }
+                      }}
+                    >
+                      {category}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
           </div>
         </div>
 
+
         {/* product catelog */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4 ">
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.productCode}
-              product={product}
-              onAddToCart={addToCart}
-            />
-          ))}
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 overflow-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 gap-4">
+              {paginatedProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onAddToCart={addToCart}
+                />
+              ))}
+            </div>
+          </div>
+          {pageCount > 1 && (
+            <div className="flex-none pt-2 flex justify-end border-t mt-4">
+              <Pagination 
+                count={pageCount} 
+                page={currentPage} 
+                onChange={handlePageChange}
+                color="secondary"
+                size="small"
+              />
+            </div>
+          )}
         </div>
       </section>
 
       {/* cart */}
-      <section className="space-y-5 lg:w-[25%] p-5 rounded-lg bg-background shadow-slate-400 shadow-lg h-[calc(100vh-2.5rem)] flex flex-col">
+      <section className="space-y-5 lg:w-[25%] p-5 rounded-lg bg-background shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
         <div className="flex-none">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
