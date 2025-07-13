@@ -58,6 +58,7 @@ const ProductManagement = () => {
       category: 'Beverages',
       price: '$3.50',
       stock: 100,
+      minStock: 20,
       status: 'Active',
       image: '☕'
     },
@@ -68,6 +69,7 @@ const ProductManagement = () => {
       category: 'Food',
       price: '$8.99',
       stock: 25,
+      minStock: 10,
       status: 'Active',
       image: '🥪'
     },
@@ -78,6 +80,7 @@ const ProductManagement = () => {
       category: 'Bakery',
       price: '$2.99',
       stock: 15,
+      minStock: 15,
       status: 'Active',
       image: '🧁'
     },
@@ -88,6 +91,7 @@ const ProductManagement = () => {
       category: 'Beverages',
       price: '$1.99',
       stock: 50,
+      minStock: 20,
       status: 'Active',
       image: '🍺'
     },
@@ -98,6 +102,7 @@ const ProductManagement = () => {
       category: 'Bakery',
       price: '$2.49',
       stock: 8,
+      minStock: 10,
       status: 'Active',
       image: '🥐'
     },
@@ -108,6 +113,7 @@ const ProductManagement = () => {
       category: 'Beverages',
       price: '$4.25',
       stock: 100,
+      minStock: 25,
       status: 'Active',
       image: '☕'
     },
@@ -118,6 +124,7 @@ const ProductManagement = () => {
       category: 'Food',
       price: '$7.99',
       stock: 20,
+      minStock: 15,
       status: 'Active',
       image: '🥗'
     },
@@ -128,6 +135,7 @@ const ProductManagement = () => {
       category: 'Bakery',
       price: '$4.99',
       stock: 12,
+      minStock: 10,
       status: 'Active',
       image: '🍰'
     },
@@ -138,6 +146,7 @@ const ProductManagement = () => {
       category: 'Beverages',
       price: '$2.75',
       stock: 75,
+      minStock: 30,
       status: 'Active',
       image: '🍵'
     },
@@ -148,6 +157,7 @@ const ProductManagement = () => {
       category: 'Food',
       price: '$3.99',
       stock: 30,
+      minStock: 15,
       status: 'Active',
       image: '🍕'
     },
@@ -158,6 +168,7 @@ const ProductManagement = () => {
       category: 'Bakery',
       price: '$1.99',
       stock: 18,
+      minStock: 12,
       status: 'Active',
       image: '🥯'
     },
@@ -168,6 +179,7 @@ const ProductManagement = () => {
       category: 'Beverages',
       price: '$5.50',
       stock: 40,
+      minStock: 20,
       status: 'Active',
       image: '🥤'
     },
@@ -178,6 +190,7 @@ const ProductManagement = () => {
       category: 'Food',
       price: '$9.99',
       stock: 15,
+      minStock: 10,
       status: 'Inactive',
       image: '🍔'
     },
@@ -188,6 +201,7 @@ const ProductManagement = () => {
       category: 'Bakery',
       price: '$2.25',
       stock: 5,
+      minStock: 15,
       status: 'Active',
       image: '🍩'
     },
@@ -198,6 +212,7 @@ const ProductManagement = () => {
       category: 'Beverages',
       price: '$3.75',
       stock: 60,
+      minStock: 25,
       status: 'Inactive',
       image: '☕'
     }
@@ -293,10 +308,19 @@ const ProductManagement = () => {
     setPage(0)
   }
 
-  const getStockColor = (stock) => {
-    if (stock <= 10) return 'warning'
-    if (stock <= 30) return 'info'
-    return 'success'
+  const getStockColor = (stock, minStock = 0) => {
+    if (stock <= 0) return 'error' // Out of stock
+    if (stock <= minStock) return 'warning' // Below minimum stock
+    if (stock <= minStock * 1.5) return 'info' // Low stock warning
+    return 'success' // Good stock level
+  }
+
+  const isLowStock = (stock, minStock = 0) => {
+    return stock <= minStock && stock > 0
+  }
+
+  const isOutOfStock = (stock) => {
+    return stock <= 0
   }
 
   return (
@@ -385,7 +409,10 @@ const ProductManagement = () => {
                         PRICE
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
-                        STOCK
+                        CURRENT STOCK
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
+                        MIN STOCK
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         STATUS
@@ -429,11 +456,26 @@ const ProductManagement = () => {
                         <TableCell sx={{ py: 1 }}>
                           <Chip
                             label={product.stock}
-                            color={getStockColor(product.stock)}
+                            color={getStockColor(product.stock, product.minStock)}
                             variant="outlined"
                             size="small"
                             sx={{ height: 24, fontSize: '0.75rem' }}
                           />
+                          {isLowStock(product.stock, product.minStock) && (
+                            <Typography variant="caption" color="warning.main" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                              Low Stock!
+                            </Typography>
+                          )}
+                          {isOutOfStock(product.stock) && (
+                            <Typography variant="caption" color="error.main" sx={{ display: 'block', fontSize: '0.65rem' }}>
+                              Out of Stock!
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell sx={{ py: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {product.minStock || 0}
+                          </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Chip
