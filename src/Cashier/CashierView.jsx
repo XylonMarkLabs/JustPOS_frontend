@@ -4,7 +4,7 @@ import CartItem from './CartItem';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import { Badge, IconButton, Tooltip, Pagination } from '@mui/material';
+import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
 // Sample product data
 const sampleProducts = [
@@ -31,7 +31,7 @@ const CashierView = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [cart, setCart] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // 2x6 grid
+  const itemsPerPage = 10; // 2x5 grid
   const categories = ['All', ...new Set(sampleProducts.map(p => p.category))];
 
   const addToCart = (product) => {
@@ -95,45 +95,89 @@ const CashierView = () => {
   return (
     <div className="lg:flex gap-5  p-5 ">
 
-      <section className="space-y-5 border-primary lg:w-[75%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
+      <section className="space-y-5 border-primary lg:w-[75%] p-3 bg-background rounded-lg shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
         {/*search bar and filters  */}
         <div className="flex-none mb-6">
-          {/* search bar */}
-          <div className="relative mb-4">
-            <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <ManageSearchIcon color="secondary" fontSize='large' />
+          <div className="flex gap-4 items-center">
+            {/* search bar */}
+            <div className="relative flex-grow">
+              <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <ManageSearchIcon color="secondary" fontSize='large' />
+              </div>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
-            />
-          </div>
 
-          {/* filters */}
-          <div className="flex gap-2 flex-wrap">
-            {categories.map(category => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  selectedCategory === category
-                    ? 'bg-surface text-primary shadow-md'
-                    : 'bg-gray-100 text-gray-700 border border-gray-500 hover:bg-gray-200'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+            {/* filters */}
+            <div className="w-64">
+              <FormControl fullWidth variant="filled" size="small">
+                <InputLabel 
+                  id="category-select-label"
+                  sx={{
+                    color: 'black',
+                    '&.Mui-focused': {
+                      color: 'black',
+                    }
+                  }}
+                >
+                  Filter by Category
+                </InputLabel>
+                <Select
+                  label="category-select-label"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="rounded-lg bg-gray-50"
+                  sx={{
+                    color: 'black',
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '16px',
+                      color: 'black',
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgb(243 244 246)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'rgb(243 244 246)',
+                    },
+                    '&:before': {
+                      borderColor: 'black',
+                    },
+                    '&:after': {
+                      borderColor: 'black',
+                    },
+                  }}
+                >
+                  {categories.map(category => (
+                    <MenuItem 
+                      key={category} 
+                      value={category}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'rgb(243 244 246)',
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: 'rgb(229 231 235)',
+                        }
+                      }}
+                    >
+                      {category}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
           </div>
         </div>
 
         {/* product catalog */}
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 overflow-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 gap-4">
               {paginatedProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -144,13 +188,13 @@ const CashierView = () => {
             </div>
           </div>
           {pageCount > 1 && (
-            <div className="flex-none py-4 flex justify-end border-t mt-4">
+            <div className="flex-none pt-2 flex justify-end border-t mt-4">
               <Pagination 
                 count={pageCount} 
                 page={currentPage} 
                 onChange={handlePageChange}
                 color="secondary"
-                size="large"
+                size="small"
               />
             </div>
           )}
