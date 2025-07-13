@@ -22,8 +22,11 @@ import {
   Delete as DeleteIcon,
   Image as ImageIcon
 } from '@mui/icons-material'
+import { useAlert } from '../Components/AlertProvider'
 
 const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
+  const { showError, showWarning, showSuccess } = useAlert()
+  
   const [formData, setFormData] = useState({
     name: '',
     category: 'Beverages',
@@ -68,14 +71,14 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
       if (!allowedTypes.includes(file.type)) {
-        alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)')
+        showError('Please select a valid image file (JPEG, PNG, GIF, or WebP)', 'Invalid File Type')
         return
       }
 
       // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024
       if (file.size > maxSize) {
-        alert('Image file must be less than 5MB')
+        showError('Image file must be less than 5MB', 'File Too Large')
         return
       }
 
@@ -103,13 +106,13 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   const handleSubmit = () => {
     // Basic validation
     if (!formData.name || !formData.price || !formData.stock || !formData.barcode) {
-      alert('Please fill in all required fields')
+      showError('Please fill in all required fields', 'Missing Information')
       return
     }
 
     // Validate minimum stock
     if (formData.minStock && parseInt(formData.minStock) > parseInt(formData.stock)) {
-      alert('Minimum stock level cannot be greater than current stock')
+      showWarning('Minimum stock level cannot be greater than current stock', 'Invalid Stock Level')
       return
     }
 
@@ -128,6 +131,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
     }
 
     onEditProduct(updatedProduct)
+    showSuccess(`Product "${formData.name}" has been updated successfully!`, 'Product Updated')
     handleClose()
   }
 

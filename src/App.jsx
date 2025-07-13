@@ -10,12 +10,14 @@ import ProductManagement from './Products/ProductManagement.jsx';
 import Orders from './Orders/Orders.jsx';
 import UserManagement from './User Management/UserManagement.jsx';
 import Reports from './Reports/Reports.jsx';
+import AlertProvider from './Components/AlertProvider.jsx';
 
 
 function App() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={Theme}>
+        <AlertProvider>
             <Navbar />
             <Routes>
               <Route path="/" element={<CashierView />} />
@@ -24,7 +26,7 @@ function App() {
               <Route path="/reports" element={<Reports />} />
               <Route path="/user-management" element={<UserManagement />} />
             </Routes>
-   
+        </AlertProvider>
       </ThemeProvider>
     </BrowserRouter>
   )

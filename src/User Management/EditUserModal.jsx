@@ -21,8 +21,11 @@ import {
   Visibility,
   VisibilityOff
 } from '@mui/icons-material'
+import { useAlert } from '../Components/AlertProvider'
 
 const EditUserModal = ({ open, onClose, onEditUser, user }) => {
+  const { showError, showWarning, showSuccess } = useAlert()
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -109,24 +112,24 @@ const EditUserModal = ({ open, onClose, onEditUser, user }) => {
   const handleSubmit = () => {
     // Basic validation
     if (!formData.name || !formData.email || !formData.username || !formData.role) {
-      alert('Please fill in all required fields')
+      showError('Please fill in all required fields', 'Missing Information')
       return
     }
 
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      alert('Please enter a valid email address')
+      showError('Please enter a valid email address', 'Invalid Email')
       return
     }
 
     // Password validation (only if new password is provided)
     if (formData.newPassword) {
       if (!validatePassword(formData.newPassword).isValid) {
-        alert('Please ensure your password meets all requirements')
+        showError('Please ensure your password meets all requirements', 'Password Requirements Not Met')
         return
       }
       
       if (formData.newPassword !== formData.confirmNewPassword) {
-        alert('Passwords do not match')
+        showError('Passwords do not match', 'Password Mismatch')
         return
       }
     }
@@ -142,6 +145,7 @@ const EditUserModal = ({ open, onClose, onEditUser, user }) => {
     }
     
     onEditUser(updatedUser)
+    showSuccess(`User "${formData.name}" has been updated successfully!`, 'User Updated')
     handleClose()
   }
 
