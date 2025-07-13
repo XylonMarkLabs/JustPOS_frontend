@@ -337,7 +337,19 @@ const UserManagement = () => {
                             color={getRoleColor(user.role)}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: getRoleColor(user.role) === 'error' ? '#fef2f2' :
+                                             getRoleColor(user.role) === 'primary' ? '#eff6ff' :
+                                             getRoleColor(user.role) === 'success' ? '#f0fdf4' : '#f9fafb',
+                              borderColor: getRoleColor(user.role) === 'error' ? '#fecaca' :
+                                          getRoleColor(user.role) === 'primary' ? '#dbeafe' :
+                                          getRoleColor(user.role) === 'success' ? '#dcfce7' : '#e5e7eb',
+                              color: getRoleColor(user.role) === 'error' ? '#dc2626' :
+                                    getRoleColor(user.role) === 'primary' ? '#2563eb' :
+                                    getRoleColor(user.role) === 'success' ? '#059669' : '#6b7280'
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
@@ -346,7 +358,13 @@ const UserManagement = () => {
                             color={user.status === 'Active' ? 'success' : 'error'}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: user.status === 'Active' ? '#f0fdf4' : '#fef2f2',
+                              borderColor: user.status === 'Active' ? '#dcfce7' : '#fecaca',
+                              color: user.status === 'Active' ? '#059669' : '#dc2626'
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>

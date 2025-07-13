@@ -459,7 +459,22 @@ const ProductManagement = () => {
                             color={getStockColor(product.stock, product.minStock)}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: getStockColor(product.stock, product.minStock) === 'success' ? '#f0fdf4' :
+                                             getStockColor(product.stock, product.minStock) === 'warning' ? '#fffbeb' :
+                                             getStockColor(product.stock, product.minStock) === 'info' ? '#f0f9ff' :
+                                             getStockColor(product.stock, product.minStock) === 'error' ? '#fef2f2' : '#f9fafb',
+                              borderColor: getStockColor(product.stock, product.minStock) === 'success' ? '#dcfce7' :
+                                          getStockColor(product.stock, product.minStock) === 'warning' ? '#fef3c7' :
+                                          getStockColor(product.stock, product.minStock) === 'info' ? '#dbeafe' :
+                                          getStockColor(product.stock, product.minStock) === 'error' ? '#fecaca' : '#e5e7eb',
+                              color: getStockColor(product.stock, product.minStock) === 'success' ? '#059669' :
+                                    getStockColor(product.stock, product.minStock) === 'warning' ? '#d97706' :
+                                    getStockColor(product.stock, product.minStock) === 'info' ? '#2563eb' :
+                                    getStockColor(product.stock, product.minStock) === 'error' ? '#dc2626' : '#6b7280'
+                            }}
                           />
                           {isLowStock(product.stock, product.minStock) && (
                             <Typography variant="caption" color="warning.main" sx={{ display: 'block', fontSize: '0.65rem' }}>
@@ -483,7 +498,13 @@ const ProductManagement = () => {
                             color={product.status === 'Active' ? 'success' : 'error'}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: product.status === 'Active' ? '#f0fdf4' : '#fef2f2',
+                              borderColor: product.status === 'Active' ? '#dcfce7' : '#fecaca',
+                              color: product.status === 'Active' ? '#059669' : '#dc2626'
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
