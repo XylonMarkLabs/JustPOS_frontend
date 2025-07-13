@@ -13,11 +13,14 @@ import logo from '../assets/JUSTPOS_transparent.png';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => event.preventDefault();
@@ -30,9 +33,16 @@ const Login = () => {
     })
     .then(response => {
         console.log('Login response:', response.data);
+        if (response.data.success) {
+            localStorage.setItem('token', response.data.token);
+            navigate('/cashier');
+        } else {
+            alert('Login failed: ' + response.data.message);
+        }
     })
     .catch( err => {
         console.error('Login error:', err);
+        alert('Login failed: ' + (err.response ? err.response.data.message : 'Network error'));
     })
   };
 

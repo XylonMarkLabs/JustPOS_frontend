@@ -12,13 +12,13 @@ const ProductCard = ({ product, onAddToCart }) => {
           </div>
         )}
         <img 
-            src={product.image} 
-            alt={product.name}
+            src={product.imageURL} 
+            alt={product.productName}
             className="w-full h-32 object-cover"
         />
         <div className="p-4">
             <div className='flex justify-between'>
-                <h3 className="font-semibold text-lg">{product.name}</h3>
+                <h3 className="font-semibold text-lg">{product.productName}</h3>
                 <Chip label={product.category} color='warning' variant="outlined" size="small" sx={{ fontSize: '0.70rem' }}/> 
             </div>
             <div className="flex justify-between items-center">
@@ -26,20 +26,20 @@ const ProductCard = ({ product, onAddToCart }) => {
                     {product.discount > 0 ? (
                         <>
                             <span className="text-xl font-bold text-green-600">
-                                ${(product.price * (1 - product.discount)).toFixed(2)}
+                                ${(product.sellingPrice * (1 - product.discount)).toFixed(2)}
                             </span>
                             <span className="text-sm text-gray-500 line-through">
-                                ${product.price.toFixed(2)}
+                                ${product.sellingPrice.toFixed(2)}
                             </span>
                         </>
                     ) : (
                         <span className="text-xl font-bold text-green-600">
-                            ${product.price.toFixed(2)}
+                            ${product.sellingPrice.toFixed(2)}
                         </span>
                     )}
                 </div>
                 <span className="text-sm text-gray-500 whitespace-nowrap">
-                    Stock: {product.stock}
+                    Stock: {product.quantityInStock}
                 </span>
             </div>
             <div className='flex justify-center mt-2'>
