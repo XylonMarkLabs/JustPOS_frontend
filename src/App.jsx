@@ -9,6 +9,7 @@ import Login from './Auth/Login.jsx';
 import ProductManagement from './Products/ProductManagement.jsx';
 import Orders from './Orders/Orders.jsx';
 import UserManagement from './User Management/UserManagement.jsx';
+import Reports from './Reports/Reports.jsx';
 
 
 function App() {
@@ -19,9 +20,9 @@ function App() {
             <Routes>
               <Route path="/" element={<CashierView />} />
               <Route path="/products" element={<ProductManagement />} />
-              <Route path="/orders" element={<Orders/>} />
-              <Route path="/reports" element={<div>Reports Page</div>} />
-              <Route path="/user-management" element={<UserManagement/>} />
+              <Route path="/orders" element={<Orders />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/user-management" element={<UserManagement />} />
             </Routes>
    
       </ThemeProvider>
