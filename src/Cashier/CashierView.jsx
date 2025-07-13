@@ -8,22 +8,22 @@ import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, 
 
 // Sample product data
 const sampleProducts = [
-  { id: 1, name: 'Espresso', price: 2.50, category: 'Coffee', image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e76?w=200&h=200&fit=crop', stock: 50, discount: 0.2 },
-  { id: 2, name: 'Cappuccino', price: 3.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop', stock: 30, discount: 0 },
-  { id: 3, name: 'Croissant', price: 2.25, category: 'Bakery', image: 'https://images.unsplash.com/photo-1555507036-ab794f4ade0a?w=200&h=200&fit=crop', stock: 25, discount: 0.15 },
-  { id: 4, name: 'Latte', price: 4.00, category: 'Coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', stock: 40, discount: 0 },
-  { id: 5, name: 'Muffin', price: 3.50, category: 'Bakery', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=200&h=200&fit=crop', stock: 20, discount: 0.1 },
-  { id: 6, name: 'Americano', price: 2.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=200&h=200&fit=crop', stock: 35, discount: 0 },
-  { id: 7, name: 'Bagel', price: 2.00, category: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop', stock: 15, discount: 0.25 },
-  { id: 8, name: 'Green Tea', price: 2.25, category: 'Tea', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop', stock: 45, discount: 0 },
-  { id: 9, name: 'Espresso', price: 2.50, category: 'Coffee', image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e76?w=200&h=200&fit=crop', stock: 50, discount: 0.2 },
-  { id: 10, name: 'Cappuccino', price: 3.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop', stock: 30, discount: 0 },
-  { id: 11, name: 'Croissant', price: 2.25, category: 'Bakery', image: 'https://images.unsplash.com/photo-1555507036-ab794f4ade0a?w=200&h=200&fit=crop', stock: 25, discount: 0.15 },
-  { id: 12, name: 'Latte', price: 4.00, category: 'Coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', stock: 40, discount: 0 },
-  { id: 13, name: 'Muffin', price: 3.50, category: 'Bakery', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=200&h=200&fit=crop', stock: 20, discount: 0.1 },
-  { id: 14, name: 'Americano', price: 2.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=200&h=200&fit=crop', stock: 35, discount: 0 },
-  { id: 15, name: 'Bagel', price: 2.00, category: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop', stock: 15, discount: 0.25 },
-  { id: 16, name: 'Green Tea', price: 2.25, category: 'Tea', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop', stock: 45, discount: 0 }
+  { id: 1, name: 'Espresso', price: 2.50, category: 'Coffee', image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e76?w=200&h=200&fit=crop', stock: 50, minStock: 20, discount: 0.2 },
+  { id: 2, name: 'Cappuccino', price: 3.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop', stock: 30, minStock: 15, discount: 0 },
+  { id: 3, name: 'Croissant', price: 2.25, category: 'Bakery', image: 'https://images.unsplash.com/photo-1555507036-ab794f4ade0a?w=200&h=200&fit=crop', stock: 25, minStock: 10, discount: 0.15 },
+  { id: 4, name: 'Latte', price: 4.00, category: 'Coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', stock: 40, minStock: 20, discount: 0 },
+  { id: 5, name: 'Muffin', price: 3.50, category: 'Bakery', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=200&h=200&fit=crop', stock: 5, minStock: 15, discount: 0.1 },
+  { id: 6, name: 'Americano', price: 2.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=200&h=200&fit=crop', stock: 35, minStock: 25, discount: 0 },
+  { id: 7, name: 'Bagel', price: 2.00, category: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop', stock: 15, minStock: 12, discount: 0.25 },
+  { id: 8, name: 'Green Tea', price: 2.25, category: 'Tea', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop', stock: 45, minStock: 20, discount: 0 },
+  { id: 9, name: 'Black Coffee', price: 2.50, category: 'Coffee', image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e76?w=200&h=200&fit=crop', stock: 8, minStock: 15, discount: 0.2 },
+  { id: 10, name: 'Flat White', price: 3.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=200&h=200&fit=crop', stock: 30, minStock: 20, discount: 0 },
+  { id: 11, name: 'Danish', price: 2.25, category: 'Bakery', image: 'https://images.unsplash.com/photo-1555507036-ab794f4ade0a?w=200&h=200&fit=crop', stock: 0, minStock: 10, discount: 0.15 },
+  { id: 12, name: 'Mocha', price: 4.00, category: 'Coffee', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=200&h=200&fit=crop', stock: 40, minStock: 25, discount: 0 },
+  { id: 13, name: 'Scone', price: 3.50, category: 'Bakery', image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=200&h=200&fit=crop', stock: 20, minStock: 15, discount: 0.1 },
+  { id: 14, name: 'Cold Brew', price: 2.75, category: 'Coffee', image: 'https://images.unsplash.com/photo-1497636577773-f1231844b336?w=200&h=200&fit=crop', stock: 35, minStock: 20, discount: 0 },
+  { id: 15, name: 'Pretzel', price: 2.00, category: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop', stock: 3, minStock: 10, discount: 0.25 },
+  { id: 16, name: 'Chai Tea', price: 2.25, category: 'Tea', image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&h=200&fit=crop', stock: 45, minStock: 25, discount: 0 }
 ];
 
 const CashierView = () => {
@@ -193,7 +193,7 @@ const CashierView = () => {
                 count={pageCount} 
                 page={currentPage} 
                 onChange={handlePageChange}
-                color="secondary"
+                // color="primary"
                 size="small"
               />
             </div>

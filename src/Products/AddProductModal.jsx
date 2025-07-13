@@ -21,6 +21,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
     category: 'Beverages',
     price: '',
     stock: '',
+    minStock: '',
     barcode: '',
     description: ''
   })
@@ -39,6 +40,12 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       return
     }
 
+    // Validate minimum stock
+    if (formData.minStock && parseInt(formData.minStock) > parseInt(formData.stock)) {
+      alert('Minimum stock level cannot be greater than current stock')
+      return
+    }
+
     // Create new product object
     const newProduct = {
       id: Date.now(), // Simple ID generation
@@ -47,6 +54,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       category: formData.category,
       price: `$${parseFloat(formData.price).toFixed(2)}`,
       stock: parseInt(formData.stock),
+      minStock: formData.minStock ? parseInt(formData.minStock) : 0,
       status: 'Active',
       image: getCategoryEmoji(formData.category),
       description: formData.description
@@ -62,6 +70,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       category: 'Beverages',
       price: '',
       stock: '',
+      minStock: '',
       barcode: '',
       description: ''
     })
@@ -153,7 +162,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             </FormControl>
           </Box>
 
-          {/* Price and Stock */}
+          {/* Price and Barcode */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
@@ -188,7 +197,37 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Stock
+                Barcode
+              </Typography>
+              <TextField
+                fullWidth
+                placeholder="Enter barcode"
+                value={formData.barcode}
+                onChange={handleChange('barcode')}
+                variant="outlined"
+                size="small"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f9fafb',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: '#f3f4f6'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#fff',
+                      borderColor: '#000000'
+                    }
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
+
+          {/* Current Stock and Minimum Stock Level */}
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                Current Stock
               </Typography>
               <TextField
                 fullWidth
@@ -216,62 +255,38 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 }}
               />
             </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                Min Stock Level
+              </Typography>
+              <TextField
+                fullWidth
+                type="number"
+                placeholder="0"
+                value={formData.minStock}
+                onChange={handleChange('minStock')}
+                variant="outlined"
+                size="small"
+                inputProps={{ 
+                  min: 0,
+                  style: { fontSize: '0.875rem' }
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f9fafb',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: '#f3f4f6'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#fff'
+                    }
+                  }
+                }}
+                helperText="Alert threshold"
+              />
+            </Grid>
           </Grid>
-
-          {/* Barcode */}
-          <Box>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-              Barcode
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder="Enter barcode"
-              value={formData.barcode}
-              onChange={handleChange('barcode')}
-              variant="outlined"
-              size="small"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#f9fafb',
-                  height: '40px',
-                  '&:hover': {
-                    backgroundColor: '#f3f4f6'
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: '#fff',
-                    borderColor: '#000000'
-                  }
-                }
-              }}
-            />
-          </Box>
-
-          {/* Description */}
-          <Box>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-              Description
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              placeholder="Enter product description (optional)"
-              value={formData.description}
-              onChange={handleChange('description')}
-              variant="outlined"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#f9fafb',
-                  '&:hover': {
-                    backgroundColor: '#f3f4f6'
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: '#fff'
-                  }
-                }
-              }}
-            />
-          </Box>
         </Box>
       </DialogContent>
 
