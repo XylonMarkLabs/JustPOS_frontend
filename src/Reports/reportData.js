@@ -23,6 +23,8 @@ export const inventoryData = {
   lowStockItems: [
     { name: 'Croissant', currentStock: 8, minimumStock: 10, status: 'Low Stock' },
     { name: 'Water Bottle', currentStock: 5, minimumStock: 20, status: 'Low Stock' },
-    { name: 'Muffin - Blueberry', currentStock: 3, minimumStock: 15, status: 'Low Stock' }
+    { name: 'Muffin - Blueberry', currentStock: 3, minimumStock: 15, status: 'Low Stock' },
+    { name: 'Bagel', currentStock: 2, minimumStock: 10, status: 'Critical' },
+    { name: 'Coffee - Espresso', currentStock: 0, minimumStock: 5, status: 'Out of Stock' }
   ]
 }
