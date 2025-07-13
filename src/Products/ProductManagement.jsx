@@ -430,8 +430,17 @@ const ProductManagement = () => {
                       }}>
                         <TableCell sx={{ py: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <Avatar sx={{ width: 32, height: 32, backgroundColor: '#f3f4f6', fontSize: '1rem' }}>
-                              {product.image}
+                            <Avatar 
+                              src={product.image && !product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? product.image : undefined}
+                              sx={{ 
+                                width: 32, 
+                                height: 32, 
+                                backgroundColor: '#f3f4f6', 
+                                fontSize: '1rem',
+                                border: product.image && !product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? '1px solid #e5e7eb' : 'none'
+                              }}
+                            >
+                              {product.image && product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? product.image : product.name.charAt(0).toUpperCase()}
                             </Avatar>
                             <Box>
                               <Typography variant="body2" sx={{ fontWeight: 'medium', lineHeight: 1.2 }}>

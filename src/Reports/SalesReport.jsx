@@ -70,7 +70,7 @@ const SalesReport = ({ data }) => {
       </Grid>
 
       <Card>
-        <CardContent sx={{ p: 3 }}>
+        <CardContent sx={{ px: 3, pb: 0 }}>
           <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
             Top Selling Products
           </Typography>
@@ -91,7 +91,7 @@ const SalesReport = ({ data }) => {
               </TableHead>
               <TableBody>
                 {paginatedProducts.map((product, index) => (
-                  <TableRow key={index} sx={{ 
+                  <TableRow key={index} sx={{
                     '&:hover': { backgroundColor: '#f9fafb' },
                     height: 40
                   }}>
