@@ -4,6 +4,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import AssessmentIcon from '@mui/icons-material/Assessment'
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 const Sidebar = () => {
   const navigate = useNavigate()
@@ -14,7 +15,8 @@ const Sidebar = () => {
     { title: 'Dashboard', icon: <DashboardIcon />, path: '/' },
     { title: 'Products', icon: <Inventory2Icon />, path: '/products' },
     { title: 'Orders', icon: <ShoppingCartIcon />, path: '/orders' },
-    { title: 'Reports', icon: <AssessmentIcon />, path: '/reports' }
+    { title: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+    { title: 'Users', icon: <ManageAccountsIcon />, path: '/user-management' },
   ]
 
   const handleNavigation = (path) => {
