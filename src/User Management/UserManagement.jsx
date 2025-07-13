@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Sidebar from '../Components/Sidebar'
-import AddProductModal from './AddProductModal'
-import EditProductModal from './EditProductModal'
+import AddUserModal from './AddUserModal'
+import EditUserModal from './EditUserModal'
 import ConfirmationDialog from '../Components/ConfirmationDialog'
 import {
   Box,
@@ -26,242 +26,142 @@ import {
   TablePagination
 } from '@mui/material'
 import {
-  Add as AddIcon,
+  GroupAdd as AddIcon,
   Search as SearchIcon,
-  Edit as EditIcon,
-  Block as BlockIcon,
+  EditNote as EditIcon,
   Delete as DeleteIcon,
-  Visibility as ActivateIcon,
-  DisabledVisible as DeactivateIcon
+  PersonOff as DeactivateIcon,
+  PersonAdd as ActivateIcon
 } from '@mui/icons-material'
 
-const ProductManagement = () => {
+const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('All')
+  const [roleFilter, setRoleFilter] = useState('All Roles')
   const [statusFilter, setStatusFilter] = useState('All Status')
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [selectedUser, setSelectedUser] = useState(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
-  const [productToDelete, setProductToDelete] = useState(null)
-  const [productToToggle, setProductToToggle] = useState(null)
+  const [userToDelete, setUserToDelete] = useState(null)
+  const [userToToggle, setUserToToggle] = useState(null)
 
-  // Sample product data - converted to state so we can add new products
-  const [products, setProducts] = useState([
+  // Sample user data
+  const [users, setUsers] = useState([
     {
       id: 1,
-      name: 'Coffee - Americano',
-      code: '123456789123',
-      category: 'Beverages',
-      price: '$3.50',
-      stock: 100,
+      name: 'John Doe',
+      email: 'cashier@justpos.com',
+      username: 'cashier1',
+      role: 'Cashier',
       status: 'Active',
-      image: '☕'
+      created: '1/1/2024',
+      initials: 'JD'
     },
     {
       id: 2,
-      name: 'Sandwich - Club',
-      code: '123456789124',
-      category: 'Food',
-      price: '$8.99',
-      stock: 25,
+      name: 'Jane Smith',
+      email: 'manager@justpos.com',
+      username: 'manager1',
+      role: 'Manager',
       status: 'Active',
-      image: '🥪'
+      created: '1/1/2024',
+      initials: 'JS'
     },
     {
       id: 3,
-      name: 'Muffin - Blueberry',
-      code: '123456789125',
-      category: 'Bakery',
-      price: '$2.99',
-      stock: 15,
+      name: 'Admin User',
+      email: 'admin@justpos.com',
+      username: 'admin1',
+      role: 'Admin',
       status: 'Active',
-      image: '🧁'
+      created: '1/1/2024',
+      initials: 'AU'
     },
     {
       id: 4,
-      name: 'Water Bottle',
-      code: '123456789126',
-      category: 'Beverages',
-      price: '$1.99',
-      stock: 50,
-      status: 'Active',
-      image: '🍺'
+      name: 'Mike Johnson',
+      email: 'cashier2@justpos.com',
+      username: 'cashier2',
+      role: 'Cashier',
+      status: 'Inactive',
+      created: '2/1/2024',
+      initials: 'MJ'
     },
     {
       id: 5,
-      name: 'Croissant',
-      code: '123456789127',
-      category: 'Bakery',
-      price: '$2.49',
-      stock: 8,
+      name: 'Sarah Wilson',
+      email: 'manager2@justpos.com',
+      username: 'manager2',
+      role: 'Manager',
       status: 'Active',
-      image: '🥐'
-    },
-    {
-      id: 6,
-      name: 'Latte',
-      code: '123456789128',
-      category: 'Beverages',
-      price: '$4.25',
-      stock: 100,
-      status: 'Active',
-      image: '☕'
-    },
-    {
-      id: 7,
-      name: 'Caesar Salad',
-      code: '123456789129',
-      category: 'Food',
-      price: '$7.99',
-      stock: 20,
-      status: 'Active',
-      image: '🥗'
-    },
-    {
-      id: 8,
-      name: 'Chocolate Cake',
-      code: '123456789130',
-      category: 'Bakery',
-      price: '$4.99',
-      stock: 12,
-      status: 'Active',
-      image: '🍰'
-    },
-    {
-      id: 9,
-      name: 'Green Tea',
-      code: '123456789131',
-      category: 'Beverages',
-      price: '$2.75',
-      stock: 75,
-      status: 'Active',
-      image: '🍵'
-    },
-    {
-      id: 10,
-      name: 'Pizza Slice',
-      code: '123456789132',
-      category: 'Food',
-      price: '$3.99',
-      stock: 30,
-      status: 'Active',
-      image: '🍕'
-    },
-    {
-      id: 11,
-      name: 'Bagel',
-      code: '123456789133',
-      category: 'Bakery',
-      price: '$1.99',
-      stock: 18,
-      status: 'Active',
-      image: '🥯'
-    },
-    {
-      id: 12,
-      name: 'Smoothie',
-      code: '123456789134',
-      category: 'Beverages',
-      price: '$5.50',
-      stock: 40,
-      status: 'Active',
-      image: '🥤'
-    },
-    {
-      id: 13,
-      name: 'Burger',
-      code: '123456789135',
-      category: 'Food',
-      price: '$9.99',
-      stock: 15,
-      status: 'Inactive',
-      image: '🍔'
-    },
-    {
-      id: 14,
-      name: 'Donut',
-      code: '123456789136',
-      category: 'Bakery',
-      price: '$2.25',
-      stock: 5,
-      status: 'Active',
-      image: '🍩'
-    },
-    {
-      id: 15,
-      name: 'Hot Chocolate',
-      code: '123456789137',
-      category: 'Beverages',
-      price: '$3.75',
-      stock: 60,
-      status: 'Inactive',
-      image: '☕'
+      created: '2/15/2024',
+      initials: 'SW'
     }
   ])
 
-  // Handle adding new product
-  const handleAddProduct = (newProduct) => {
-    setProducts([...products, newProduct])
+  // Handle adding new user
+  const handleAddUser = (newUser) => {
+    setUsers([...users, newUser])
   }
 
-  // Handle editing product
-  const handleEditProduct = (updatedProduct) => {
-    setProducts(products.map(product => 
-      product.id === updatedProduct.id ? updatedProduct : product
+  // Handle editing user
+  const handleEditUser = (updatedUser) => {
+    setUsers(users.map(user => 
+      user.id === updatedUser.id ? updatedUser : user
     ))
   }
 
   // Handle opening edit modal
-  const handleOpenEditModal = (product) => {
-    setSelectedProduct(product)
+  const handleOpenEditModal = (user) => {
+    setSelectedUser(user)
     setEditModalOpen(true)
   }
 
-  // Handle delete product
-  const handleDeleteProduct = (product) => {
-    setProductToDelete(product)
+  // Handle delete user
+  const handleDeleteUser = (user) => {
+    setUserToDelete(user)
     setDeleteDialogOpen(true)
   }
 
-  const confirmDeleteProduct = () => {
-    setProducts(products.filter(product => product.id !== productToDelete.id))
+  const confirmDeleteUser = () => {
+    setUsers(users.filter(user => user.id !== userToDelete.id))
     setDeleteDialogOpen(false)
-    setProductToDelete(null)
+    setUserToDelete(null)
   }
 
-  // Handle toggle product status
-  const handleToggleStatus = (product) => {
-    setProductToToggle(product)
+  // Handle toggle user status
+  const handleToggleStatus = (user) => {
+    setUserToToggle(user)
     setStatusDialogOpen(true)
   }
 
   const confirmToggleStatus = () => {
-    const newStatus = productToToggle.status === 'Active' ? 'Inactive' : 'Active'
-    setProducts(products.map(product => 
-      product.id === productToToggle.id 
-        ? { ...product, status: newStatus }
-        : product
+    const newStatus = userToToggle.status === 'Active' ? 'Inactive' : 'Active'
+    setUsers(users.map(user => 
+      user.id === userToToggle.id 
+        ? { ...user, status: newStatus }
+        : user
     ))
     setStatusDialogOpen(false)
-    setProductToToggle(null)
+    setUserToToggle(null)
   }
 
-  // Filter products based on search term, category, and status
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.code.includes(searchTerm)
-    const matchesCategory = categoryFilter === 'All' || product.category === categoryFilter
-    const matchesStatus = statusFilter === 'All Status' || product.status === statusFilter
+  // Filter users based on search term, role, and status
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.username.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRole = roleFilter === 'All Roles' || user.role === roleFilter
+    const matchesStatus = statusFilter === 'All Status' || user.status === statusFilter
     
-    return matchesSearch && matchesCategory && matchesStatus
+    return matchesSearch && matchesRole && matchesStatus
   })
 
-  // Get current page products
-  const paginatedProducts = filteredProducts.slice(
+  // Get current page users
+  const paginatedUsers = filteredUsers.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   )
@@ -283,8 +183,8 @@ const ProductManagement = () => {
     setPage(0)
   }
 
-  const handleCategoryChange = (e) => {
-    setCategoryFilter(e.target.value)
+  const handleRoleChange = (e) => {
+    setRoleFilter(e.target.value)
     setPage(0)
   }
 
@@ -293,10 +193,13 @@ const ProductManagement = () => {
     setPage(0)
   }
 
-  const getStockColor = (stock) => {
-    if (stock <= 10) return 'warning'
-    if (stock <= 30) return 'info'
-    return 'success'
+  const getRoleColor = (role) => {
+    switch (role) {
+      case 'Admin': return 'error'
+      case 'Manager': return 'primary'
+      case 'Cashier': return 'success'
+      default: return 'default'
+    }
   }
 
   return (
@@ -308,7 +211,7 @@ const ProductManagement = () => {
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
-                Product Management
+                User Management
               </Typography>
               <Button
                 variant="contained"
@@ -323,14 +226,14 @@ const ProductManagement = () => {
                   py: 1
                 }}
               >
-                Add Product
+                Add User
               </Button>
             </Box>
 
             {/* Search and Filters */}
             <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
               <TextField
-                placeholder="Search products..."
+                placeholder="Search users..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 sx={{ flex: 1, minWidth: '300px' }}
@@ -343,16 +246,16 @@ const ProductManagement = () => {
                 }}
               />
               <FormControl sx={{ minWidth: 120 }}>
-                <InputLabel>Category</InputLabel>
+                <InputLabel>Role</InputLabel>
                 <Select
-                  value={categoryFilter}
-                  label="Category"
-                  onChange={handleCategoryChange}
+                  value={roleFilter}
+                  label="Role"
+                  onChange={handleRoleChange}
                 >
-                  <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="Beverages">Beverages</MenuItem>
-                  <MenuItem value="Food">Food</MenuItem>
-                  <MenuItem value="Bakery">Bakery</MenuItem>
+                  <MenuItem value="All Roles">All Roles</MenuItem>
+                  <MenuItem value="Admin">Admin</MenuItem>
+                  <MenuItem value="Manager">Manager</MenuItem>
+                  <MenuItem value="Cashier">Cashier</MenuItem>
                 </Select>
               </FormControl>
               <FormControl sx={{ minWidth: 120 }}>
@@ -369,26 +272,26 @@ const ProductManagement = () => {
               </FormControl>
             </Box>
 
-            {/* Products Table */}
+            {/* Users Table */}
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <TableContainer component={Paper} sx={{ flex: 1, overflow: 'auto' }}>
                 <Table stickyHeader size="small" sx={{ '& .MuiTableCell-root': { borderBottom: '1px solid #f3f4f6' } }}>
                   <TableHead>
                     <TableRow sx={{ height: 48 }}>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
-                        PRODUCT
+                        USER
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
-                        CATEGORY
+                        USERNAME
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
-                        PRICE
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
-                        STOCK
+                        ROLE
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         STATUS
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
+                        CREATED
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         ACTIONS
@@ -396,40 +299,42 @@ const ProductManagement = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {paginatedProducts.map((product) => (
-                      <TableRow key={product.id} sx={{ 
+                    {paginatedUsers.map((user) => (
+                      <TableRow key={user.id} sx={{ 
                         '&:hover': { backgroundColor: '#f9fafb' },
                         height: 60
                       }}>
                         <TableCell sx={{ py: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <Avatar sx={{ width: 32, height: 32, backgroundColor: '#f3f4f6', fontSize: '1rem' }}>
-                              {product.image}
+                            <Avatar sx={{ 
+                              width: 32, 
+                              height: 32, 
+                              backgroundColor: '#3b82f6', 
+                              fontSize: '0.875rem',
+                              fontWeight: 'bold',
+                              color: 'white'
+                            }}>
+                              {user.initials}
                             </Avatar>
                             <Box>
                               <Typography variant="body2" sx={{ fontWeight: 'medium', lineHeight: 1.2 }}>
-                                {product.name}
+                                {user.name}
                               </Typography>
                               <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1 }}>
-                                {product.code}
+                                {user.email}
                               </Typography>
                             </Box>
                           </Box>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            {product.category}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                            {product.price}
+                            {user.username}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Chip
-                            label={product.stock}
-                            color={getStockColor(product.stock)}
+                            label={user.role}
+                            color={getRoleColor(user.role)}
                             variant="outlined"
                             size="small"
                             sx={{ height: 24, fontSize: '0.75rem' }}
@@ -437,30 +342,35 @@ const ProductManagement = () => {
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Chip
-                            label={product.status}
-                            color={product.status === 'Active' ? 'success' : 'error'}
+                            label={user.status}
+                            color={user.status === 'Active' ? 'success' : 'error'}
                             variant="outlined"
                             size="small"
                             sx={{ height: 24, fontSize: '0.75rem' }}
                           />
+                        </TableCell>
+                        <TableCell sx={{ py: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {user.created}
+                          </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Box sx={{ display: 'flex', gap: 0.5 }}>
                             <IconButton 
                               size="small" 
                               sx={{ color: '#2563eb', padding: '4px' }}
-                              onClick={() => handleOpenEditModal(product)}
-                              title="Edit Product"
+                              onClick={() => handleOpenEditModal(user)}
+                              title="Edit User"
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
                             <IconButton 
                               size="small" 
-                              sx={{ color: product.status === 'Active' ? '#f59e0b' : '#10b981', padding: '4px' }}
-                              onClick={() => handleToggleStatus(product)}
-                              title={product.status === 'Active' ? 'Deactivate Product' : 'Activate Product'}
+                              sx={{ color: user.status === 'Active' ? '#f59e0b' : '#10b981', padding: '4px' }}
+                              onClick={() => handleToggleStatus(user)}
+                              title={user.status === 'Active' ? 'Deactivate User' : 'Activate User'}
                             >
-                              {product.status === 'Active' ? (
+                              {user.status === 'Active' ? (
                                 <DeactivateIcon fontSize="small" />
                               ) : (
                                 <ActivateIcon fontSize="small" />
@@ -469,8 +379,8 @@ const ProductManagement = () => {
                             <IconButton 
                               size="small" 
                               sx={{ color: '#ef4444', padding: '4px' }}
-                              onClick={() => handleDeleteProduct(product)}
-                              title="Delete Product"
+                              onClick={() => handleDeleteUser(user)}
+                              title="Delete User"
                             >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
@@ -491,7 +401,7 @@ const ProductManagement = () => {
               }}>
                 <TablePagination
                   component="div"
-                  count={filteredProducts.length}
+                  count={filteredUsers.length}
                   page={page}
                   onPageChange={handleChangePage}
                   rowsPerPage={rowsPerPage}
@@ -520,28 +430,28 @@ const ProductManagement = () => {
           </Box>
         </section>
 
-        {/* Add Product Modal */}
-        <AddProductModal
+        {/* Add User Modal */}
+        <AddUserModal
           open={addModalOpen}
           onClose={() => setAddModalOpen(false)}
-          onAddProduct={handleAddProduct}
+          onAddUser={handleAddUser}
         />
 
-        {/* Edit Product Modal */}
-        <EditProductModal
+        {/* Edit User Modal */}
+        <EditUserModal
           open={editModalOpen}
           onClose={() => setEditModalOpen(false)}
-          onEditProduct={handleEditProduct}
-          product={selectedProduct}
+          onEditUser={handleEditUser}
+          user={selectedUser}
         />
 
         {/* Delete Confirmation Dialog */}
         <ConfirmationDialog
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}
-          onConfirm={confirmDeleteProduct}
-          title="Delete Product"
-          message={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
+          onConfirm={confirmDeleteUser}
+          title="Delete User"
+          message={`Are you sure you want to delete "${userToDelete?.name}"? This action cannot be undone.`}
           confirmText="Delete"
           cancelText="Cancel"
           type="danger"
@@ -552,9 +462,9 @@ const ProductManagement = () => {
           open={statusDialogOpen}
           onClose={() => setStatusDialogOpen(false)}
           onConfirm={confirmToggleStatus}
-          title={`${productToToggle?.status === 'Active' ? 'Deactivate' : 'Activate'} Product`}
-          message={`Are you sure you want to ${productToToggle?.status === 'Active' ? 'deactivate' : 'activate'} "${productToToggle?.name}"?`}
-          confirmText={productToToggle?.status === 'Active' ? 'Deactivate' : 'Activate'}
+          title={`${userToToggle?.status === 'Active' ? 'Deactivate' : 'Activate'} User`}
+          message={`Are you sure you want to ${userToToggle?.status === 'Active' ? 'deactivate' : 'activate'} "${userToToggle?.name}"?`}
+          confirmText={userToToggle?.status === 'Active' ? 'Deactivate' : 'Activate'}
           cancelText="Cancel"
           type="warning"
         />
@@ -562,4 +472,4 @@ const ProductManagement = () => {
   )
 }
 
-export default ProductManagement
+export default UserManagement

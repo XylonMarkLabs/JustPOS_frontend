@@ -8,6 +8,7 @@ import CashierView from './Cashier/CashierView.jsx';
 import Login from './Auth/Login.jsx';
 import ProductManagement from './Products/ProductManagement.jsx';
 import Orders from './Orders/Orders.jsx';
+import UserManagement from './User Management/UserManagement.jsx';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
               <Route path="/products" element={<ProductManagement />} />
               <Route path="/orders" element={<Orders/>} />
               <Route path="/reports" element={<div>Reports Page</div>} />
+              <Route path="/user-management" element={<UserManagement/>} />
             </Routes>
    
       </ThemeProvider>
