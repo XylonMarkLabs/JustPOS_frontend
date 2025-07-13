@@ -5,6 +5,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { useAlert } from '../Components/AlertProvider';
 
 // Sample product data
 const sampleProducts = [
@@ -27,6 +28,8 @@ const sampleProducts = [
 ];
 
 const CashierView = () => {
+  const { showSuccess, showInfo, showWarning } = useAlert()
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [cart, setCart] = useState([]);
@@ -35,6 +38,11 @@ const CashierView = () => {
   const categories = ['All', ...new Set(sampleProducts.map(p => p.category))];
 
   const addToCart = (product) => {
+    if (product.stock <= 0) {
+      showWarning(`${product.name} is out of stock!`, 'Out of Stock')
+      return
+    }
+    
     const existingItem = cart.find(item => item.product.id === product.id);
     if (existingItem) {
       setCart(cart.map(item =>
@@ -42,13 +50,19 @@ const CashierView = () => {
           ? { ...item, quantity: item.quantity + 1 }
           : item
       ));
+      showInfo(`Added another ${product.name} to cart`, 'Item Added')
     } else {
       setCart([...cart, { product, quantity: 1 }]);
+      showSuccess(`${product.name} added to cart!`, 'Item Added')
     }
   };
 
   const removeFromCart = (productId) => {
+    const removedItem = cart.find(item => item.product.id === productId);
     setCart(cart.filter(item => item.product.id !== productId));
+    if (removedItem) {
+      showInfo(`${removedItem.product.name} removed from cart`, 'Item Removed')
+    }
   };
 
   const updateQuantity = (productId, newQuantity) => {
@@ -61,7 +75,10 @@ const CashierView = () => {
   };
 
   const clearCart = () => {
-    setCart([]);
+    if (cart.length > 0) {
+      setCart([]);
+      showInfo('Cart cleared', 'Cart Empty')
+    }
   };
 
   const calculateItemPrice = (item) => {
@@ -73,6 +90,20 @@ const CashierView = () => {
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + calculateItemPrice(item), 0);
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      showWarning('Your cart is empty!', 'Cannot Checkout')
+      return
+    }
+    
+    const total = calculateTotal().toFixed(2)
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+    
+    // Here you would normally integrate with a payment system
+    showSuccess(`Order completed successfully! Total: $${total} for ${itemCount} items`, 'Order Completed')
+    setCart([])
   };
   
   const filteredProducts = sampleProducts.filter(product => {
@@ -255,7 +286,10 @@ const CashierView = () => {
                 <span>Total:</span>
                 <span className="text-green-600">${calculateTotal().toFixed(2)}</span>
               </div>
-              <button className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors">
+              <button 
+                className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+                onClick={handleCheckout}
+              >
                 Proceed to Checkout
               </button>
             </>

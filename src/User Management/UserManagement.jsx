@@ -3,6 +3,7 @@ import Sidebar from '../Components/Sidebar'
 import AddUserModal from './AddUserModal'
 import EditUserModal from './EditUserModal'
 import ConfirmationDialog from '../Components/ConfirmationDialog'
+import { useAlert } from '../Components/AlertProvider'
 import {
   Box,
   Typography,
@@ -35,6 +36,8 @@ import {
 } from '@mui/icons-material'
 
 const UserManagement = () => {
+  const { showSuccess, showInfo } = useAlert()
+  
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('All Roles')
   const [statusFilter, setStatusFilter] = useState('All Status')
@@ -127,9 +130,11 @@ const UserManagement = () => {
   }
 
   const confirmDeleteUser = () => {
+    const userName = userToDelete.name
     setUsers(users.filter(user => user.id !== userToDelete.id))
     setDeleteDialogOpen(false)
     setUserToDelete(null)
+    showSuccess(`User "${userName}" has been deleted successfully!`, 'User Deleted')
   }
 
   // Handle toggle user status
@@ -140,6 +145,7 @@ const UserManagement = () => {
 
   const confirmToggleStatus = () => {
     const newStatus = userToToggle.status === 'Active' ? 'Inactive' : 'Active'
+    const userName = userToToggle.name
     setUsers(users.map(user => 
       user.id === userToToggle.id 
         ? { ...user, status: newStatus }
@@ -147,6 +153,7 @@ const UserManagement = () => {
     ))
     setStatusDialogOpen(false)
     setUserToToggle(null)
+    showInfo(`User "${userName}" status changed to ${newStatus}`, 'Status Updated')
   }
 
   // Filter users based on search term, role, and status

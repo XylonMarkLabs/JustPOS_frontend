@@ -20,8 +20,11 @@ import {
   Visibility,
   VisibilityOff
 } from '@mui/icons-material'
+import { useAlert } from '../Components/AlertProvider'
 
 const AddUserModal = ({ open, onClose, onAddUser }) => {
+  const { showError, showWarning, showSuccess } = useAlert()
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -95,22 +98,22 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
   const handleSubmit = () => {
     // Basic validation
     if (!formData.name || !formData.email || !formData.username || !formData.password || !formData.confirmPassword || !formData.role) {
-      alert('Please fill in all required fields')
+      showError('Please fill in all required fields', 'Missing Information')
       return
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match')
+      showError('Passwords do not match', 'Password Mismatch')
       return
     }
 
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      alert('Please enter a valid email address')
+      showError('Please enter a valid email address', 'Invalid Email')
       return
     }
 
     if (!validatePassword(formData.password).isValid) {
-      alert('Please ensure your password meets all requirements')
+      showError('Please ensure your password meets all requirements', 'Password Requirements Not Met')
       return
     }
 
@@ -127,6 +130,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
     }
     
     onAddUser(newUser)
+    showSuccess(`User "${formData.name}" has been added successfully!`, 'User Added')
     handleClose()
   }
 

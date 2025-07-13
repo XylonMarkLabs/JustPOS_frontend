@@ -3,6 +3,7 @@ import Sidebar from '../Components/Sidebar'
 import AddProductModal from './AddProductModal'
 import EditProductModal from './EditProductModal'
 import ConfirmationDialog from '../Components/ConfirmationDialog'
+import { useAlert } from '../Components/AlertProvider'
 import {
   Box,
   Typography,
@@ -36,6 +37,8 @@ import {
 } from '@mui/icons-material'
 
 const ProductManagement = () => {
+  const { showSuccess, showInfo } = useAlert()
+  
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All Status')
@@ -243,9 +246,11 @@ const ProductManagement = () => {
   }
 
   const confirmDeleteProduct = () => {
+    const productName = productToDelete.name
     setProducts(products.filter(product => product.id !== productToDelete.id))
     setDeleteDialogOpen(false)
     setProductToDelete(null)
+    showSuccess(`Product "${productName}" has been deleted successfully!`, 'Product Deleted')
   }
 
   // Handle toggle product status
@@ -256,6 +261,7 @@ const ProductManagement = () => {
 
   const confirmToggleStatus = () => {
     const newStatus = productToToggle.status === 'Active' ? 'Inactive' : 'Active'
+    const productName = productToToggle.name
     setProducts(products.map(product => 
       product.id === productToToggle.id 
         ? { ...product, status: newStatus }
@@ -263,6 +269,7 @@ const ProductManagement = () => {
     ))
     setStatusDialogOpen(false)
     setProductToToggle(null)
+    showInfo(`Product "${productName}" status changed to ${newStatus}`, 'Status Updated')
   }
 
   // Filter products based on search term, category, and status
