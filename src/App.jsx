@@ -10,16 +10,24 @@ import ProductManagement from './Products/ProductManagement.jsx';
 import Orders from './Orders/Orders.jsx';
 import UserManagement from './User Management/UserManagement.jsx';
 import Reports from './Reports/Reports.jsx';
+import { useEffect, useState } from 'react';
 import AlertProvider from './Components/AlertProvider.jsx';
 
-
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
   return (
     <BrowserRouter>
       <ThemeProvider theme={Theme}>
         <AlertProvider>
-            <Navbar />
+            {isLoggedIn && <Navbar />}
             <Routes>
+              <Route path="/login" element={<Login />} />
               <Route path="/" element={<CashierView />} />
               <Route path="/products" element={<ProductManagement />} />
               <Route path="/orders" element={<Orders />} />

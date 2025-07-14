@@ -25,29 +25,29 @@ const ProductCard = ({ product, onAddToCart }) => {
           </div>
         )}
         <img 
-            src={product.image} 
-            alt={product.name}
-            className="w-full h-24 object-cover"
+            src={product.imageURL} 
+            alt={product.productName}
+            className="w-full h-32 object-cover"
         />
         <div className="px-4 pb-2">
             <div className='flex justify-between items-end'>
-                <h3 className="font-semibold text-lg">{product.name}</h3>
-                <Chip label={product.category} color='warning' variant="outlined" size="small" sx={{ fontSize: '0.60rem'}}/> 
+                <h3 className="font-semibold text-lg">{product.productName}</h3>
+                <Chip label={product.category} color='warning' variant="outlined" size="small" sx={{ fontSize: '0.60rem' }}/> 
             </div>
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     {product.discount > 0 ? (
                         <>
                             <span className="text-xl font-bold text-green-600">
-                                ${(product.price * (1 - product.discount)).toFixed(2)}
+                                ${(product.sellingPrice * (1 - product.discount)).toFixed(2)}
                             </span>
                             <span className="text-sm text-gray-500 line-through">
-                                ${product.price.toFixed(2)}
+                                ${product.sellingPrice.toFixed(2)}
                             </span>
                         </>
                     ) : (
                         <span className="text-xl font-bold text-green-600">
-                            ${product.price.toFixed(2)}
+                            ${product.sellingPrice.toFixed(2)}
                         </span>
                     )}
                 </div>
@@ -57,7 +57,7 @@ const ProductCard = ({ product, onAddToCart }) => {
                     isLowStock ? 'text-orange-600 font-semibold' : 
                     'text-gray-500'
                   }`}>
-                    Stock: {product.stock}
+                    Stock: {product.quantityInStock}
                   </span>
                   {product.minStock && (
                     <div className="text-xs text-gray-400">

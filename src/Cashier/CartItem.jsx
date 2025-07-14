@@ -3,7 +3,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const CartItem = ({ item, itemTotal, onUpdateQuantity, onRemove }) => {
   const hasDiscount = item.product.discount > 0;
-  const originalTotal = item.product.price * item.quantity;
+  const originalTotal = item.product.price * item.product.quantity;
 
   return (
     <div className="flex items-center bg-white p-3 rounded-lg shadow h-24">
@@ -16,7 +16,7 @@ const CartItem = ({ item, itemTotal, onUpdateQuantity, onRemove }) => {
         <div className="flex justify-between items-start">
           <h3 className="font-semibold truncate pr-2">{item.product.name}</h3>
           <IconButton
-            onClick={() => onRemove(item.product.id)}
+            onClick={() => onRemove(item.product.productCode)}
             size="small"
             color="error"
           >
@@ -27,14 +27,14 @@ const CartItem = ({ item, itemTotal, onUpdateQuantity, onRemove }) => {
         <div className="flex justify-between items-center gap-2">
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
-              onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
+              onClick={() => onUpdateQuantity(item.product.productCode, item.product.quantity - 1)}
               className="h-7 w-7 flex items-center justify-center text-lg font-medium hover:bg-gray-200 rounded-lg transition-colors"
             >
               -
             </button>
-            <span className="px-4 font-semibold">{item.quantity}</span>
+            <span className="px-4 font-semibold">{item.product.quantity}</span>
             <button
-              onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
+              onClick={() => onUpdateQuantity(item.product.productCode, item.product.quantity + 1)}
               className="h-7 w-7 flex items-center justify-center text-lg font-medium hover:bg-gray-200 rounded-lg transition-colors"
             >
               +
