@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -6,25 +6,45 @@ import {
   DialogActions,
   TextField,
   Button,
+  Box,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
-  Box,
+  IconButton,
+  InputAdornment,
+  Divider,
   Typography,
   Grid
 } from '@mui/material'
+import {
+  Visibility,
+  VisibilityOff
+} from '@mui/icons-material'
 
-const AddProductModal = ({ open, onClose, onAddProduct }) => {
+const EditUserModal = ({ open, onClose, onEditUser, user }) => {
   const [formData, setFormData] = useState({
     name: '',
-    category: 'Beverages',
-    price: '',
-    stock: '',
-    minStock: '',
-    barcode: '',
-    description: ''
+    email: '',
+    username: '',
+    role: '',
+    newPassword: '',
+    confirmNewPassword: ''
   })
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false)
+
+  useEffect(() => {
+    if (user && open) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        username: user.username || '',
+        role: user.role || '',
+        newPassword: '',
+        confirmNewPassword: ''
+      })
+    }
+  }, [user, open])
 
   const handleChange = (field) => (event) => {
     setFormData({
@@ -35,56 +55,58 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
 
   const handleSubmit = () => {
     // Basic validation
-    if (!formData.name || !formData.price || !formData.stock || !formData.barcode) {
+    if (!formData.name || !formData.email || !formData.username || !formData.role) {
       alert('Please fill in all required fields')
       return
     }
 
-    // Validate minimum stock
-    if (formData.minStock && parseInt(formData.minStock) > parseInt(formData.stock)) {
-      alert('Minimum stock level cannot be greater than current stock')
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      alert('Please enter a valid email address')
       return
     }
 
-    // Create new product object
-    const newProduct = {
-      id: Date.now(), // Simple ID generation
-      name: formData.name,
-      code: formData.barcode,
-      category: formData.category,
-      price: `$${parseFloat(formData.price).toFixed(2)}`,
-      stock: parseInt(formData.stock),
-      minStock: formData.minStock ? parseInt(formData.minStock) : 0,
-      status: 'Active',
-      image: getCategoryEmoji(formData.category),
-      description: formData.description
+    // Password validation (only if new password is provided)
+    if (formData.newPassword) {
+      if (formData.newPassword.length < 6) {
+        alert('Password must be at least 6 characters')
+        return
+      }
+      
+      if (formData.newPassword !== formData.confirmNewPassword) {
+        alert('Passwords do not match')
+        return
+      }
     }
 
-    onAddProduct(newProduct)
+    // Create updated user object
+    const updatedUser = {
+      ...user,
+      name: formData.name,
+      email: formData.email,
+      username: formData.username,
+      role: formData.role,
+      initials: formData.name.split(' ').map(n => n[0]).join('').toUpperCase()
+    }
+    
+    onEditUser(updatedUser)
     handleClose()
   }
 
   const handleClose = () => {
     setFormData({
       name: '',
-      category: 'Beverages',
-      price: '',
-      stock: '',
-      minStock: '',
-      barcode: '',
-      description: ''
+      email: '',
+      username: '',
+      role: '',
+      newPassword: '',
+      confirmNewPassword: ''
     })
+    setShowNewPassword(false)
+    setShowConfirmNewPassword(false)
     onClose()
   }
 
-  const getCategoryEmoji = (category) => {
-    const emojiMap = {
-      'Beverages': '☕',
-      'Food': '🍕',
-      'Bakery': '🧁'
-    }
-    return emojiMap[category] || '📦'
-  }
+  if (!user) return null
 
   return (
     <Dialog 
@@ -95,26 +117,26 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       PaperProps={{
         sx: {
           borderRadius: 2,
-          minHeight: '450px'
+          minHeight: '550px'
         }
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
-          Add New Product
+          Edit User
         </Typography>
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Product Name */}
+          {/* Full Name */}
           <Box>
             <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-              Product Name
+              Full Name
             </Typography>
             <TextField
               fullWidth
-              placeholder="Enter product name"
+              placeholder="Enter full name"
               value={formData.name}
               onChange={handleChange('name')}
               variant="outlined"
@@ -134,17 +156,21 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             />
           </Box>
 
-          {/* Category */}
+          {/* Email */}
           <Box>
             <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-              Category
+              Email Address
             </Typography>
-            <FormControl fullWidth size="small">
-              <Select
-                value={formData.category}
-                onChange={handleChange('category')}
-                variant="outlined"
-                sx={{
+            <TextField
+              fullWidth
+              type="email"
+              placeholder="Enter email"
+              value={formData.email}
+              onChange={handleChange('email')}
+              variant="outlined"
+              size="small"
+              sx={{
+                '& .MuiOutlinedInput-root': {
                   backgroundColor: '#f9fafb',
                   height: '40px',
                   '&:hover': {
@@ -153,34 +179,24 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                   '&.Mui-focused': {
                     backgroundColor: '#fff'
                   }
-                }}
-              >
-                <MenuItem value="Beverages">Beverages</MenuItem>
-                <MenuItem value="Food">Food</MenuItem>
-                <MenuItem value="Bakery">Bakery</MenuItem>
-              </Select>
-            </FormControl>
+                }
+              }}
+            />
           </Box>
 
-          {/* Price and Barcode */}
+          {/* Username and Role */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Price
+                Username
               </Typography>
               <TextField
                 fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.price}
-                onChange={handleChange('price')}
+                placeholder="Enter username"
+                value={formData.username}
+                onChange={handleChange('username')}
                 variant="outlined"
                 size="small"
-                inputProps={{ 
-                  min: 0, 
-                  step: 0.01,
-                  style: { fontSize: '0.875rem' }
-                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#f9fafb',
@@ -197,49 +213,64 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Barcode
+                Role
               </Typography>
-              <TextField
-                fullWidth
-                placeholder="Enter barcode"
-                value={formData.barcode}
-                onChange={handleChange('barcode')}
-                variant="outlined"
-                size="small"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
+              <FormControl fullWidth size="small">
+                <Select
+                  value={formData.role}
+                  onChange={handleChange('role')}
+                  variant="outlined"
+                  sx={{
                     backgroundColor: '#f9fafb',
                     height: '40px',
                     '&:hover': {
                       backgroundColor: '#f3f4f6'
                     },
                     '&.Mui-focused': {
-                      backgroundColor: '#fff',
-                      borderColor: '#000000'
+                      backgroundColor: '#fff'
                     }
-                  }
-                }}
-              />
+                  }}
+                >
+                  <MenuItem value="Cashier">Cashier</MenuItem>
+                  <MenuItem value="Manager">Manager</MenuItem>
+                  <MenuItem value="Admin">Admin</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
 
-          {/* Current Stock and Minimum Stock Level */}
+          <Divider sx={{ my: 1 }} />
+          
+          <Typography variant="body2" sx={{ fontWeight: 'medium', color: '#374151', mb: 1 }}>
+            Change Password (Optional)
+          </Typography>
+
+          {/* New Password and Confirm New Password */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Current Stock
+                New Password
               </Typography>
               <TextField
                 fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.stock}
-                onChange={handleChange('stock')}
+                type={showNewPassword ? 'text' : 'password'}
+                placeholder="Enter new password"
+                value={formData.newPassword}
+                onChange={handleChange('newPassword')}
                 variant="outlined"
                 size="small"
-                inputProps={{ 
-                  min: 0,
-                  style: { fontSize: '0.875rem' }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        edge="end"
+                        size="small"
+                      >
+                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -257,19 +288,28 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Min Stock Level
+                Confirm New Password
               </Typography>
               <TextField
                 fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.minStock}
-                onChange={handleChange('minStock')}
+                type={showConfirmNewPassword ? 'text' : 'password'}
+                placeholder="Confirm new password"
+                value={formData.confirmNewPassword}
+                onChange={handleChange('confirmNewPassword')}
                 variant="outlined"
                 size="small"
-                inputProps={{ 
-                  min: 0,
-                  style: { fontSize: '0.875rem' }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                        edge="end"
+                        size="small"
+                      >
+                        {showConfirmNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -283,7 +323,6 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                     }
                   }
                 }}
-                helperText="Alert threshold"
               />
             </Grid>
           </Grid>
@@ -321,11 +360,11 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             py: 1
           }}
         >
-          Add Product
+          Update User
         </Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default AddProductModal
+export default EditUserModal

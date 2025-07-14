@@ -20,6 +20,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
     category: 'Beverages',
     price: '',
     stock: '',
+    minStock: '',
     barcode: '',
     description: '',
     status: 'Active'
@@ -33,6 +34,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
         category: product.category || 'Beverages',
         price: product.price ? product.price.replace('$', '') : '',
         stock: product.stock || '',
+        minStock: product.minStock || '',
         barcode: product.code || '',
         description: product.description || '',
         status: product.status || 'Active'
@@ -54,6 +56,12 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       return
     }
 
+    // Validate minimum stock
+    if (formData.minStock && parseInt(formData.minStock) > parseInt(formData.stock)) {
+      alert('Minimum stock level cannot be greater than current stock')
+      return
+    }
+
     // Create updated product object
     const updatedProduct = {
       ...product,
@@ -62,6 +70,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       category: formData.category,
       price: `$${parseFloat(formData.price).toFixed(2)}`,
       stock: parseInt(formData.stock),
+      minStock: formData.minStock ? parseInt(formData.minStock) : 0,
       status: formData.status,
       image: getCategoryEmoji(formData.category),
       description: formData.description
@@ -160,9 +169,9 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
             </FormControl>
           </Box>
 
-          {/* Price, Stock and Status */}
+          {/* Price and Barcode */}
           <Grid container spacing={2}>
-            <Grid item xs={4}>
+            <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
                 Price
               </Typography>
@@ -193,9 +202,38 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                 }}
               />
             </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                Barcode
+              </Typography>
+              <TextField
+                fullWidth
+                placeholder="Enter barcode"
+                value={formData.barcode}
+                onChange={handleChange('barcode')}
+                variant="outlined"
+                size="small"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f9fafb',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: '#f3f4f6'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#fff'
+                    }
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
+
+          {/* Current Stock, Min Stock Level, and Status */}
+          <Grid container spacing={2}>
             <Grid item xs={4}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Stock
+                Current Stock
               </Typography>
               <TextField
                 fullWidth
@@ -225,6 +263,37 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
             </Grid>
             <Grid item xs={4}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                Min Stock Level
+              </Typography>
+              <TextField
+                fullWidth
+                type="number"
+                placeholder="0"
+                value={formData.minStock}
+                onChange={handleChange('minStock')}
+                variant="outlined"
+                size="small"
+                inputProps={{ 
+                  min: 0,
+                  style: { fontSize: '0.875rem' }
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f9fafb',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: '#f3f4f6'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#fff'
+                    }
+                  }
+                }}
+                helperText="Alert threshold"
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
                 Status
               </Typography>
               <FormControl fullWidth size="small">
@@ -249,60 +318,6 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
               </FormControl>
             </Grid>
           </Grid>
-
-          {/* Barcode */}
-          <Box>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-              Barcode
-            </Typography>
-            <TextField
-              fullWidth
-              placeholder="Enter barcode"
-              value={formData.barcode}
-              onChange={handleChange('barcode')}
-              variant="outlined"
-              size="small"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#f9fafb',
-                  height: '40px',
-                  '&:hover': {
-                    backgroundColor: '#f3f4f6'
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: '#fff'
-                  }
-                }
-              }}
-            />
-          </Box>
-
-          {/* Description */}
-          <Box>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-              Description
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              placeholder="Enter product description (optional)"
-              value={formData.description}
-              onChange={handleChange('description')}
-              variant="outlined"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#f9fafb',
-                  '&:hover': {
-                    backgroundColor: '#f3f4f6'
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: '#fff'
-                  }
-                }
-              }}
-            />
-          </Box>
         </Box>
       </DialogContent>
 

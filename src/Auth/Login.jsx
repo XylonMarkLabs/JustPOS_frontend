@@ -35,7 +35,8 @@ const Login = () => {
         console.log('Login response:', response.data);
         if (response.data.success) {
             localStorage.setItem('token', response.data.token);
-            navigate('/cashier');
+            localStorage.setItem('username', response.data.username);
+            navigate('/');
         } else {
             alert('Login failed: ' + response.data.message);
         }
