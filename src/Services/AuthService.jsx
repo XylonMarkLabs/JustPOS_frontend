@@ -7,7 +7,7 @@ const AuthService = {
 
     getConfirm: () => {
         let answer = jwtDecode(AuthService.getToken());
-        console.log(answer);
+        return answer;
     }
 }
 

@@ -1,30 +1,30 @@
-import { useEffect, useState } from 'react';
-import ProductCard from './ProductCard';
-import CartItem from './CartItem';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { useEffect, useState } from "react";
+import ProductCard from "./ProductCard";
+import CartItem from "./CartItem";
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
+import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import ApiCall from "../Services/ApiCall";
-import Sidebar from '../Components/Sidebar';
-import AuthService from '../Services/AuthService';
-import { useAlert } from '../Components/AlertProvider';
+import Sidebar from "../Components/Sidebar";
+import AuthService from "../Services/AuthService";
+import { useAlert } from "../Components/AlertProvider";
 
 const CashierView = () => {
   const { showSuccess, showInfo, showWarning } = useAlert();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
-  const categories = ['All', ...new Set(products.map(p => p.category))];
+  const categories = ["All", ...new Set(products.map((p) => p.category))];
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 2x5 grid
 
-  const username = localStorage.getItem('username');
+  const username = localStorage.getItem("username");
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    AuthService.getConfirm();
     getProducts();
     getCart();
   }, []);
@@ -60,40 +60,45 @@ const CashierView = () => {
       return;
     }
 
-    if (product.stock <= 0) {
-      showWarning(`${product.name} is out of stock!`, 'Out of Stock')
-      return
-    }
-    
-    const existingItem = cart.find(item => item.product.id === product.id);
-    if (existingItem) {
-      setCart(cart.map(item =>
-        item.product.id === product.id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
-      showInfo(`Added another ${product.name} to cart`, 'Item Added')
-    } else {
-      setCart([...cart, { product, quantity: 1 }]);
-      showSuccess(`${product.name} added to cart!`, 'Item Added')
+    if (product.quantityInStock <= 0) {
+      showWarning(`${product.productName} is out of stock!`, "Out of Stock");
+      return;
     }
 
     await ApiCall.cart.addToCart(username, product.productCode);
-    getCart();
 
+    const existingItem = cart.find(
+      (item) => item.product.productCode === product.productCode
+    );
+    if (existingItem) {
+      setCart(
+        cart.map((item) =>
+          item.product.productCode === product.productCode
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+      showInfo(`Added another ${product.productName} to cart`, "Item Added");
+    } else {
+      setCart([...cart, { product, quantity: 1 }]);
+      showSuccess(`${product.productName} added to cart!`, "Item Added");
+    }
+
+    getCart();
   };
 
   // Remove a product from the cart
   const removeFromCart = async (productId) => {
     let productCode = productId;
     await ApiCall.cart.removeFromCart(username, productCode);
-    setCart(cart.filter((item) => item.product.productCode !== productCode));
     // getCart();
 
-    const removedItem = cart.find(item => item.product.id === productId);
-    setCart(cart.filter(item => item.product.id !== productId));
+    const removedItem = cart.find(
+      (item) => item.product.productCode === productCode
+    );
+    setCart(cart.filter((item) => item.product.productCode !== productCode));
     if (removedItem) {
-      showInfo(`${removedItem.product.name} removed from cart`, 'Item Removed')
+      showInfo(`${removedItem.product.name} removed from cart`, "Item Removed");
     }
   };
 
@@ -104,24 +109,14 @@ const CashierView = () => {
     await ApiCall.cart.updateCartQuantity(username, productCode, newQuantity);
 
     getCart();
-
-    // setCart(
-    //   cart.map((item) => {
-    //     console.log("Updating item: ", item);
-    //     return item.product.productCode === productId
-    //       ? { ...item, quantity: newQuantity }
-    //       : item;
-    //   })
-    // );
   };
-
 
   // Clear the cart
   const clearCart = async () => {
     if (cart.length > 0) {
       await ApiCall.cart.clearCart(username);
       setCart([]);
-      showInfo('Cart cleared', 'Cart Empty')
+      showInfo("Cart cleared", "Cart Empty");
     }
   };
 
@@ -138,21 +133,27 @@ const CashierView = () => {
 
   const handleCheckout = () => {
     if (cart.length === 0) {
-      showWarning('Your cart is empty!', 'Cannot Checkout')
-      return
+      showWarning("Your cart is empty!", "Cannot Checkout");
+      return;
     }
-    
-    const total = calculateTotal().toFixed(2)
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0)
-    
+
+    const total = calculateTotal().toFixed(2);
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
     // Here you would normally integrate with a payment system
-    showSuccess(`Order completed successfully! Total: $${total} for ${itemCount} items`, 'Order Completed')
-    setCart([])
+    showSuccess(
+      `Order completed successfully! Total: $${total} for ${itemCount} items`,
+      "Order Completed"
+    );
+    setCart([]);
   };
-  
-  const filteredProducts = sampleProducts.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.productName
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "All" || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -166,38 +167,38 @@ const CashierView = () => {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
-  
+
   return (
     <div className="lg:flex gap-5 h-screen p-5 ">
-      <Sidebar/>
+      {user.role === "admin" && <Sidebar />}
       <section className="space-y-5 border-primary  lg:w-[75%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg">
         {/*search bar and fltters  */}
         <div className="flex-none mb-6">
           <div className="flex gap-4 items-center">
-          {/* search bar */}
-          <div className="relative flex-grow">
-            <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-              <ManageSearchIcon color="primary" fontSize='large' />
+            {/* search bar */}
+            <div className="relative flex-grow">
+              <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <ManageSearchIcon color="primary" fontSize="large" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
-            />
-          </div>
 
-          {/* filters */}
-          <div className="w-64">
+            {/* filters */}
+            <div className="w-64">
               <FormControl fullWidth variant="filled" size="small">
-                <InputLabel 
+                <InputLabel
                   id="category-select-label"
                   sx={{
-                    color: 'black',
-                    '&.Mui-focused': {
-                      color: 'black',
-                    }
+                    color: "black",
+                    "&.Mui-focused": {
+                      color: "black",
+                    },
                   }}
                 >
                   Filter by Category
@@ -208,36 +209,36 @@ const CashierView = () => {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="rounded-lg bg-gray-50"
                   sx={{
-                    color: 'black',
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '16px',
-                      color: 'black',
+                    color: "black",
+                    "& .MuiFilledInput-input": {
+                      paddingTop: "16px",
+                      color: "black",
                     },
-                    '&:hover': {
-                      backgroundColor: 'rgb(243 244 246)',
+                    "&:hover": {
+                      backgroundColor: "rgb(243 244 246)",
                     },
-                    '&.Mui-focused': {
-                      backgroundColor: 'rgb(243 244 246)',
+                    "&.Mui-focused": {
+                      backgroundColor: "rgb(243 244 246)",
                     },
-                    '&:before': {
-                      borderColor: 'black',
+                    "&:before": {
+                      borderColor: "black",
                     },
-                    '&:after': {
-                      borderColor: 'black',
+                    "&:after": {
+                      borderColor: "black",
                     },
                   }}
                 >
-                  {categories.map(category => (
-                    <MenuItem 
-                      key={category} 
+                  {categories.map((category) => (
+                    <MenuItem
+                      key={category}
                       value={category}
                       sx={{
-                        '&:hover': {
-                          backgroundColor: 'rgb(243 244 246)',
+                        "&:hover": {
+                          backgroundColor: "rgb(243 244 246)",
                         },
-                        '&.Mui-selected': {
-                          backgroundColor: 'rgb(229 231 235)',
-                        }
+                        "&.Mui-selected": {
+                          backgroundColor: "rgb(229 231 235)",
+                        },
                       }}
                     >
                       {category}
@@ -248,7 +249,6 @@ const CashierView = () => {
             </div>
           </div>
         </div>
-
 
         {/* product catelog */}
         <div className="flex-1 flex flex-col min-h-0">
@@ -265,9 +265,9 @@ const CashierView = () => {
           </div>
           {pageCount > 1 && (
             <div className="flex-none pt-2 flex justify-end border-t mt-4">
-              <Pagination 
-                count={pageCount} 
-                page={currentPage} 
+              <Pagination
+                count={pageCount}
+                page={currentPage}
                 onChange={handlePageChange}
                 // color="primary"
                 size="small"
@@ -324,19 +324,15 @@ const CashierView = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {cart.map(
-                (item) => (
-                  (
-                    <CartItem
-                      key={item.product.productCode}
-                      item={item}
-                      itemTotal={calculateItemPrice(item)}
-                      onUpdateQuantity={updateQuantity}
-                      onRemove={removeFromCart}
-                    />
-                  )
-                )
-              )}
+              {cart.map((item) => (
+                <CartItem
+                  key={item.product.productCode}
+                  item={item}
+                  itemTotal={calculateItemPrice(item)}
+                  onUpdateQuantity={updateQuantity}
+                  onRemove={removeFromCart}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -350,7 +346,7 @@ const CashierView = () => {
                   ${calculateTotal().toFixed(2)}
                 </span>
               </div>
-              <button 
+              <button
                 className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
                 onClick={handleCheckout}
               >

@@ -1,6 +1,24 @@
 import axios from "axios";
+import AuthService from "./AuthService";
 
 const ApiCall = {
+    user: {
+        getUserData: async () => {
+            const id = AuthService.getConfirm().id
+            try {
+                const response = await axios.post('http://localhost:4000/api/user/getUserById', { id });
+                console.log("Resonse: ", response)
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data.user;
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                throw error;
+            }
+        }
+    },
+
     product: {
         getAll: async () => {
             try {

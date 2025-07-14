@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   FormControl,
@@ -8,17 +8,18 @@ import {
   IconButton,
   Button,
   Typography,
-} from '@mui/material';
-import logo from '../assets/JUSTPOS_transparent.png';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import logo from "../assets/JUSTPOS_transparent.png";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import ApiCall from "../Services/ApiCall";
 
 const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
   const navigate = useNavigate();
 
@@ -26,25 +27,45 @@ const Login = () => {
   const handleMouseDownPassword = (event) => event.preventDefault();
   const handleMouseUpPassword = (event) => event.preventDefault();
 
-  const handleLogin = () => {
-    axios.post('http://localhost:4000/api/user/login', {
-        username: email,
-        password: password  
-    })
-    .then(response => {
-        console.log('Login response:', response.data);
-        if (response.data.success) {
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('username', response.data.username);
-            navigate('/');
-        } else {
-            alert('Login failed: ' + response.data.message);
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/user/login",
+        {
+          username: email,
+          password: password,
         }
-    })
-    .catch( err => {
-        console.error('Login error:', err);
-        alert('Login failed: ' + (err.response ? err.response.data.message : 'Network error'));
-    })
+      );
+
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        await getuserData();
+        navigate("/");
+      } else {
+        alert("Login failed: " + response.data.message);
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert(
+        "Login failed: " +
+          (err.response ? err.response.data.message : "Network error")
+      );
+    }
+  };
+
+  const getuserData = async () => {
+    try {
+      const userData = await ApiCall.user.getUserData();
+      if (userData) {
+        const user = {
+          username: userData.username,
+          role: userData.role,
+        };
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
 
   return (
@@ -59,131 +80,143 @@ const Login = () => {
 
         {/* Right Form Panel */}
         <div className="bg-primary flex flex-col justify-center items-center rounded-r-lg px-5 w-96">
-            <Box sx={{ textAlign: 'center', mb: 3 }}>
-                <Typography
-                    variant="h4"
-                    sx={{
-                    color: '#FBF8EF',
-                    fontWeight: 'bold',
-                    letterSpacing: 1,
-                    }}
-                >
-                    Welcome to <span style={{ color: '#FBF8EF',fontFamily:'fantasy' }}>JUSTPOS</span>
-                </Typography>
-                <Typography
-                    variant="subtitle1"
-                    sx={{
-                    color: '#FBF8EF',
-                    mt: 1,
-                    fontStyle: 'italic',
-                    fontSize: '0.95rem',
-                    }}
-                >
-                    Powering your sales with speed and simplicity
-                </Typography>
-                <Box
-                    sx={{
-                    height: '2px',
-                    width: '60px',
-                    backgroundColor: '#FBF8EF',
-                    margin: '8px auto 0',
-                    borderRadius: '4px',
-                    }}
-                />
-                </Box>
-            
-
-            {/* Email Input */}
-            <FormControl sx={{ m: 1, width: '40ch' }} variant="outlined" color="primary">
-                <InputLabel
-                htmlFor="outlined-adornment-email"
-                sx={{
-                    color: '#FBF8EF',
-                    '&.Mui-focused': {
-                    color: '#FBF8EF',
-                    },
-                }}
-                >
-                Email
-                </InputLabel>
-                <OutlinedInput
-                id="outlined-adornment-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                label="Email"
-                sx={{
-                    input: { color: '#FBF8EF' },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#FBF8EF',
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#FBF8EF',
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#FBF8EF',
-                    },
-                }}
-                />
-            </FormControl>
-
-            {/* Password Input */}
-            <FormControl sx={{ m: 1, width: '40ch' }} variant="outlined" color="primary">
-                <InputLabel
-                htmlFor="outlined-adornment-password"
-                sx={{
-                    color: '#FBF8EF',
-                    '&.Mui-focused': {
-                    color: '#FBF8EF',
-                    },
-                }}
-                >
-                Password
-                </InputLabel>
-                <OutlinedInput
-                id="outlined-adornment-password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                endAdornment={
-                    <InputAdornment position="end">
-                    <IconButton
-                        aria-label={showPassword ? 'hide password' : 'show password'}
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        onMouseUp={handleMouseUpPassword}
-                        edge="end"
-                        color="primary"
-                    >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                    </InputAdornment>
-                }
-                label="Password"
-                sx={{
-                    input: { color: '#FBF8EF' },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#FBF8EF',
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#FBF8EF',
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#FBF8EF',
-                    },
-                }}
-                />
-            </FormControl>
-
-            {/* Login Button */}
-            <Button
-                variant="contained"
-                color="primary"
-                sx={{ mt: 2, width: '44ch',py:2 }}
-                onClick={handleLogin}
+          <Box sx={{ textAlign: "center", mb: 3 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                color: "#FBF8EF",
+                fontWeight: "bold",
+                letterSpacing: 1,
+              }}
             >
-                Login
-            </Button>
+              Welcome to{" "}
+              <span style={{ color: "#FBF8EF", fontFamily: "fantasy" }}>
+                JUSTPOS
+              </span>
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: "#FBF8EF",
+                mt: 1,
+                fontStyle: "italic",
+                fontSize: "0.95rem",
+              }}
+            >
+              Powering your sales with speed and simplicity
+            </Typography>
+            <Box
+              sx={{
+                height: "2px",
+                width: "60px",
+                backgroundColor: "#FBF8EF",
+                margin: "8px auto 0",
+                borderRadius: "4px",
+              }}
+            />
+          </Box>
+
+          {/* Email Input */}
+          <FormControl
+            sx={{ m: 1, width: "40ch" }}
+            variant="outlined"
+            color="primary"
+          >
+            <InputLabel
+              htmlFor="outlined-adornment-email"
+              sx={{
+                color: "#FBF8EF",
+                "&.Mui-focused": {
+                  color: "#FBF8EF",
+                },
+              }}
+            >
+              Email
+            </InputLabel>
+            <OutlinedInput
+              id="outlined-adornment-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              label="Email"
+              sx={{
+                input: { color: "#FBF8EF" },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#FBF8EF",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#FBF8EF",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#FBF8EF",
+                },
+              }}
+            />
+          </FormControl>
+
+          {/* Password Input */}
+          <FormControl
+            sx={{ m: 1, width: "40ch" }}
+            variant="outlined"
+            color="primary"
+          >
+            <InputLabel
+              htmlFor="outlined-adornment-password"
+              sx={{
+                color: "#FBF8EF",
+                "&.Mui-focused": {
+                  color: "#FBF8EF",
+                },
+              }}
+            >
+              Password
+            </InputLabel>
+            <OutlinedInput
+              id="outlined-adornment-password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={
+                      showPassword ? "hide password" : "show password"
+                    }
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    onMouseUp={handleMouseUpPassword}
+                    edge="end"
+                    color="primary"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label="Password"
+              sx={{
+                input: { color: "#FBF8EF" },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#FBF8EF",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#FBF8EF",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#FBF8EF",
+                },
+              }}
+            />
+          </FormControl>
+
+          {/* Login Button */}
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2, width: "44ch", py: 2 }}
+            onClick={handleLogin}
+          >
+            Login
+          </Button>
         </div>
       </div>
     </div>
