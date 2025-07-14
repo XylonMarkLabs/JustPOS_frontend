@@ -3,6 +3,7 @@ import Sidebar from '../Components/Sidebar'
 import AddProductModal from './AddProductModal'
 import EditProductModal from './EditProductModal'
 import ConfirmationDialog from '../Components/ConfirmationDialog'
+import { useAlert } from '../Components/AlertProvider'
 import {
   Box,
   Typography,
@@ -36,6 +37,8 @@ import {
 } from '@mui/icons-material'
 
 const ProductManagement = () => {
+  const { showSuccess, showInfo } = useAlert()
+  
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All Status')
@@ -243,9 +246,11 @@ const ProductManagement = () => {
   }
 
   const confirmDeleteProduct = () => {
+    const productName = productToDelete.name
     setProducts(products.filter(product => product.id !== productToDelete.id))
     setDeleteDialogOpen(false)
     setProductToDelete(null)
+    showSuccess(`Product "${productName}" has been deleted successfully!`, 'Product Deleted')
   }
 
   // Handle toggle product status
@@ -256,6 +261,7 @@ const ProductManagement = () => {
 
   const confirmToggleStatus = () => {
     const newStatus = productToToggle.status === 'Active' ? 'Inactive' : 'Active'
+    const productName = productToToggle.name
     setProducts(products.map(product => 
       product.id === productToToggle.id 
         ? { ...product, status: newStatus }
@@ -263,6 +269,7 @@ const ProductManagement = () => {
     ))
     setStatusDialogOpen(false)
     setProductToToggle(null)
+    showInfo(`Product "${productName}" status changed to ${newStatus}`, 'Status Updated')
   }
 
   // Filter products based on search term, category, and status
@@ -430,8 +437,17 @@ const ProductManagement = () => {
                       }}>
                         <TableCell sx={{ py: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                            <Avatar sx={{ width: 32, height: 32, backgroundColor: '#f3f4f6', fontSize: '1rem' }}>
-                              {product.image}
+                            <Avatar 
+                              src={product.image && !product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? product.image : undefined}
+                              sx={{ 
+                                width: 32, 
+                                height: 32, 
+                                backgroundColor: '#f3f4f6', 
+                                fontSize: '1rem',
+                                border: product.image && !product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? '1px solid #e5e7eb' : 'none'
+                              }}
+                            >
+                              {product.image && product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? product.image : product.name.charAt(0).toUpperCase()}
                             </Avatar>
                             <Box>
                               <Typography variant="body2" sx={{ fontWeight: 'medium', lineHeight: 1.2 }}>
@@ -459,7 +475,22 @@ const ProductManagement = () => {
                             color={getStockColor(product.stock, product.minStock)}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: getStockColor(product.stock, product.minStock) === 'success' ? '#f0fdf4' :
+                                             getStockColor(product.stock, product.minStock) === 'warning' ? '#fffbeb' :
+                                             getStockColor(product.stock, product.minStock) === 'info' ? '#f0f9ff' :
+                                             getStockColor(product.stock, product.minStock) === 'error' ? '#fef2f2' : '#f9fafb',
+                              borderColor: getStockColor(product.stock, product.minStock) === 'success' ? '#dcfce7' :
+                                          getStockColor(product.stock, product.minStock) === 'warning' ? '#fef3c7' :
+                                          getStockColor(product.stock, product.minStock) === 'info' ? '#dbeafe' :
+                                          getStockColor(product.stock, product.minStock) === 'error' ? '#fecaca' : '#e5e7eb',
+                              color: getStockColor(product.stock, product.minStock) === 'success' ? '#059669' :
+                                    getStockColor(product.stock, product.minStock) === 'warning' ? '#d97706' :
+                                    getStockColor(product.stock, product.minStock) === 'info' ? '#2563eb' :
+                                    getStockColor(product.stock, product.minStock) === 'error' ? '#dc2626' : '#6b7280'
+                            }}
                           />
                           {isLowStock(product.stock, product.minStock) && (
                             <Typography variant="caption" color="warning.main" sx={{ display: 'block', fontSize: '0.65rem' }}>
@@ -483,7 +514,13 @@ const ProductManagement = () => {
                             color={product.status === 'Active' ? 'success' : 'error'}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: product.status === 'Active' ? '#f0fdf4' : '#fef2f2',
+                              borderColor: product.status === 'Active' ? '#dcfce7' : '#fecaca',
+                              color: product.status === 'Active' ? '#059669' : '#dc2626'
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>

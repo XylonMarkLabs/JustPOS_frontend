@@ -11,7 +11,7 @@ import Orders from './Orders/Orders.jsx';
 import UserManagement from './User Management/UserManagement.jsx';
 import Reports from './Reports/Reports.jsx';
 import { useEffect, useState } from 'react';
-
+import AlertProvider from './Components/AlertProvider.jsx';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -24,6 +24,7 @@ function App() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={Theme}>
+        <AlertProvider>
             {isLoggedIn && <Navbar />}
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -33,7 +34,7 @@ function App() {
               <Route path="/reports" element={<Reports />} />
               <Route path="/user-management" element={<UserManagement />} />
             </Routes>
-   
+        </AlertProvider>
       </ThemeProvider>
     </BrowserRouter>
   )

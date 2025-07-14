@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -13,14 +13,18 @@ import {
   IconButton,
   InputAdornment,
   Typography,
-  Grid
+  Grid,
+  Alert
 } from '@mui/material'
 import {
   Visibility,
   VisibilityOff
 } from '@mui/icons-material'
+import { useAlert } from '../Components/AlertProvider'
 
 const AddUserModal = ({ open, onClose, onAddUser }) => {
+  const { showError, showWarning, showSuccess } = useAlert()
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,6 +32,10 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
     password: '',
     confirmPassword: '',
     role: 'Cashier'
+  })
+  const [errors, setErrors] = useState({
+    password: '',
+    confirmPassword: ''
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -39,25 +47,73 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
     })
   }
 
+  const validatePassword = (password) => {
+    const validations = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    const messages = [];
+    if (!validations.length) messages.push('At least 8 characters');
+    if (!validations.uppercase) messages.push('One uppercase letter');
+    if (!validations.lowercase) messages.push('One lowercase letter');
+    if (!validations.number) messages.push('One number');
+    if (!validations.special) messages.push('One special character');
+
+    return {
+      isValid: Object.values(validations).every(Boolean),
+      message: messages.join(', ')
+    };
+  };
+
+  useEffect(() => {
+    const validateForm = () => {
+      const newErrors = {
+        password: '',
+        confirmPassword: ''
+      };
+
+      // Validate password
+      if (formData.password) {
+        const validation = validatePassword(formData.password);
+        if (!validation.isValid) {
+          newErrors.password = `Password must contain: ${validation.message}`;
+        }
+      }
+
+      // Validate password confirmation
+      if (formData.confirmPassword && formData.confirmPassword !== formData.password) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
+
+      setErrors(newErrors);
+    };
+
+    validateForm();
+  }, [formData.password, formData.confirmPassword]);
+
   const handleSubmit = () => {
     // Basic validation
     if (!formData.name || !formData.email || !formData.username || !formData.password || !formData.confirmPassword || !formData.role) {
-      alert('Please fill in all required fields')
+      showError('Please fill in all required fields', 'Missing Information')
       return
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match')
+      showError('Passwords do not match', 'Password Mismatch')
       return
     }
 
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      alert('Please enter a valid email address')
+      showError('Please enter a valid email address', 'Invalid Email')
       return
     }
 
-    if (formData.password.length < 6) {
-      alert('Password must be at least 6 characters')
+    if (!validatePassword(formData.password).isValid) {
+      showError('Please ensure your password meets all requirements', 'Password Requirements Not Met')
       return
     }
 
@@ -74,6 +130,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
     }
     
     onAddUser(newUser)
+    showSuccess(`User "${formData.name}" has been added successfully!`, 'User Added')
     handleClose()
   }
 
@@ -85,6 +142,10 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
       password: '',
       confirmPassword: '',
       role: 'Cashier'
+    })
+    setErrors({
+      password: '',
+      confirmPassword: ''
     })
     setShowPassword(false)
     setShowConfirmPassword(false)
@@ -223,86 +284,105 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
           </Grid>
 
           {/* Password and Confirm Password */}
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Password
-              </Typography>
-              <TextField
-                fullWidth
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter password"
-                value={formData.password}
-                onChange={handleChange('password')}
-                variant="outlined"
-                size="small"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                        size="small"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: '#f9fafb',
-                    height: '40px',
-                    '&:hover': {
-                      backgroundColor: '#f3f4f6'
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: '#fff'
-                    }
+          <Box>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+              Password
+            </Typography>
+            <TextField
+              fullWidth
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Enter password"
+              value={formData.password}
+              onChange={handleChange('password')}
+              variant="outlined"
+              size="small"
+              error={!!errors.password}
+              helperText={errors.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      size="small"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: '#f9fafb',
+                  height: '40px',
+                  '&:hover': {
+                    backgroundColor: '#f3f4f6'
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: '#fff'
                   }
-                }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Confirm Password
-              </Typography>
-              <TextField
-                fullWidth
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Confirm password"
-                value={formData.confirmPassword}
-                onChange={handleChange('confirmPassword')}
-                variant="outlined"
-                size="small"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        edge="end"
-                        size="small"
-                      >
-                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: '#f9fafb',
-                    height: '40px',
-                    '&:hover': {
-                      backgroundColor: '#f3f4f6'
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: '#fff'
-                    }
+                }
+              }}
+            />
+          </Box>
+
+          <Box>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+              Confirm Password
+            </Typography>
+            <TextField
+              fullWidth
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm password"
+              value={formData.confirmPassword}
+              onChange={handleChange('confirmPassword')}
+              variant="outlined"
+              size="small"
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      edge="end"
+                      size="small"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: '#f9fafb',
+                  height: '40px',
+                  '&:hover': {
+                    backgroundColor: '#f3f4f6'
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: '#fff'
                   }
-                }}
-              />
-            </Grid>
-          </Grid>
+                }
+              }}
+            />
+          </Box>
+
+          {/* Password Requirements Alert */}
+          {formData.password && !validatePassword(formData.password).isValid && (
+            <Alert severity="info" sx={{ mt: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                Password Requirements:
+              </Typography>
+              <Typography variant="body2" component="div">
+                • At least 8 characters<br />
+                • One uppercase letter<br />
+                • One lowercase letter<br />
+                • One number<br />
+                • One special character (!@#$%^&*(),.?":{}|&lt;&gt;)
+              </Typography>
+            </Alert>
+          )}
         </Box>
       </DialogContent>
 

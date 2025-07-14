@@ -1,9 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Box,
+  IconButton,
+  InputAdornment,
+  Typography,
+  Alert
+} from '@mui/material';
+import {
+  Visibility,
+  VisibilityOff
+} from '@mui/icons-material';
+import { useAlert } from './AlertProvider';
 
 const ChangePasswordModal = ({ open, onClose, logo }) => {
+    const { showSuccess, showError } = useAlert()
+    
     const [passwordForm, setPasswordForm] = useState({
         oldPassword: '',
         newPassword: '',
@@ -27,11 +44,10 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
         }));
     };
 
-    const handlePasswordChange = (event) => {
-        const { name, value } = event.target;
+    const handlePasswordChange = (field) => (event) => {
         setPasswordForm(prev => ({
             ...prev,
-            [name]: value
+            [field]: event.target.value
         }));
     };
 
@@ -113,10 +129,12 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
 
     const handleSubmitPasswordChange = () => {
         if (!isFormValid()) {
+            showError('Please fix the form errors before submitting', 'Invalid Form')
             return;
         }
         // TODO: Add API call to change password here
         console.log('Password change submitted:', passwordForm);
+        showSuccess('Password changed successfully!', 'Password Updated')
         handleClose();
     };
 
@@ -127,125 +145,215 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
             maxWidth="sm"
             fullWidth
             PaperProps={{
-                className: 'rounded-lg shadow-xl max-w-[400px]'
+                sx: {
+                    borderRadius: 2,
+                    minHeight: '400px'
+                }
             }}
         >
-            <div className="p-8 bg-secondary flex flex-col items-center">
-                <img 
-                    src={logo} 
-                    alt="JUSTPOS Logo" 
-                    className="h-[60px] mb-6" 
-                />
-                
-                <h2 className="text-primary text-2xl font-semibold mb-8">
+            <DialogTitle sx={{ pb: 1, pt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {logo && (
+                    <Box sx={{ mb: 2 }}>
+                        <img 
+                            src={logo} 
+                            alt="JUSTPOS Logo" 
+                            style={{ height: '60px', objectFit: 'contain' }}
+                        />
+                    </Box>
+                )}
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
                     Change Password
-                </h2>
+                </Typography>
+            </DialogTitle>
 
-                <div className="w-full">
-                    <div className="flex flex-col space-y-6">
-                        <div className="space-y-1">
-                            <div className="relative">
-                                <input
-                                    type={showPassword.oldPassword ? 'text' : 'password'}
-                                    name="oldPassword"
-                                    value={passwordForm.oldPassword}
-                                    onChange={handlePasswordChange}
-                                    placeholder="Current Password"
-                                    className={`w-full px-4 py-2 bg-[#FBF8EF] border rounded-md focus:outline-none ${
-                                        errors.oldPassword 
-                                            ? 'border-red-500 focus:border-red-500' 
-                                            : 'border-gray-700 focus:border-primary'
-                                    }`}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => handleClickShowPassword('oldPassword')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                >
-                                    {showPassword.oldPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                </button>
-                            </div>
-                            {errors.oldPassword && (
-                                <p className="text-sm text-red-500">{errors.oldPassword}</p>
-                            )}
-                        </div>
-                        
-                        <div className="space-y-1">
-                            <div className="relative">
-                                <input
-                                    type={showPassword.newPassword ? 'text' : 'password'}
-                                    name="newPassword"
-                                    value={passwordForm.newPassword}
-                                    onChange={handlePasswordChange}
-                                    placeholder="New Password"
-                                    className={`w-full px-4 py-2 bg-[#FBF8EF] border rounded-md focus:outline-none ${
-                                        errors.newPassword 
-                                            ? 'border-red-500 focus:border-red-500' 
-                                            : 'border-gray-700 focus:border-primary'
-                                    }`}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => handleClickShowPassword('newPassword')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                >
-                                    {showPassword.newPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                </button>
-                            </div>
-                            {errors.newPassword && (
-                                <p className="text-sm text-red-500">{errors.newPassword}</p>
-                            )}
-                        </div>
-                        
-                        <div className="space-y-1">
-                            <div className="relative">
-                                <input
-                                    type={showPassword.confirmPassword ? 'text' : 'password'}
-                                    name="confirmPassword"
-                                    value={passwordForm.confirmPassword}
-                                    onChange={handlePasswordChange}
-                                    placeholder="Confirm New Password"
-                                    className={`w-full px-4 py-2 bg-[#FBF8EF] border rounded-md focus:outline-none ${
-                                        errors.confirmPassword 
-                                            ? 'border-red-500 focus:border-red-500' 
-                                            : 'border-gray-700 focus:border-primary'
-                                    }`}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => handleClickShowPassword('confirmPassword')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                >
-                                    {showPassword.confirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                </button>
-                            </div>
-                            {errors.confirmPassword && (
-                                <p className="text-sm text-red-500">{errors.confirmPassword}</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
+            <DialogContent sx={{ pt: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {/* Current Password */}
+                    <Box>
+                        <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                            Current Password
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            type={showPassword.oldPassword ? 'text' : 'password'}
+                            placeholder="Enter current password"
+                            value={passwordForm.oldPassword}
+                            onChange={handlePasswordChange('oldPassword')}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.oldPassword}
+                            helperText={errors.oldPassword}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => handleClickShowPassword('oldPassword')}
+                                            edge="end"
+                                            size="small"
+                                        >
+                                            {showPassword.oldPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: '#f9fafb',
+                                    height: '40px',
+                                    '&:hover': {
+                                        backgroundColor: '#f3f4f6'
+                                    },
+                                    '&.Mui-focused': {
+                                        backgroundColor: '#fff'
+                                    }
+                                }
+                            }}
+                        />
+                    </Box>
 
-                <div className="mt-8 w-full flex justify-between space-x-4">
-                    <button
-                        onClick={handleClose}
-                        className="min-w-[100px] py-2 px-4 rounded-md border-primary border text-primary hover:bg-primary hover:text-secondary transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSubmitPasswordChange}
-                        className={`min-w-[140px] py-2 px-6 rounded-md transition-all ${
-                            isFormValid()
-                                ? 'bg-primary text-secondary hover:brightness-90'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                        disabled={!isFormValid()}
-                    >
-                        Update Password
-                    </button>
-                </div>
-            </div>
+                    {/* New Password */}
+                    <Box>
+                        <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                            New Password
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            type={showPassword.newPassword ? 'text' : 'password'}
+                            placeholder="Enter new password"
+                            value={passwordForm.newPassword}
+                            onChange={handlePasswordChange('newPassword')}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.newPassword}
+                            helperText={errors.newPassword}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => handleClickShowPassword('newPassword')}
+                                            edge="end"
+                                            size="small"
+                                        >
+                                            {showPassword.newPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: '#f9fafb',
+                                    height: '40px',
+                                    '&:hover': {
+                                        backgroundColor: '#f3f4f6'
+                                    },
+                                    '&.Mui-focused': {
+                                        backgroundColor: '#fff'
+                                    }
+                                }
+                            }}
+                        />
+                    </Box>
+
+                    {/* Confirm New Password */}
+                    <Box>
+                        <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                            Confirm New Password
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            type={showPassword.confirmPassword ? 'text' : 'password'}
+                            placeholder="Confirm new password"
+                            value={passwordForm.confirmPassword}
+                            onChange={handlePasswordChange('confirmPassword')}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.confirmPassword}
+                            helperText={errors.confirmPassword}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => handleClickShowPassword('confirmPassword')}
+                                            edge="end"
+                                            size="small"
+                                        >
+                                            {showPassword.confirmPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: '#f9fafb',
+                                    height: '40px',
+                                    '&:hover': {
+                                        backgroundColor: '#f3f4f6'
+                                    },
+                                    '&.Mui-focused': {
+                                        backgroundColor: '#fff'
+                                    }
+                                }
+                            }}
+                        />
+                    </Box>
+
+                    {/* Password Requirements Alert */}
+                    {passwordForm.newPassword && !validatePassword(passwordForm.newPassword).isValid && (
+                        <Alert severity="info" sx={{ mt: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                                Password Requirements:
+                            </Typography>
+                            <Typography variant="body2" component="div">
+                                • At least 8 characters<br />
+                                • One uppercase letter<br />
+                                • One lowercase letter<br />
+                                • One number<br />
+                                • One special character (!@#$%^&*(),.?":{}|&lt;&gt;)
+                            </Typography>
+                        </Alert>
+                    )}
+                </Box>
+            </DialogContent>
+
+            <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+                <Button
+                    onClick={handleClose}
+                    variant="outlined"
+                    sx={{
+                        color: '#6b7280',
+                        borderColor: '#d1d5db',
+                        '&:hover': {
+                            borderColor: '#9ca3af',
+                            backgroundColor: '#f9fafb'
+                        },
+                        textTransform: 'none',
+                        fontWeight: 'medium',
+                        px: 3,
+                        py: 1
+                    }}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    onClick={handleSubmitPasswordChange}
+                    variant="contained"
+                    disabled={!isFormValid()}
+                    sx={{
+                        backgroundColor: '#b0a892',
+                        '&:hover': { backgroundColor: '#e0dac5' },
+                        '&:disabled': {
+                            backgroundColor: '#d1d5db',
+                            color: '#9ca3af'
+                        },
+                        textTransform: 'none',
+                        fontWeight: 'bold',
+                        px: 3,
+                        py: 1
+                    }}
+                >
+                    Update Password
+                </Button>
+            </DialogActions>
         </Dialog>
     );
 };

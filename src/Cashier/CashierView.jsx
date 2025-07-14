@@ -8,10 +8,13 @@ import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, 
 import ApiCall from "../Services/ApiCall";
 import Sidebar from '../Components/Sidebar';
 import AuthService from '../Services/AuthService';
+import { useAlert } from '../Components/AlertProvider';
 
 const CashierView = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const { showSuccess, showInfo, showWarning } = useAlert();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const categories = ['All', ...new Set(products.map(p => p.category))];
@@ -57,19 +60,26 @@ const CashierView = () => {
       return;
     }
 
+    if (product.stock <= 0) {
+      showWarning(`${product.name} is out of stock!`, 'Out of Stock')
+      return
+    }
+    
+    const existingItem = cart.find(item => item.product.id === product.id);
+    if (existingItem) {
+      setCart(cart.map(item =>
+        item.product.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+      showInfo(`Added another ${product.name} to cart`, 'Item Added')
+    } else {
+      setCart([...cart, { product, quantity: 1 }]);
+      showSuccess(`${product.name} added to cart!`, 'Item Added')
+    }
+
     await ApiCall.cart.addToCart(username, product.productCode);
     getCart();
-
-    // const existingItem = cart.find(item => item.product.id === product.id);
-    // if (existingItem) {
-    //   setCart(cart.map(item =>
-    //     item.product.id === product.id
-    //       ? { ...item, quantity: item.quantity + 1 }
-    //       : item
-    //   ));
-    // } else {
-    //   setCart([...cart, { product, quantity: 1 }]);
-    // }
 
   };
 
@@ -79,6 +89,12 @@ const CashierView = () => {
     await ApiCall.cart.removeFromCart(username, productCode);
     setCart(cart.filter((item) => item.product.productCode !== productCode));
     // getCart();
+
+    const removedItem = cart.find(item => item.product.id === productId);
+    setCart(cart.filter(item => item.product.id !== productId));
+    if (removedItem) {
+      showInfo(`${removedItem.product.name} removed from cart`, 'Item Removed')
+    }
   };
 
   // Update the quantity of a product in the cart
@@ -99,10 +115,14 @@ const CashierView = () => {
     // );
   };
 
+
   // Clear the cart
   const clearCart = async () => {
-    await ApiCall.cart.clearCart(username);
-    setCart([]);
+    if (cart.length > 0) {
+      await ApiCall.cart.clearCart(username);
+      setCart([]);
+      showInfo('Cart cleared', 'Cart Empty')
+    }
   };
 
   const calculateItemPrice = (item) => {
@@ -116,12 +136,23 @@ const CashierView = () => {
     return cart.reduce((total, item) => total + calculateItemPrice(item), 0);
   };
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.productName
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || product.category === selectedCategory;
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      showWarning('Your cart is empty!', 'Cannot Checkout')
+      return
+    }
+    
+    const total = calculateTotal().toFixed(2)
+    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+    
+    // Here you would normally integrate with a payment system
+    showSuccess(`Order completed successfully! Total: $${total} for ${itemCount} items`, 'Order Completed')
+    setCart([])
+  };
+  
+  const filteredProducts = sampleProducts.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -319,7 +350,10 @@ const CashierView = () => {
                   ${calculateTotal().toFixed(2)}
                 </span>
               </div>
-              <button className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors">
+              <button 
+                className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+                onClick={handleCheckout}
+              >
                 Proceed to Checkout
               </button>
             </>

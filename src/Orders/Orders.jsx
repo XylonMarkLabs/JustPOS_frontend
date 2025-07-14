@@ -294,7 +294,22 @@ const Orders = () => {
                             color={getStatusColor(order.status)}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: getStatusColor(order.status) === 'success' ? '#f0f9ff' :
+                                             getStatusColor(order.status) === 'warning' ? '#fffbeb' :
+                                             getStatusColor(order.status) === 'info' ? '#f0f9ff' :
+                                             getStatusColor(order.status) === 'error' ? '#fef2f2' : '#f9fafb',
+                              borderColor: getStatusColor(order.status) === 'success' ? '#dcfce7' :
+                                          getStatusColor(order.status) === 'warning' ? '#fef3c7' :
+                                          getStatusColor(order.status) === 'info' ? '#dbeafe' :
+                                          getStatusColor(order.status) === 'error' ? '#fecaca' : '#e5e7eb',
+                              color: getStatusColor(order.status) === 'success' ? '#059669' :
+                                    getStatusColor(order.status) === 'warning' ? '#d97706' :
+                                    getStatusColor(order.status) === 'info' ? '#2563eb' :
+                                    getStatusColor(order.status) === 'error' ? '#dc2626' : '#6b7280'
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>

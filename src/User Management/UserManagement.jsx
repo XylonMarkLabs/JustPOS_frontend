@@ -3,6 +3,7 @@ import Sidebar from '../Components/Sidebar'
 import AddUserModal from './AddUserModal'
 import EditUserModal from './EditUserModal'
 import ConfirmationDialog from '../Components/ConfirmationDialog'
+import { useAlert } from '../Components/AlertProvider'
 import {
   Box,
   Typography,
@@ -35,6 +36,8 @@ import {
 } from '@mui/icons-material'
 
 const UserManagement = () => {
+  const { showSuccess, showInfo } = useAlert()
+  
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('All Roles')
   const [statusFilter, setStatusFilter] = useState('All Status')
@@ -127,9 +130,11 @@ const UserManagement = () => {
   }
 
   const confirmDeleteUser = () => {
+    const userName = userToDelete.name
     setUsers(users.filter(user => user.id !== userToDelete.id))
     setDeleteDialogOpen(false)
     setUserToDelete(null)
+    showSuccess(`User "${userName}" has been deleted successfully!`, 'User Deleted')
   }
 
   // Handle toggle user status
@@ -140,6 +145,7 @@ const UserManagement = () => {
 
   const confirmToggleStatus = () => {
     const newStatus = userToToggle.status === 'Active' ? 'Inactive' : 'Active'
+    const userName = userToToggle.name
     setUsers(users.map(user => 
       user.id === userToToggle.id 
         ? { ...user, status: newStatus }
@@ -147,6 +153,7 @@ const UserManagement = () => {
     ))
     setStatusDialogOpen(false)
     setUserToToggle(null)
+    showInfo(`User "${userName}" status changed to ${newStatus}`, 'Status Updated')
   }
 
   // Filter users based on search term, role, and status
@@ -337,7 +344,19 @@ const UserManagement = () => {
                             color={getRoleColor(user.role)}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: getRoleColor(user.role) === 'error' ? '#fef2f2' :
+                                             getRoleColor(user.role) === 'primary' ? '#eff6ff' :
+                                             getRoleColor(user.role) === 'success' ? '#f0fdf4' : '#f9fafb',
+                              borderColor: getRoleColor(user.role) === 'error' ? '#fecaca' :
+                                          getRoleColor(user.role) === 'primary' ? '#dbeafe' :
+                                          getRoleColor(user.role) === 'success' ? '#dcfce7' : '#e5e7eb',
+                              color: getRoleColor(user.role) === 'error' ? '#dc2626' :
+                                    getRoleColor(user.role) === 'primary' ? '#2563eb' :
+                                    getRoleColor(user.role) === 'success' ? '#059669' : '#6b7280'
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
@@ -346,7 +365,13 @@ const UserManagement = () => {
                             color={user.status === 'Active' ? 'success' : 'error'}
                             variant="outlined"
                             size="small"
-                            sx={{ height: 24, fontSize: '0.75rem' }}
+                            sx={{ 
+                              height: 24, 
+                              fontSize: '0.75rem',
+                              backgroundColor: user.status === 'Active' ? '#f0fdf4' : '#fef2f2',
+                              borderColor: user.status === 'Active' ? '#dcfce7' : '#fecaca',
+                              color: user.status === 'Active' ? '#059669' : '#dc2626'
+                            }}
                           />
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
