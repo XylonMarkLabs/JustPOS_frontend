@@ -1,12 +1,14 @@
 import axios from "axios";
 import AuthService from "./AuthService";
 
+const baseURL = 'http://localhost:4000/api'
+
 const ApiCall = {
     user: {
         getUserData: async () => {
             const id = AuthService.getConfirm().id
             try {
-                const response = await axios.post('http://localhost:4000/api/user/getUserById', { id });
+                const response = await axios.post(`${baseURL}/user/getUserById`, { id });
                 console.log("Resonse: ", response)
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
@@ -22,7 +24,7 @@ const ApiCall = {
     product: {
         getAll: async () => {
             try {
-                const response = await axios.get('http://localhost:4000/api/product/get-all');
+                const response = await axios.get(`${baseURL}/product/get-all`);
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -31,13 +33,79 @@ const ApiCall = {
                 console.error('Error fetching products:', error);
                 throw error;
             }
+        },
+
+        addProduct: async (product) => {
+            try {
+                const response = await axios.post(`${baseURL}/product/add`, {
+                    productCode: product.productCode,
+                    productName: product.productName,
+                    sellingPrice: product.sellingPrice,
+                    category: product.category,
+                    quantityInStock: product.quantityInStock,
+                    minStock: product.minStock
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error adding product:', error);
+                throw error;
+            }
+        },
+
+        updateStatus: async (productCode, status) => {
+            try {
+                const response = await axios.post(`${baseURL}/product/update-status`, { productCode, status });
+                if (!response.data.success) {
+                    throw new Error('Network reponse was not ok')
+                }
+                return true;
+            } catch (error) {
+                console.error('Error updating product status: ', error);
+                throw error;
+            }
+        },
+
+        deleteProduct: async (productCode) => {
+            try {
+                const response = await axios.post(`${baseURL}/product/delete`, { productCode });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                throw error;
+            }
+        },
+
+        editProduct: async (product) => {
+            try {
+                const response = await axios.put(`${baseURL}/product/edit`, {
+                    productCode: product.productCode,
+                    productName: product.productName,
+                    sellingPrice: product.sellingPrice,
+                    category: product.category,
+                    quantityInStock: product.quantityInStock,
+                    minStock: product.minStock
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error editing product:', error);
+                throw error;
+            }
         }
     },
 
     cart: {
         getCart: async (username) => {
             try {
-                const response = await axios.get(`http://localhost:4000/api/cart/get/${username}`);
+                const response = await axios.get(`${baseURL}/cart/get/${username}`);
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -49,7 +117,7 @@ const ApiCall = {
         },
         clearCart: async (username) => {
             try {
-                const response = await axios.put(`http://localhost:4000/api/cart/clear/${username}`);
+                const response = await axios.put(`${baseURL}/cart/clear/${username}`);
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -61,7 +129,7 @@ const ApiCall = {
         },
         addToCart: async (username, productCode) => {
             try {
-                const response = await axios.post('http://localhost:4000/api/cart/add', { username, productCode });
+                const response = await axios.post(`${baseURL}/cart/add`, { username, productCode });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -73,7 +141,7 @@ const ApiCall = {
         },
         removeFromCart: async (username, productCode) => {
             try {
-                const response = await axios.post("http://localhost:4000/api/cart/remove", { username, productCode });
+                const response = await axios.post(`${baseURL}/cart/remove`, { username, productCode });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -85,7 +153,7 @@ const ApiCall = {
         },
         updateCartQuantity: async (username, productCode, quantity) => {
             try {
-                const response = await axios.put("http://localhost:4000/api/cart/update-quantity", { username, productCode, quantity });
+                const response = await axios.put(`${baseURL}/cart/update-quantity`, { username, productCode, quantity });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
