@@ -31,11 +31,10 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
   const [formData, setFormData] = useState({
     name: '',
     category: 'Beverages',
-    price: '',
-    stock: '',
-    minStock: '',
+    price: 0,
+    stock: 0,
+    minStock: 0,
     barcode: '',
-    description: '',
     image: null,
     imagePreview: null
   })
@@ -100,16 +99,13 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
 
     // Create new product object
     const newProduct = {
-      id: Date.now(), // Simple ID generation
-      name: formData.name,
-      code: formData.barcode,
+      productName: formData.name,
+      productCode: formData.barcode,
       category: formData.category,
-      price: `$${parseFloat(formData.price).toFixed(2)}`,
-      stock: parseInt(formData.stock),
+      sellingPrice: `${parseFloat(formData.price).toFixed(2)}`,
+      quantityInStock: parseInt(formData.stock),
       minStock: formData.minStock ? parseInt(formData.minStock) : 0,
-      status: 'Active',
       image: formData.imagePreview || getCategoryEmoji(formData.category),
-      description: formData.description
     }
 
     onAddProduct(newProduct)
@@ -125,7 +121,6 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       stock: '',
       minStock: '',
       barcode: '',
-      description: '',
       image: null,
       imagePreview: null
     })

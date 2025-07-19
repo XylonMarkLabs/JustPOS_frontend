@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Sidebar from '../Components/Sidebar'
 import AddProductModal from './AddProductModal'
 import EditProductModal from './EditProductModal'
@@ -35,6 +35,7 @@ import {
   Visibility as ActivateIcon,
   DisabledVisible as DeactivateIcon
 } from '@mui/icons-material'
+import ApiCall from '../Services/ApiCall'
 
 const ProductManagement = () => {
   const { showSuccess, showInfo } = useAlert()
@@ -51,186 +52,44 @@ const ProductManagement = () => {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
   const [productToDelete, setProductToDelete] = useState(null)
   const [productToToggle, setProductToToggle] = useState(null)
+  const [products, setProducts] = useState([]);
 
-  // Sample product data - converted to state so we can add new products
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: 'Coffee - Americano',
-      code: '123456789123',
-      category: 'Beverages',
-      price: '$3.50',
-      stock: 100,
-      minStock: 20,
-      status: 'Active',
-      image: '☕'
-    },
-    {
-      id: 2,
-      name: 'Sandwich - Club',
-      code: '123456789124',
-      category: 'Food',
-      price: '$8.99',
-      stock: 25,
-      minStock: 10,
-      status: 'Active',
-      image: '🥪'
-    },
-    {
-      id: 3,
-      name: 'Muffin - Blueberry',
-      code: '123456789125',
-      category: 'Bakery',
-      price: '$2.99',
-      stock: 15,
-      minStock: 15,
-      status: 'Active',
-      image: '🧁'
-    },
-    {
-      id: 4,
-      name: 'Water Bottle',
-      code: '123456789126',
-      category: 'Beverages',
-      price: '$1.99',
-      stock: 50,
-      minStock: 20,
-      status: 'Active',
-      image: '🍺'
-    },
-    {
-      id: 5,
-      name: 'Croissant',
-      code: '123456789127',
-      category: 'Bakery',
-      price: '$2.49',
-      stock: 8,
-      minStock: 10,
-      status: 'Active',
-      image: '🥐'
-    },
-    {
-      id: 6,
-      name: 'Latte',
-      code: '123456789128',
-      category: 'Beverages',
-      price: '$4.25',
-      stock: 100,
-      minStock: 25,
-      status: 'Active',
-      image: '☕'
-    },
-    {
-      id: 7,
-      name: 'Caesar Salad',
-      code: '123456789129',
-      category: 'Food',
-      price: '$7.99',
-      stock: 20,
-      minStock: 15,
-      status: 'Active',
-      image: '🥗'
-    },
-    {
-      id: 8,
-      name: 'Chocolate Cake',
-      code: '123456789130',
-      category: 'Bakery',
-      price: '$4.99',
-      stock: 12,
-      minStock: 10,
-      status: 'Active',
-      image: '🍰'
-    },
-    {
-      id: 9,
-      name: 'Green Tea',
-      code: '123456789131',
-      category: 'Beverages',
-      price: '$2.75',
-      stock: 75,
-      minStock: 30,
-      status: 'Active',
-      image: '🍵'
-    },
-    {
-      id: 10,
-      name: 'Pizza Slice',
-      code: '123456789132',
-      category: 'Food',
-      price: '$3.99',
-      stock: 30,
-      minStock: 15,
-      status: 'Active',
-      image: '🍕'
-    },
-    {
-      id: 11,
-      name: 'Bagel',
-      code: '123456789133',
-      category: 'Bakery',
-      price: '$1.99',
-      stock: 18,
-      minStock: 12,
-      status: 'Active',
-      image: '🥯'
-    },
-    {
-      id: 12,
-      name: 'Smoothie',
-      code: '123456789134',
-      category: 'Beverages',
-      price: '$5.50',
-      stock: 40,
-      minStock: 20,
-      status: 'Active',
-      image: '🥤'
-    },
-    {
-      id: 13,
-      name: 'Burger',
-      code: '123456789135',
-      category: 'Food',
-      price: '$9.99',
-      stock: 15,
-      minStock: 10,
-      status: 'Inactive',
-      image: '🍔'
-    },
-    {
-      id: 14,
-      name: 'Donut',
-      code: '123456789136',
-      category: 'Bakery',
-      price: '$2.25',
-      stock: 5,
-      minStock: 15,
-      status: 'Active',
-      image: '🍩'
-    },
-    {
-      id: 15,
-      name: 'Hot Chocolate',
-      code: '123456789137',
-      category: 'Beverages',
-      price: '$3.75',
-      stock: 60,
-      minStock: 25,
-      status: 'Inactive',
-      image: '☕'
-    }
-  ])
+  useEffect(() => {
+    getProducts();
+  }, []);
+  
+  // Fetch all products from the API
+  const getProducts = async () => {
+  try {
+    const products = await ApiCall.product.getAll();
+    setProducts(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
+};
 
   // Handle adding new product
-  const handleAddProduct = (newProduct) => {
-    setProducts([...products, newProduct])
+  const handleAddProduct = async (newProduct) => {
+  const response = await ApiCall.product.addProduct(newProduct);
+  if (response) {
+    getProducts();
+    setAddModalOpen(false);
+    showSuccess(`Product "${response.product.productName}" has been added successfully!`, 'Product Added');
+  } else {
+    showInfo('Failed to add product. Please try again.', 'Error');
   }
+}
 
   // Handle editing product
-  const handleEditProduct = (updatedProduct) => {
-    setProducts(products.map(product => 
-      product.id === updatedProduct.id ? updatedProduct : product
-    ))
+  const handleEditProduct = async (updatedProduct) => {
+    const response = await ApiCall.product.editProduct(updatedProduct);
+    if (response) {
+      getProducts();
+      setEditModalOpen(false);
+      showSuccess(`Product "${updatedProduct.productName}" has been updated successfully!`, 'Product Updated');
+    } else {
+      showInfo('Failed to update product. Please try again.', 'Error');
+    }
   }
 
   // Handle opening edit modal
@@ -245,12 +104,21 @@ const ProductManagement = () => {
     setDeleteDialogOpen(true)
   }
 
-  const confirmDeleteProduct = () => {
+  const confirmDeleteProduct = async () => {
+    const productCode = productToDelete.productCode
     const productName = productToDelete.name
-    setProducts(products.filter(product => product.id !== productToDelete.id))
-    setDeleteDialogOpen(false)
-    setProductToDelete(null)
-    showSuccess(`Product "${productName}" has been deleted successfully!`, 'Product Deleted')
+    
+    const response = await ApiCall.product.deleteProduct(productCode);
+
+    if (response) {
+      getProducts();
+      setDeleteDialogOpen(false)
+      setProductToDelete(null)
+      showSuccess(`Product "${productName}" has been deleted successfully!`, 'Product Deleted')
+    } else{
+      showInfo('Failed to delete product. Please try again.', 'Error');
+      setDeleteDialogOpen(false)
+    }
   }
 
   // Handle toggle product status
@@ -259,23 +127,27 @@ const ProductManagement = () => {
     setStatusDialogOpen(true)
   }
 
-  const confirmToggleStatus = () => {
-    const newStatus = productToToggle.status === 'Active' ? 'Inactive' : 'Active'
-    const productName = productToToggle.name
-    setProducts(products.map(product => 
-      product.id === productToToggle.id 
-        ? { ...product, status: newStatus }
-        : product
-    ))
-    setStatusDialogOpen(false)
-    setProductToToggle(null)
-    showInfo(`Product "${productName}" status changed to ${newStatus}`, 'Status Updated')
+  const confirmToggleStatus = async () => {
+    const newStatus = productToToggle.status === 1 ? 0 : 1
+    const productCode = productToToggle.productCode
+    const productName = productToToggle.productName;
+    
+    const response = await ApiCall.product.updateStatus(productCode, newStatus);
+
+    if (response) {
+      getProducts();
+      setStatusDialogOpen(false);
+      setProductToToggle(null)
+      showInfo(`Product "${productName}" status changed to ${newStatus === 1 ? 'Active': 'Deactive'}`, 'Status Updated')
+    } else {
+      showInfo('Failed to update product status. Please try again.', 'Error');
+    }
   }
 
   // Filter products based on search term, category, and status
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.code.includes(searchTerm)
+    const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.productCode.includes(searchTerm)
     const matchesCategory = categoryFilter === 'All' || product.category === categoryFilter
     const matchesStatus = statusFilter === 'All Status' || product.status === statusFilter
     
@@ -315,19 +187,19 @@ const ProductManagement = () => {
     setPage(0)
   }
 
-  const getStockColor = (stock, minStock = 0) => {
-    if (stock <= 0) return 'error' // Out of stock
-    if (stock <= minStock) return 'warning' // Below minimum stock
-    if (stock <= minStock * 1.5) return 'info' // Low stock warning
+  const getStockColor = (quantityInStock, minStock = 0) => {
+    if (quantityInStock <= 0) return 'error' // Out of stock
+    if (quantityInStock <= minStock) return 'warning' // Below minimum stock
+    if (quantityInStock <= minStock * 1.5) return 'info' // Low stock warning
     return 'success' // Good stock level
   }
 
-  const isLowStock = (stock, minStock = 0) => {
-    return stock <= minStock && stock > 0
+  const isLowStock = (quantityInStock, minStock = 0) => {
+    return quantityInStock <= minStock && quantityInStock > 0
   }
 
-  const isOutOfStock = (stock) => {
-    return stock <= 0
+  const isOutOfStock = (quantityInStock) => {
+    return quantityInStock <= 0
   }
 
   return (
@@ -394,8 +266,8 @@ const ProductManagement = () => {
                   onChange={handleStatusChange}
                 >
                   <MenuItem value="All Status">All Status</MenuItem>
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
+                  <MenuItem value={1}>Active</MenuItem>
+                  <MenuItem value={0}>Inactive</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -431,7 +303,7 @@ const ProductManagement = () => {
                   </TableHead>
                   <TableBody>
                     {paginatedProducts.map((product) => (
-                      <TableRow key={product.id} sx={{ 
+                      <TableRow key={product.productCode} sx={{ 
                         '&:hover': { backgroundColor: '#f9fafb' },
                         height: 60
                       }}>
@@ -447,11 +319,11 @@ const ProductManagement = () => {
                                 border: product.image && !product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? '1px solid #e5e7eb' : 'none'
                               }}
                             >
-                              {product.image && product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? product.image : product.name.charAt(0).toUpperCase()}
+                              {product.image && product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? product.image : product.productName.charAt(0).toUpperCase()}
                             </Avatar>
                             <Box>
                               <Typography variant="body2" sx={{ fontWeight: 'medium', lineHeight: 1.2 }}>
-                                {product.name}
+                                {product.productName}
                               </Typography>
                               <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1 }}>
                                 {product.code}
@@ -466,38 +338,38 @@ const ProductManagement = () => {
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                            {product.price}
+                            {product.sellingPrice}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Chip
-                            label={product.stock}
-                            color={getStockColor(product.stock, product.minStock)}
+                            label={product.quantityInStock}
+                            color={getStockColor(product.quantityInStock, product.minStock)}
                             variant="outlined"
                             size="small"
                             sx={{ 
                               height: 24, 
                               fontSize: '0.75rem',
-                              backgroundColor: getStockColor(product.stock, product.minStock) === 'success' ? '#f0fdf4' :
-                                             getStockColor(product.stock, product.minStock) === 'warning' ? '#fffbeb' :
-                                             getStockColor(product.stock, product.minStock) === 'info' ? '#f0f9ff' :
-                                             getStockColor(product.stock, product.minStock) === 'error' ? '#fef2f2' : '#f9fafb',
-                              borderColor: getStockColor(product.stock, product.minStock) === 'success' ? '#dcfce7' :
-                                          getStockColor(product.stock, product.minStock) === 'warning' ? '#fef3c7' :
-                                          getStockColor(product.stock, product.minStock) === 'info' ? '#dbeafe' :
-                                          getStockColor(product.stock, product.minStock) === 'error' ? '#fecaca' : '#e5e7eb',
-                              color: getStockColor(product.stock, product.minStock) === 'success' ? '#059669' :
-                                    getStockColor(product.stock, product.minStock) === 'warning' ? '#d97706' :
-                                    getStockColor(product.stock, product.minStock) === 'info' ? '#2563eb' :
-                                    getStockColor(product.stock, product.minStock) === 'error' ? '#dc2626' : '#6b7280'
+                              backgroundColor: getStockColor(product.quantityInStock, product.minStock) === 'success' ? '#f0fdf4' :
+                                             getStockColor(product.quantityInStock, product.minStock) === 'warning' ? '#fffbeb' :
+                                             getStockColor(product.quantityInStock, product.minStock) === 'info' ? '#f0f9ff' :
+                                             getStockColor(product.quantityInStock, product.minStock) === 'error' ? '#fef2f2' : '#f9fafb',
+                              borderColor: getStockColor(product.quantityInStock, product.minStock) === 'success' ? '#dcfce7' :
+                                          getStockColor(product.quantityInStock, product.minStock) === 'warning' ? '#fef3c7' :
+                                          getStockColor(product.quantityInStock, product.minStock) === 'info' ? '#dbeafe' :
+                                          getStockColor(product.quantityInStock, product.minStock) === 'error' ? '#fecaca' : '#e5e7eb',
+                              color: getStockColor(product.quantityInStock, product.minStock) === 'success' ? '#059669' :
+                                    getStockColor(product.quantityInStock, product.minStock) === 'warning' ? '#d97706' :
+                                    getStockColor(product.quantityInStock, product.minStock) === 'info' ? '#2563eb' :
+                                    getStockColor(product.quantityInStock, product.minStock) === 'error' ? '#dc2626' : '#6b7280'
                             }}
                           />
-                          {isLowStock(product.stock, product.minStock) && (
+                          {isLowStock(product.quantityInStock, product.minStock) && (
                             <Typography variant="caption" color="warning.main" sx={{ display: 'block', fontSize: '0.65rem' }}>
                               Low Stock!
                             </Typography>
                           )}
-                          {isOutOfStock(product.stock) && (
+                          {isOutOfStock(product.quantityInStock) && (
                             <Typography variant="caption" color="error.main" sx={{ display: 'block', fontSize: '0.65rem' }}>
                               Out of Stock!
                             </Typography>
@@ -511,15 +383,15 @@ const ProductManagement = () => {
                         <TableCell sx={{ py: 1 }}>
                           <Chip
                             label={product.status}
-                            color={product.status === 'Active' ? 'success' : 'error'}
+                            color={product.status === 1 ? 'success' : 'error'}
                             variant="outlined"
                             size="small"
                             sx={{ 
                               height: 24, 
                               fontSize: '0.75rem',
-                              backgroundColor: product.status === 'Active' ? '#f0fdf4' : '#fef2f2',
-                              borderColor: product.status === 'Active' ? '#dcfce7' : '#fecaca',
-                              color: product.status === 'Active' ? '#059669' : '#dc2626'
+                              backgroundColor: product.status === 1 ? '#f0fdf4' : '#fef2f2',
+                              borderColor: product.status === 1 ? '#dcfce7' : '#fecaca',
+                              color: product.status === 1 ? '#059669' : '#dc2626'
                             }}
                           />
                         </TableCell>
@@ -535,11 +407,11 @@ const ProductManagement = () => {
                             </IconButton>
                             <IconButton 
                               size="small" 
-                              sx={{ color: product.status === 'Active' ? '#f59e0b' : '#10b981', padding: '4px' }}
+                              sx={{ color: product.status === 1 ? '#f59e0b' : '#10b981', padding: '4px' }}
                               onClick={() => handleToggleStatus(product)}
-                              title={product.status === 'Active' ? 'Deactivate Product' : 'Activate Product'}
+                              title={product.status === 1 ? 'Deactivate Product' : 'Activate Product'}
                             >
-                              {product.status === 'Active' ? (
+                              {product.status === 1 ? (
                                 <DeactivateIcon fontSize="small" />
                               ) : (
                                 <ActivateIcon fontSize="small" />
@@ -620,7 +492,7 @@ const ProductManagement = () => {
           onClose={() => setDeleteDialogOpen(false)}
           onConfirm={confirmDeleteProduct}
           title="Delete Product"
-          message={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
+          message={`Are you sure you want to delete "${productToDelete?.productName}"? This action cannot be undone.`}
           confirmText="Delete"
           cancelText="Cancel"
           type="danger"
@@ -631,9 +503,9 @@ const ProductManagement = () => {
           open={statusDialogOpen}
           onClose={() => setStatusDialogOpen(false)}
           onConfirm={confirmToggleStatus}
-          title={`${productToToggle?.status === 'Active' ? 'Deactivate' : 'Activate'} Product`}
-          message={`Are you sure you want to ${productToToggle?.status === 'Active' ? 'deactivate' : 'activate'} "${productToToggle?.name}"?`}
-          confirmText={productToToggle?.status === 'Active' ? 'Deactivate' : 'Activate'}
+          title={`${productToToggle?.status === 1 ? 'Deactivate' : 'Activate'} Product`}
+          message={`Are you sure you want to ${productToToggle?.status === 1 ? 'deactivate' : 'activate'} "${productToToggle?.productName}"?`}
+          confirmText={productToToggle?.status === 1 ? 'Deactivate' : 'Activate'}
           cancelText="Cancel"
           type="warning"
         />

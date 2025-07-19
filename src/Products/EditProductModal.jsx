@@ -30,12 +30,10 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   const [formData, setFormData] = useState({
     name: '',
     category: 'Beverages',
-    price: '',
-    stock: '',
-    minStock: '',
+    price: 0,
+    stock: 0,
+    minStock: 0,
     barcode: '',
-    description: '',
-    status: 'Active',
     image: null,
     imagePreview: null
   })
@@ -44,14 +42,13 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   useEffect(() => {
     if (product) {
       setFormData({
-        name: product.name || '',
+        name: product.productName || '',
         category: product.category || 'Beverages',
-        price: product.price ? product.price.replace('$', '') : '',
-        stock: product.stock || '',
+        price: product.sellingPrice,
+        stock: product.quantityInStock || '',
         minStock: product.minStock || '',
-        barcode: product.code || '',
-        description: product.description || '',
-        status: product.status || 'Active',
+        barcode: product.productCode || '',
+        status: product.status === 1 ? 'Active' : 'Inactive',
         image: null,
         imagePreview: product.image && !product.image.match(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u) ? product.image : null
       })
@@ -119,19 +116,16 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
     // Create updated product object
     const updatedProduct = {
       ...product,
-      name: formData.name,
-      code: formData.barcode,
+      productName: formData.name,
+      productCode: formData.barcode,
       category: formData.category,
-      price: `$${parseFloat(formData.price).toFixed(2)}`,
-      stock: parseInt(formData.stock),
+      sellingPrice: `${parseFloat(formData.price).toFixed(2)}`,
+      quantityInStock: parseInt(formData.stock),
       minStock: formData.minStock ? parseInt(formData.minStock) : 0,
-      status: formData.status,
       image: formData.imagePreview || product.image || getCategoryEmoji(formData.category),
-      description: formData.description
     }
 
     onEditProduct(updatedProduct)
-    showSuccess(`Product "${formData.name}" has been updated successfully!`, 'Product Updated')
     handleClose()
   }
 
@@ -449,8 +443,8 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                     }
                   }}
                 >
-                  <MenuItem value="Active">Active</MenuItem>
-                  <MenuItem value="Inactive">Inactive</MenuItem>
+                  <MenuItem value={1}>Active</MenuItem>
+                  <MenuItem value={0}>Inactive</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

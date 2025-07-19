@@ -12,13 +12,17 @@ import UserManagement from './User Management/UserManagement.jsx';
 import Reports from './Reports/Reports.jsx';
 import { useEffect, useState } from 'react';
 import AlertProvider from './Components/AlertProvider.jsx';
+import AuthService from './Services/AuthService.jsx';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    if (AuthService.isTokenExpired()) {
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
   }, []);
 
   return (

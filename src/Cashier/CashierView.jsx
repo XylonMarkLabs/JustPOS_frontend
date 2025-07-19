@@ -7,7 +7,6 @@ import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import ApiCall from "../Services/ApiCall";
 import Sidebar from "../Components/Sidebar";
-import AuthService from "../Services/AuthService";
 import { useAlert } from "../Components/AlertProvider";
 
 const CashierView = () => {
@@ -21,8 +20,8 @@ const CashierView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 2x5 grid
 
-  const username = localStorage.getItem("username");
   const user = JSON.parse(localStorage.getItem("user"));
+  const username = user?.username;
 
   useEffect(() => {
     getProducts();
