@@ -33,7 +33,10 @@ const CashierView = () => {
     await ApiCall.product
       .getAll()
       .then((products) => {
-        setProducts(products);
+        const filteredProducts = products.filter(
+          (product) => product.status !== 0
+        );
+        setProducts(filteredProducts);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -169,7 +172,7 @@ const CashierView = () => {
 
   return (
     <div className="lg:flex gap-5 h-screen p-5 ">
-      {user.role === "admin" && <Sidebar />}
+      {user.role === "Admin" && <Sidebar />}
       <section className="space-y-5 border-primary  lg:w-[75%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg">
         {/*search bar and fltters  */}
         <div className="flex-none mb-6">

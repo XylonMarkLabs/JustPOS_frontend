@@ -18,7 +18,94 @@ const ApiCall = {
                 console.error('Error fetching user data:', error);
                 throw error;
             }
-        }
+        },
+
+        getUsers: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/user/get`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data.users;
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                throw error;
+            }
+        },
+
+        editUser: async (user) => {
+            try {
+                const payload = {
+                    username: user.username,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                };
+
+                if (user.password) {
+                    payload.password = user.password;
+                }
+
+                const response = await axios.put(`${baseURL}/user/edit`, payload);
+
+                console.log("Response in ApiCall for editUser: ", response);
+
+                if (!response.data.success) {
+                    throw new Error('Edit failed: ' + (response.data.message || 'Unknown error'));
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error editing user:', error);
+                throw error;
+            }
+        },
+
+        updateStatus: async (username, status) => {
+            try {
+                const response = await axios.post(`${baseURL}/user/update-status`, { username, status });
+                if (!response.data.success) {
+                    throw new Error('Network reponse was not ok')
+                }
+                return true;
+            } catch (error) {
+                console.error('Error updating product status: ', error);
+                throw error;
+            }
+        },
+
+        deleteUser: async (username) => {
+            try {
+                const response = await axios.post(`${baseURL}/user/delete`, { username });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                throw error;
+            }
+        },
+
+        addUser: async (user) => {
+            try {
+                const response = await axios.post(`${baseURL}/user/register`, {
+                    name: user.name,
+                    username: user.username,
+                    email: user.email,
+                    password: user.password,
+                    role: user.role
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error adding product:', error);
+                throw error;
+            }
+        },
+
     },
 
     product: {

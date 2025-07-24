@@ -13,6 +13,7 @@ import {
 import LogoutIcon from '@mui/icons-material/Logout';
 import logo from '../assets/JUSTPOS_transparent.png';
 import ChangePasswordModal from './ChangePasswordModal';
+import AuthService from '../Services/AuthService';
 
 const Navbar = () => {
     const theme = useTheme();
@@ -68,6 +69,11 @@ const Navbar = () => {
         handlePasswordModalClose();
     };
 
+    const handleLogout = () => {
+        AuthService.logout();
+        handleClose();
+    }
+
     return (
         <div className='px-5 pt-2'>
             <AppBar position="static" sx={{ borderRadius: '8px', backgroundColor:'#FBF8EF', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
@@ -107,7 +113,7 @@ const Navbar = () => {
                             onClose={handleClose}
                         >
                             <MenuItem onClick={handlePasswordModalOpen}>Change Password</MenuItem>
-                            <MenuItem onClick={handleClose} sx={{ color: 'red' }}>
+                            <MenuItem onClick={handleLogout} sx={{ color: 'red' }}>
                                 <LogoutIcon sx={{ mr: 1 }} />Logout
                             </MenuItem>
                         </Menu>

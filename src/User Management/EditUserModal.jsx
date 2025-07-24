@@ -22,6 +22,7 @@ import {
   VisibilityOff
 } from '@mui/icons-material'
 import { useAlert } from '../Components/AlertProvider'
+import ValidateInput from '../Validation/ValidateInput'
 
 const EditUserModal = ({ open, onClose, onEditUser, user }) => {
   const { showError, showWarning, showSuccess } = useAlert()
@@ -35,6 +36,8 @@ const EditUserModal = ({ open, onClose, onEditUser, user }) => {
     confirmNewPassword: ''
   })
   const [errors, setErrors] = useState({
+    username: '',
+    email: '',
     newPassword: '',
     confirmNewPassword: ''
   })
@@ -62,26 +65,44 @@ const EditUserModal = ({ open, onClose, onEditUser, user }) => {
   }
 
   const validatePassword = (password) => {
-    const validations = {
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      number: /[0-9]/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-    };
-
-    const messages = [];
-    if (!validations.length) messages.push('At least 8 characters');
-    if (!validations.uppercase) messages.push('One uppercase letter');
-    if (!validations.lowercase) messages.push('One lowercase letter');
-    if (!validations.number) messages.push('One number');
-    if (!validations.special) messages.push('One special character');
-
-    return {
-      isValid: Object.values(validations).every(Boolean),
-      message: messages.join(', ')
-    };
+    const validation =  ValidateInput.password(password)
+      return {
+        isValid: validation.isValid,
+        message: validation.message
+      }
   };
+
+  const handleUsernameKeyUp = (event) => {
+    const username = event.target.value
+    const validation = ValidateInput.username(username)
+    if (!validation.isValid) {
+      setErrors((prev) => ({
+        ...prev,
+        username: validation.message
+      }))
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        username: ''
+      }))
+    }
+  }
+
+  const handleEmailKeyUp = (event) => {
+    const email = event.target.value
+    const validation = ValidateInput.email(email)
+    if (!validation.isValid) {
+      setErrors((prev) => ({
+        ...prev,
+        email: validation.message
+      }))
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        email: ''
+      }))
+    }
+  }
 
   useEffect(() => {
     const validateForm = () => {
@@ -138,10 +159,11 @@ const EditUserModal = ({ open, onClose, onEditUser, user }) => {
     const updatedUser = {
       ...user,
       name: formData.name,
-      email: formData.email,
+      email: formData.email.trim(),
       username: formData.username,
       role: formData.role,
-      initials: formData.name.split(' ').map(n => n[0]).join('').toUpperCase()
+      initials: formData.name.split(' ').map(n => n[0]).join('').toUpperCase(),
+      ...(formData.newPassword && { password: formData.newPassword })
     }
     
     onEditUser(updatedUser)
@@ -228,6 +250,9 @@ const EditUserModal = ({ open, onClose, onEditUser, user }) => {
               placeholder="Enter email"
               value={formData.email}
               onChange={handleChange('email')}
+              onKeyUp={handleEmailKeyUp}
+              error={!!errors.email}
+              helperText={errors.email}
               variant="outlined"
               size="small"
               sx={{
@@ -256,6 +281,9 @@ const EditUserModal = ({ open, onClose, onEditUser, user }) => {
                 placeholder="Enter username"
                 value={formData.username}
                 onChange={handleChange('username')}
+                onKeyUp={handleUsernameKeyUp}
+                error={!!errors.username}
+                helperText={errors.username}
                 variant="outlined"
                 size="small"
                 sx={{
