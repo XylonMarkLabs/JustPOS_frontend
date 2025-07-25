@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Sidebar from '../Components/Sidebar'
 import OrderDetailsModal from './OrderDetailsModal'
 import {
@@ -25,6 +25,7 @@ import {
   Search as SearchIcon,
   Visibility as ViewIcon
 } from '@mui/icons-material'
+import ApiCall from '../Services/ApiCall'
 
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -33,100 +34,22 @@ const Orders = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [orderDetailsOpen, setOrderDetailsOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [orders, setOrders] = useState([])
 
-  // Sample order data
-  const [orders] = useState([
-    {
-      id: 1,
-      orderId: '#1',
-      customer: 'John Smith',
-      items: '2 items',
-      itemDetails: [
-        { name: 'Coffee - Americano', quantity: 1, price: 3.50 },
-        { name: 'Muffin - Blueberry', quantity: 1, price: 2.99 }
-      ],
-      total: '$15.99',
-      payment: 'Card',
-      status: 'Completed',
-      date: '1/15/2024',
-      time: '10:30 AM'
-    },
-    {
-      id: 2,
-      orderId: '#2',
-      customer: 'Walk-in Customer',
-      items: '2 items',
-      itemDetails: [
-        { name: 'Sandwich - Club', quantity: 1, price: 8.99 },
-        { name: 'Water Bottle', quantity: 1, price: 1.99 }
-      ],
-      total: '$6.97',
-      payment: 'Cash',
-      status: 'Completed',
-      date: '1/15/2024',
-      time: '11:15 AM'
-    },
-    {
-      id: 3,
-      orderId: '#3',
-      customer: 'Sarah Johnson',
-      items: '3 items',
-      itemDetails: [
-        { name: 'Latte', quantity: 2, price: 4.25 },
-        { name: 'Croissant', quantity: 1, price: 2.49 }
-      ],
-      total: '$10.99',
-      payment: 'Card',
-      status: 'Pending',
-      date: '1/15/2024',
-      time: '12:00 PM'
-    },
-    {
-      id: 4,
-      orderId: '#4',
-      customer: 'Mike Wilson',
-      items: '1 item',
-      itemDetails: [
-        { name: 'Caesar Salad', quantity: 1, price: 7.99 }
-      ],
-      total: '$7.99',
-      payment: 'Cash',
-      status: 'Preparing',
-      date: '1/15/2024',
-      time: '12:30 PM'
-    },
-    {
-      id: 5,
-      orderId: '#5',
-      customer: 'Emily Davis',
-      items: '4 items',
-      itemDetails: [
-        { name: 'Green Tea', quantity: 1, price: 2.75 },
-        { name: 'Chocolate Cake', quantity: 1, price: 4.99 },
-        { name: 'Pizza Slice', quantity: 2, price: 3.99 }
-      ],
-      total: '$15.72',
-      payment: 'Card',
-      status: 'Completed',
-      date: '1/15/2024',
-      time: '1:00 PM'
-    },
-    {
-      id: 6,
-      orderId: '#6',
-      customer: 'David Brown',
-      items: '2 items',
-      itemDetails: [
-        { name: 'Smoothie', quantity: 1, price: 5.50 },
-        { name: 'Bagel', quantity: 1, price: 1.99 }
-      ],
-      total: '$7.49',
-      payment: 'Cash',
-      status: 'Cancelled',
-      date: '1/15/2024',
-      time: '1:30 PM'
-    }
-  ])
+  useEffect(() => {
+    getOrders();
+  }, [])
+  
+
+  const getOrders = async () => {
+    await ApiCall.order.getorders()
+      .then((orders) => {
+        setOrders(orders);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
+  }
 
   // Handle viewing order details
   const handleViewOrder = (order) => {
@@ -136,12 +59,17 @@ const Orders = () => {
 
   // Filter orders based on search term and status
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customer.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'All Status' || order.status === statusFilter
-    
-    return matchesSearch && matchesStatus
-  })
+    const orderIdStr = String(order.orderId);
+
+    const matchesSearch = 
+      orderIdStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customer.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === 'All Status' || order.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+});
+
 
   // Get current page orders
   const paginatedOrders = filteredOrders.slice(
@@ -246,9 +174,9 @@ const Orders = () => {
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         PAYMENT
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
+                      {/* <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         STATUS
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         DATE
                       </TableCell>
@@ -259,7 +187,7 @@ const Orders = () => {
                   </TableHead>
                   <TableBody>
                     {paginatedOrders.map((order) => (
-                      <TableRow key={order.id} sx={{ 
+                      <TableRow key={order._id} sx={{ 
                         '&:hover': { backgroundColor: '#f9fafb' },
                         height: 60
                       }}>
@@ -270,17 +198,17 @@ const Orders = () => {
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            {order.customer}
+                            {order.username}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            {order.items}
+                            {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                            {order.total}
+                            {order.totalAmount}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
@@ -288,7 +216,7 @@ const Orders = () => {
                             {order.payment}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ py: 1 }}>
+                        {/* <TableCell sx={{ py: 1 }}>
                           <Chip
                             label={order.status}
                             color={getStatusColor(order.status)}
@@ -311,10 +239,10 @@ const Orders = () => {
                                     getStatusColor(order.status) === 'error' ? '#dc2626' : '#6b7280'
                             }}
                           />
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            {order.date}
+                            {new Date(order.date).toISOString().slice(0, 10)}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
