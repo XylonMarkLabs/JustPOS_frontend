@@ -41,7 +41,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
   }
 
   const calculateSubtotal = () => {
-    return order.itemDetails.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)
+    return order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)
   }
 
   const calculateTax = () => {
@@ -146,7 +146,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Customer
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                  {order.customer}
+                  {order.username}
                 </Typography>
               </Box>
               <Box>
@@ -154,7 +154,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Order Date
                 </Typography>
                 <Typography variant="body1">
-                  {order.date} at {order.time}
+                  {new Date(order.date).toISOString().slice(0, 10)} at {new Date(order.date).toISOString().slice(11, 19)}
                 </Typography>
               </Box>
               <Box>
@@ -165,7 +165,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   {order.payment}
                 </Typography>
               </Box>
-              <Box>
+              {/* <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5 }}>
                   Status
                 </Typography>
@@ -176,7 +176,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   size="small"
                   sx={{ height: 28, fontSize: '0.875rem' }}
                 />
-              </Box>
+              </Box> */}
             </Box>
           </Box>
 
@@ -198,7 +198,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {order.itemDetails.map((item, index) => (
+                  {order.items.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell sx={{ py: 1.5 }}>
                         <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
@@ -334,20 +334,20 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontWeight: 'bold', color: '#000' }}>Customer:</Typography>
-            <Typography sx={{ color: '#000' }}>{order.customer}</Typography>
+            <Typography sx={{ color: '#000' }}>{order.username}</Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontWeight: 'bold', color: '#000' }}>Date:</Typography>
-            <Typography sx={{ color: '#000' }}>{order.date} at {order.time}</Typography>
+            <Typography sx={{ color: '#000' }}>{new Date(order.date).toISOString().slice(0, 10)} at {new Date(order.date).toISOString().slice(11, 19)}</Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontWeight: 'bold', color: '#000' }}>Payment:</Typography>
             <Typography sx={{ color: '#000' }}>{order.payment}</Typography>
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontWeight: 'bold', color: '#000' }}>Status:</Typography>
             <Typography sx={{ color: '#000' }}>{order.status}</Typography>
-          </Box>
+          </Box> */}
         </Box>
 
         <Box sx={{ borderBottom: '1px solid #ccc', my: 2 }}></Box>
@@ -374,12 +374,12 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
               <Typography sx={{ fontWeight: 'bold', textAlign: 'right' }}>Total</Typography>
             </Box>
             {/* Table Body */}
-            {order.itemDetails.map((item, index) => (
+            {order.items.map((item, index) => (
               <Box key={index} sx={{ 
                 display: 'grid', 
                 gridTemplateColumns: '3fr 1fr 1fr 1fr',
                 padding: '8px',
-                borderBottom: index < order.itemDetails.length - 1 ? '1px solid #eee' : 'none',
+                borderBottom: index < order.items.length - 1 ? '1px solid #eee' : 'none',
                 color: '#000'
               }}>
                 <Typography>{item.name}</Typography>

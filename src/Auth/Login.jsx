@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Box,
   FormControl,
@@ -15,6 +15,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ApiCall from "../Services/ApiCall";
+import { AuthContext } from "../Services/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -22,6 +23,7 @@ const Login = () => {
   const [password, setPassword] = React.useState("");
 
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => event.preventDefault();
@@ -40,6 +42,7 @@ const Login = () => {
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         await getuserData();
+        login();
         navigate("/");
       } else {
         alert("Login failed: " + response.data.message);

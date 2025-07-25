@@ -9,7 +9,6 @@ const ApiCall = {
             const id = AuthService.getConfirm().id
             try {
                 const response = await axios.post(`${baseURL}/user/getUserById`, { id });
-                console.log("Resonse: ", response)
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -47,13 +46,9 @@ const ApiCall = {
                 }
 
                 const response = await axios.put(`${baseURL}/user/edit`, payload);
-
-                console.log("Response in ApiCall for editUser: ", response);
-
                 if (!response.data.success) {
                     throw new Error('Edit failed: ' + (response.data.message || 'Unknown error'));
                 }
-
                 return true;
             } catch (error) {
                 console.error('Error editing user:', error);
@@ -247,6 +242,21 @@ const ApiCall = {
                 return response.data.cart;
             } catch (error) {
                 console.error('Error updating cart quantity:', error);
+                throw error;
+            }
+        }
+    },
+
+    order: {
+        getorders: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/order/getAll`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data.orders;
+            } catch (error) {
+                console.error('Error fetching orders:', error);
                 throw error;
             }
         }

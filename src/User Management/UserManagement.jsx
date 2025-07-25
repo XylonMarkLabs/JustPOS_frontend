@@ -63,7 +63,6 @@ const UserManagement = () => {
       .getUsers()
       .then((users) => {
         setUsers(users);
-        console.log(users);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -84,7 +83,6 @@ const UserManagement = () => {
 
   // Handle editing user
   const handleEditUser = async (updatedUser) => {
-    console.log("Updated User: ", updatedUser);
     const response = await ApiCall.user.editUser(updatedUser);
     if (response) {
       getUsers();
@@ -137,7 +135,6 @@ const UserManagement = () => {
   };
 
   const confirmToggleStatus = async () => {
-    console.log("User to toggle: ", userToToggle);
     const newStatus = userToToggle.status === 1 ? 0 : 1;
     const username = userToToggle.username;
     const name = userToToggle.name;
