@@ -20,6 +20,9 @@ const Navbar = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
+    const user = JSON.parse(localStorage.getItem("user"));
+    const role = user?.role;
+
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -85,7 +88,7 @@ const Navbar = () => {
 
                     {/* Account Icon */}
                     <Box>
-                        <Chip label='Cashier' color='warning' variant="outlined" />
+                        <Chip label={role || 'Guest'} color="warning" variant="outlined" />
                         <IconButton
                             size="large"
                             edge="end"
