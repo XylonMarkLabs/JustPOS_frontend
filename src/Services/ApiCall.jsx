@@ -125,7 +125,8 @@ const ApiCall = {
                     sellingPrice: product.sellingPrice,
                     category: product.category,
                     quantityInStock: product.quantityInStock,
-                    minStock: product.minStock
+                    minStock: product.minStock,
+                    discount: product.discount
                 });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
@@ -171,7 +172,8 @@ const ApiCall = {
                     sellingPrice: product.sellingPrice,
                     category: product.category,
                     quantityInStock: product.quantityInStock,
-                    minStock: product.minStock
+                    minStock: product.minStock,
+                    discount: product.discount
                 });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');

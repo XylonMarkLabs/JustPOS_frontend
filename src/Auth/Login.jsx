@@ -189,7 +189,7 @@ const Login = () => {
                     onMouseDown={handleMouseDownPassword}
                     onMouseUp={handleMouseUpPassword}
                     edge="end"
-                    color="primary"
+                    color="secondary"
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -214,11 +214,13 @@ const Login = () => {
           {/* Login Button */}
           <Button
             variant="contained"
-            color="primary"
+            color="secondary"
             sx={{ mt: 2, width: "44ch", py: 2 }}
             onClick={handleLogin}
           >
-            Login
+            <Typography variant="button" sx={{ color: "black" }}>
+              Login
+            </Typography>
           </Button>
         </div>
       </div>
