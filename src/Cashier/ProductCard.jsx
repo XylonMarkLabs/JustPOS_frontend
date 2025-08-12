@@ -11,7 +11,7 @@ const ProductCard = ({ product, onAddToCart }) => {
     >
         {product.discount > 0 && (
           <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-bl-lg text-sm font-medium z-10">
-            -{(product.discount * 100)}% OFF
+            {product.discount}% OFF
           </div>
         )}
         {isOutOfStock && (
@@ -30,29 +30,29 @@ const ProductCard = ({ product, onAddToCart }) => {
             className="w-full h-32 object-cover"
         />
         <div className="px-4 pb-2">
-            <div className='flex justify-between items-end'>
-                <h3 className="font-semibold text-lg">{product.productName}</h3>
-                <Chip label={product.category} color='warning' variant="outlined" size="small" sx={{ fontSize: '0.60rem' }}/> 
+            <div className='flex justify-between items-end h-8'>
+                <h3 className="font-semibold text-md">{product.productName}</h3>
+                {/* <Chip label={product.category} color='warning' variant="outlined" size="small" sx={{ fontSize: '0.60rem' }}/>  */}
             </div>
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                     {product.discount > 0 ? (
                         <>
-                            <span className="text-xl font-bold text-green-600">
-                                ${(product.sellingPrice * (1 - product.discount)).toFixed(2)}
+                            <span className="text-lg font-bold text-green-600">
+                                ${(product.sellingPrice * (1 - product.discount / 100)).toFixed(2)}
                             </span>
                             <span className="text-sm text-gray-500 line-through">
                                 ${product.sellingPrice.toFixed(2)}
                             </span>
                         </>
                     ) : (
-                        <span className="text-xl font-bold text-green-600">
+                        <span className="text-lg font-bold text-green-600">
                             ${product.sellingPrice.toFixed(2)}
                         </span>
                     )}
                 </div>
                 <div className="text-right">
-                  <span className={`text-sm whitespace-nowrap ${
+                  <span className={`text-xs whitespace-nowrap ${
                     isOutOfStock ? 'text-red-600 font-semibold' : 
                     isLowStock ? 'text-orange-600 font-semibold' : 
                     'text-gray-500'
