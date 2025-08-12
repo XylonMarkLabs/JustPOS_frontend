@@ -260,7 +260,7 @@ const ProductManagement = () => {
           {/* Search and Filters */}
           <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
             <TextField
-              placeholder="Search products..."
+              placeholder="Search product by name or barcode"
               value={searchTerm}
               onChange={handleSearchChange}
               sx={{ flex: 1, minWidth: "300px" }}
@@ -341,6 +341,17 @@ const ProductManagement = () => {
                         py: 1.5,
                       }}
                     >
+                      BARCODE 
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#6b7280",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        py: 1.5,
+                      }}
+                    >
                       CATEGORY
                     </TableCell>
                     <TableCell
@@ -353,6 +364,17 @@ const ProductManagement = () => {
                       }}
                     >
                       PRICE
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#6b7280",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        py: 1.5,
+                      }}
+                    >
+                      DISCOUNT
                     </TableCell>
                     <TableCell
                       sx={{
@@ -466,6 +488,11 @@ const ProductManagement = () => {
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
                         <Typography variant="body2" color="text.secondary">
+                          {product.productCode}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
                           {product.category}
                         </Typography>
                       </TableCell>
@@ -475,6 +502,14 @@ const ProductManagement = () => {
                           sx={{ fontWeight: "medium" }}
                         >
                           {product.sellingPrice}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ py: 1 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: "medium" }}
+                        >
+                          {product.discount}%
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>

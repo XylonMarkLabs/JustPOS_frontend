@@ -98,7 +98,9 @@ const Navbar = () => {
                             onClick={handleMenu}
                             color="inherit"
                         >
-                            <Avatar>C</Avatar>
+                            <Avatar>
+                                {role ? role.charAt(0).toUpperCase() : 'G'}
+                            </Avatar>
                         </IconButton>
                         <Menu
                             id="menu-appbar"

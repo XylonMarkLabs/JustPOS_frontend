@@ -27,13 +27,14 @@ import { useAlert } from '../Components/AlertProvider'
 
 const AddProductModal = ({ open, onClose, onAddProduct }) => {
   const { showError, showWarning, showSuccess } = useAlert()
-  
+
   const [formData, setFormData] = useState({
     name: '',
     category: 'Beverages',
-    price: 0,
-    stock: 0,
-    minStock: 0,
+    price: '',
+    stock: '',
+    minStock: '',
+    discount: '',
     barcode: '',
     image: null,
     imagePreview: null
@@ -106,6 +107,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       quantityInStock: parseInt(formData.stock),
       minStock: formData.minStock ? parseInt(formData.minStock) : 0,
       image: formData.imagePreview || getCategoryEmoji(formData.category),
+      discount: formData.discount ? parseFloat(formData.discount) : 0
     }
 
     onAddProduct(newProduct)
@@ -121,6 +123,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       stock: '',
       minStock: '',
       barcode: '',
+      discount: '',
       image: null,
       imagePreview: null
     })
@@ -137,8 +140,8 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
   }
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
@@ -167,9 +170,9 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 <Box sx={{ position: 'relative' }}>
                   <Avatar
                     src={formData.imagePreview}
-                    sx={{ 
-                      width: 50, 
-                      height: 50, 
+                    sx={{
+                      width: 50,
+                      height: 50,
                       border: '2px solid #e5e7eb'
                     }}
                   />
@@ -194,7 +197,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                   <ImageIcon sx={{ fontSize: 24, color: '#9ca3af' }} />
                 </Avatar>
               )}
-              
+
               <Box sx={{ flex: 1 }}>
                 <input
                   accept="image/*"
@@ -258,34 +261,63 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
           </Box>
 
           {/* Category */}
-          <Box>
-            <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-              Category
-            </Typography>
-            <FormControl fullWidth size="small">
-              <Select
-                value={formData.category}
-                onChange={handleChange('category')}
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                Barcode
+              </Typography>
+              <TextField
+                fullWidth
+                placeholder="Enter barcode"
+                value={formData.barcode}
+                onChange={handleChange('barcode')}
                 variant="outlined"
+                size="small"
                 sx={{
-                  backgroundColor: '#f9fafb',
-                  height: '40px',
-                  '&:hover': {
-                    backgroundColor: '#f3f4f6'
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: '#fff'
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f9fafb',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: '#f3f4f6'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#fff',
+                      borderColor: '#000000'
+                    }
                   }
                 }}
-              >
-                <MenuItem value="Beverages">Beverages</MenuItem>
-                <MenuItem value="Food">Food</MenuItem>
-                <MenuItem value="Bakery">Bakery</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
+                Category
+              </Typography>
+              <FormControl fullWidth size="small">
+                <Select
+                fullWidth
+                  value={formData.category}
+                  onChange={handleChange('category')}
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: '#f9fafb',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: '#f3f4f6'
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: '#fff'
+                    }
+                  }}
+                >
+                  <MenuItem value="Beverages">Beverages</MenuItem>
+                  <MenuItem value="Food">Food</MenuItem>
+                  <MenuItem value="Bakery">Bakery</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
 
-          {/* Price and Barcode */}
+          {/* Price and Discount */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
@@ -299,8 +331,8 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 onChange={handleChange('price')}
                 variant="outlined"
                 size="small"
-                inputProps={{ 
-                  min: 0, 
+                inputProps={{
+                  min: 0,
                   step: 0.01,
                   style: { fontSize: '0.875rem' }
                 }}
@@ -320,15 +352,21 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
-                Barcode
+                Discount (%)
               </Typography>
               <TextField
                 fullWidth
-                placeholder="Enter barcode"
-                value={formData.barcode}
-                onChange={handleChange('barcode')}
+                type="number"
+                placeholder="0"
+                value={formData.discount}
+                onChange={handleChange('discount')}
                 variant="outlined"
                 size="small"
+                inputProps={{
+                  min: 0,
+                  step: 0.01,
+                  style: { fontSize: '0.875rem' }
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#f9fafb',
@@ -360,7 +398,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 onChange={handleChange('stock')}
                 variant="outlined"
                 size="small"
-                inputProps={{ 
+                inputProps={{
                   min: 0,
                   style: { fontSize: '0.875rem' }
                 }}
@@ -390,7 +428,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 onChange={handleChange('minStock')}
                 variant="outlined"
                 size="small"
-                inputProps={{ 
+                inputProps={{
                   min: 0,
                   style: { fontSize: '0.875rem' }
                 }}
