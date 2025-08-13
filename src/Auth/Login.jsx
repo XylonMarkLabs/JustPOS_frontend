@@ -19,7 +19,7 @@ import { AuthContext } from "../Services/AuthContext";
 
 const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-  const [email, setEmail] = React.useState("");
+  const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const Login = () => {
       const response = await axios.post(
         "http://localhost:4000/api/user/login",
         {
-          username: email,
+          username: username,
           password: password,
         }
       );
@@ -73,7 +73,7 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-r from-[#292929] via-[#5c5b5a] to-[#FBF8EF]">
-      <div className="flex h-1/2 w-auto shadow-md rounded-lg">
+      <div className="flex h-3/4 w-auto shadow-md rounded-lg">
         {/* Left Logo Panel */}
         <div className="bg-secondary flex justify-center items-center rounded-l-lg px-5 w-96">
           <div>
@@ -82,7 +82,7 @@ const Login = () => {
         </div>
 
         {/* Right Form Panel */}
-        <div className="bg-primary flex flex-col justify-center items-center rounded-r-lg px-5 w-96">
+        <div className="bg-primary flex flex-col justify-center items-center rounded-r-lg px-5 mx- w-96">
           <Box sx={{ textAlign: "center", mb: 3 }}>
             <Typography
               variant="h4"
@@ -119,14 +119,14 @@ const Login = () => {
             />
           </Box>
 
-          {/* Email Input */}
+          {/* Username Input */}
           <FormControl
             sx={{ m: 1, width: "40ch" }}
             variant="outlined"
             color="primary"
           >
             <InputLabel
-              htmlFor="outlined-adornment-email"
+              htmlFor="outlined-adornment-username"
               sx={{
                 color: "#FBF8EF",
                 "&.Mui-focused": {
@@ -134,14 +134,14 @@ const Login = () => {
                 },
               }}
             >
-              Email
+              Username
             </InputLabel>
             <OutlinedInput
-              id="outlined-adornment-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              label="Email"
+              id="outlined-adornment-username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              label="Username"
               sx={{
                 input: { color: "#FBF8EF" },
                 "& .MuiOutlinedInput-notchedOutline": {
@@ -218,7 +218,7 @@ const Login = () => {
             sx={{ mt: 2, width: "44ch", py: 2 }}
             onClick={handleLogin}
           >
-            <Typography variant="button" sx={{ color: "black" }}>
+            <Typography variant="button" sx={{ color: "black", fontWeight: "bold" , fontSize: "1.1rem" }}>
               Login
             </Typography>
           </Button>
