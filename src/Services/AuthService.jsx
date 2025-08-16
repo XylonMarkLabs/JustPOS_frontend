@@ -21,7 +21,7 @@ const AuthService = {
       if (decodedToken.exp < currentTime) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/login";
+        window.location.href = "/";
         return true;
       } else return false;
     } catch (error) {
@@ -38,7 +38,7 @@ const AuthService = {
   logout: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    window.location.href = "/";
   },
 };
 

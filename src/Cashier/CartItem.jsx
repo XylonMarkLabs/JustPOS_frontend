@@ -42,9 +42,9 @@ const CartItem = ({ item, itemTotal, onUpdateQuantity, onRemove }) => {
           </div>
           <div className="text-right">
             {hasDiscount && (
-              <p className="text-sm text-gray-500 line-through">${originalTotal.toFixed(2)}</p>
+              <p className="text-sm text-gray-500 line-through">Rs.{originalTotal.toFixed(2)}</p>
             )}
-            <p className="text-base font-semibold text-green-600">${itemTotal.toFixed(2)}</p>
+            <p className="text-base font-semibold text-green-600">Rs.{itemTotal.toFixed(2)}</p>
           </div>
         </div>
       </div>

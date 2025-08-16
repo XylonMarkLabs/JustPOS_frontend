@@ -10,6 +10,7 @@ import AuthService from './Services/AuthService.jsx';
 import Login from './Auth/Login.jsx';
 import CashierView from './Cashier/CashierView.jsx';
 import ProductManagement from './Products/ProductManagement.jsx';
+import CategoryManagement from './Categories/CategoryManagement.jsx';
 import Orders from './Orders/Orders.jsx';
 import UserManagement from './User Management/UserManagement.jsx';
 import Reports from './Reports/Reports.jsx';
@@ -20,6 +21,7 @@ import { useContext } from 'react';
 
 const ProtectedCashierView = withAuth(CashierView);
 const ProtectedProductManagement = withAuth(ProductManagement);
+const ProtectedCategoryManagement = withAuth(CategoryManagement);
 const ProtectedOrders = withAuth(Orders);
 const ProtectedUserManagement = withAuth(UserManagement);
 const ProtectedReports = withAuth(Reports);
@@ -47,8 +49,8 @@ function AppContent() {
     <>
       {isAuthenticated && <Navbar />}
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={getHomePage()} />
+        <Route path="/" element={<Login />} />
+        <Route path="/home" element={getHomePage()} />
         
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={<ProtectedAdminDashboard />} />
@@ -60,6 +62,7 @@ function AppContent() {
         {/* Common Routes */}
         <Route path="/cashier" element={<ProtectedCashierView />} />
         <Route path="/products" element={<ProtectedProductManagement />} />
+        <Route path="/categories" element={<ProtectedCategoryManagement />} />
         <Route path="/orders" element={<ProtectedOrders />} />
         <Route path="/reports" element={<ProtectedReports />} />
       </Routes>

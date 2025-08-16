@@ -43,7 +43,7 @@ const Login = () => {
         localStorage.setItem("token", response.data.token);
         await getuserData();
         login();
-        navigate("/");
+        navigate("/home");
       } else {
         alert("Login failed: " + response.data.message);
       }

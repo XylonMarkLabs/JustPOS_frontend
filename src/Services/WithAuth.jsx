@@ -13,7 +13,7 @@ export default function withAuth(AuthComponent) {
     useEffect(() => {
       const checkAuth = async () => {
         if (!Auth.loggedIn()) {
-          navigate("/login");
+          navigate("/");
         } else {
           try {
             const confirmData = await Auth.getConfirm();
@@ -22,7 +22,7 @@ export default function withAuth(AuthComponent) {
           } catch (err) {
             console.error(err);
             Auth.logout();
-            navigate("/login");
+            navigate("/");
           }
         }
       };
