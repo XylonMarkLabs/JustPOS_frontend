@@ -125,7 +125,7 @@ const CashierView = () => {
   const calculateItemPrice = (item) => {
     const originalPrice = item.product.price * item.product.quantity;
     return item.product.discount > 0
-      ? originalPrice * (1 - item.product.discount)
+      ? originalPrice * (1 - item.product.discount / 100)
       : originalPrice;
   };
 

@@ -14,11 +14,17 @@ const Sidebar = () => {
   const user = JSON.parse(localStorage.getItem("user"))
 
   const menuItems = [
-    { title: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-    { title: 'Products', icon: <Inventory2Icon />, path: '/products' },
-    { title: 'Orders', icon: <ShoppingCartIcon />, path: '/orders' },
-    { title: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+    // Admin menu items
+    { title: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard', roles: ['Admin'] },
     { title: 'Users', icon: <ManageAccountsIcon />, path: '/user-management', roles: ['Admin'] },
+    
+    // Manager menu items
+    { title: 'Dashboard', icon: <DashboardIcon />, path: '/manager/dashboard', roles: ['Manager'] },
+    
+    // Common menu items
+    { title: 'Products', icon: <Inventory2Icon />, path: '/products', roles: ['Admin', 'Manager'] },
+    { title: 'Orders', icon: <ShoppingCartIcon />, path: '/orders', roles: ['Admin', 'Manager'] },
+    { title: 'Reports', icon: <AssessmentIcon />, path: '/reports', roles: ['Admin', 'Manager'] },
   ]
 
   // Filter items based on role
