@@ -5,6 +5,7 @@ import Inventory2Icon from '@mui/icons-material/Inventory2'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
+import CategoryIcon from '@mui/icons-material/Category'
 
 const Sidebar = () => {
   const navigate = useNavigate()
@@ -23,6 +24,7 @@ const Sidebar = () => {
     
     // Common menu items
     { title: 'Products', icon: <Inventory2Icon />, path: '/products', roles: ['Admin', 'Manager'] },
+    { title: 'Categories', icon: <CategoryIcon />, path: '/categories', roles: ['Admin', 'Manager'] },
     { title: 'Orders', icon: <ShoppingCartIcon />, path: '/orders', roles: ['Admin', 'Manager'] },
     { title: 'Reports', icon: <AssessmentIcon />, path: '/reports', roles: ['Admin', 'Manager'] },
   ]

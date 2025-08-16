@@ -80,10 +80,8 @@ const CashierView = () => {
             : item
         )
       );
-      showInfo(`Added another ${product.productName} to cart`, "Item Added");
     } else {
       setCart([...cart, { product, quantity: 1 }]);
-      showSuccess(`${product.productName} added to cart!`, "Item Added");
     }
 
     getCart();
@@ -93,15 +91,11 @@ const CashierView = () => {
   const removeFromCart = async (productId) => {
     let productCode = productId;
     await ApiCall.cart.removeFromCart(username, productCode);
-    // getCart();
 
     const removedItem = cart.find(
       (item) => item.product.productCode === productCode
     );
     setCart(cart.filter((item) => item.product.productCode !== productCode));
-    if (removedItem) {
-      showInfo(`${removedItem.product.name} removed from cart`, "Item Removed");
-    }
   };
 
   // Update the quantity of a product in the cart
@@ -118,7 +112,6 @@ const CashierView = () => {
     if (cart.length > 0) {
       await ApiCall.cart.clearCart(username);
       setCart([]);
-      showInfo("Cart cleared", "Cart Empty");
     }
   };
 

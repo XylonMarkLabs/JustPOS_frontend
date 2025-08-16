@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import AddProductModal from "./AddProductModal";
 import EditProductModal from "./EditProductModal";
+import ProductDetailsModal from "./ProductDetailsModal";
 import ConfirmationDialog from "../Components/ConfirmationDialog";
 import { useAlert } from "../Components/AlertProvider";
 import {
@@ -34,6 +35,7 @@ import {
   Delete as DeleteIcon,
   Visibility as ActivateIcon,
   DisabledVisible as DeactivateIcon,
+  Visibility as VisibilityIcon,
 } from "@mui/icons-material";
 import ApiCall from "../Services/ApiCall";
 
@@ -47,6 +49,7 @@ const ProductManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
@@ -148,8 +151,7 @@ const ProductManagement = () => {
       setStatusDialogOpen(false);
       setProductToToggle(null);
       showInfo(
-        `Product "${productName}" status changed to ${
-          newStatus === 1 ? "Active" : "Deactive"
+        `Product "${productName}" status changed to ${newStatus === 1 ? "Active" : "Deactive"
         }`,
         "Status Updated"
       );
@@ -332,7 +334,7 @@ const ProductManagement = () => {
                     >
                       PRODUCT
                     </TableCell>
-                    <TableCell
+                    {/* <TableCell
                       sx={{
                         fontWeight: "bold",
                         color: "#6b7280",
@@ -342,7 +344,7 @@ const ProductManagement = () => {
                       }}
                     >
                       BARCODE 
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell
                       sx={{
                         fontWeight: "bold",
@@ -439,36 +441,14 @@ const ProductManagement = () => {
                             gap: 1.5,
                           }}
                         >
-                          <Avatar
-                            src={
-                              product.image &&
-                              !product.image.match(
-                                /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u
-                              )
-                                ? product.image
-                                : undefined
-                            }
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              backgroundColor: "#f3f4f6",
-                              fontSize: "1rem",
-                              border:
-                                product.image &&
-                                !product.image.match(
-                                  /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u
-                                )
-                                  ? "1px solid #e5e7eb"
-                                  : "none",
-                            }}
-                          >
-                            {product.image &&
-                            product.image.match(
-                              /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u
-                            )
-                              ? product.image
-                              : product.productName.charAt(0).toUpperCase()}
-                          </Avatar>
+                          <div >
+                            <img
+                              src={product.imageURL}
+                              alt={product.productName}
+                              className="rounded-md "
+                              style={{ width: 52, height: 52 }}
+                            />
+                          </div>
                           <Box>
                             <Typography
                               variant="body2"
@@ -477,20 +457,20 @@ const ProductManagement = () => {
                               {product.productName}
                             </Typography>
                             <Typography
-                              variant="caption"
+                              variant="body"
                               color="text.secondary"
                               sx={{ lineHeight: 1 }}
                             >
-                              {product.code}
+                              {product.productCode}
                             </Typography>
                           </Box>
                         </Box>
                       </TableCell>
-                      <TableCell sx={{ py: 1 }}>
+                      {/* <TableCell sx={{ py: 1 }}>
                         <Typography variant="body2" color="text.secondary">
                           {product.productCode}
                         </Typography>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell sx={{ py: 1 }}>
                         <Typography variant="body2" color="text.secondary">
                           {product.category}
@@ -501,7 +481,7 @@ const ProductManagement = () => {
                           variant="body2"
                           sx={{ fontWeight: "medium" }}
                         >
-                          {product.sellingPrice}
+                          Rs.{product.sellingPrice.toFixed(2)}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
@@ -531,21 +511,21 @@ const ProductManagement = () => {
                               ) === "success"
                                 ? "#f0fdf4"
                                 : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "warning"
-                                ? "#fffbeb"
-                                : getStockColor(
+                                  product.quantityInStock,
+                                  product.minStock
+                                ) === "warning"
+                                  ? "#fffbeb"
+                                  : getStockColor(
                                     product.quantityInStock,
                                     product.minStock
                                   ) === "info"
-                                ? "#f0f9ff"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "error"
-                                ? "#fef2f2"
-                                : "#f9fafb",
+                                    ? "#f0f9ff"
+                                    : getStockColor(
+                                      product.quantityInStock,
+                                      product.minStock
+                                    ) === "error"
+                                      ? "#fef2f2"
+                                      : "#f9fafb",
                             borderColor:
                               getStockColor(
                                 product.quantityInStock,
@@ -553,21 +533,21 @@ const ProductManagement = () => {
                               ) === "success"
                                 ? "#dcfce7"
                                 : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "warning"
-                                ? "#fef3c7"
-                                : getStockColor(
+                                  product.quantityInStock,
+                                  product.minStock
+                                ) === "warning"
+                                  ? "#fef3c7"
+                                  : getStockColor(
                                     product.quantityInStock,
                                     product.minStock
                                   ) === "info"
-                                ? "#dbeafe"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "error"
-                                ? "#fecaca"
-                                : "#e5e7eb",
+                                    ? "#dbeafe"
+                                    : getStockColor(
+                                      product.quantityInStock,
+                                      product.minStock
+                                    ) === "error"
+                                      ? "#fecaca"
+                                      : "#e5e7eb",
                             color:
                               getStockColor(
                                 product.quantityInStock,
@@ -575,35 +555,35 @@ const ProductManagement = () => {
                               ) === "success"
                                 ? "#059669"
                                 : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "warning"
-                                ? "#d97706"
-                                : getStockColor(
+                                  product.quantityInStock,
+                                  product.minStock
+                                ) === "warning"
+                                  ? "#d97706"
+                                  : getStockColor(
                                     product.quantityInStock,
                                     product.minStock
                                   ) === "info"
-                                ? "#2563eb"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "error"
-                                ? "#dc2626"
-                                : "#6b7280",
+                                    ? "#2563eb"
+                                    : getStockColor(
+                                      product.quantityInStock,
+                                      product.minStock
+                                    ) === "error"
+                                      ? "#dc2626"
+                                      : "#6b7280",
                           }}
                         />
                         {isLowStock(
                           product.quantityInStock,
                           product.minStock
                         ) && (
-                          <Typography
-                            variant="caption"
-                            color="warning.main"
-                            sx={{ display: "block", fontSize: "0.65rem" }}
-                          >
-                            Low Stock!
-                          </Typography>
-                        )}
+                            <Typography
+                              variant="caption"
+                              color="warning.main"
+                              sx={{ display: "block", fontSize: "0.65rem" }}
+                            >
+                              Low Stock!
+                            </Typography>
+                          )}
                         {isOutOfStock(product.quantityInStock) && (
                           <Typography
                             variant="caption"
@@ -638,6 +618,17 @@ const ProductManagement = () => {
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
                         <Box sx={{ display: "flex", gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            sx={{ color: "#4b5563", padding: "4px" }}
+                            onClick={() => {
+                              setSelectedProduct(product);
+                              setDetailsModalOpen(true);
+                            }}
+                            title="View Details"
+                          >
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
                           <IconButton
                             size="small"
                             sx={{ color: "#2563eb", padding: "4px" }}
@@ -704,13 +695,13 @@ const ProductManagement = () => {
                   "& .MuiTablePagination-toolbar": {
                     paddingLeft: 2,
                     paddingRight: 2,
-                    minHeight: 56,
+                    minHeight: 48,
                   },
                   "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-                    {
-                      fontSize: "0.875rem",
-                      color: "#6b7280",
-                    },
+                  {
+                    fontSize: "0.875rem",
+                    color: "#6b7280",
+                  },
                   "& .MuiTablePagination-select": {
                     fontSize: "0.875rem",
                   },
@@ -756,15 +747,20 @@ const ProductManagement = () => {
         open={statusDialogOpen}
         onClose={() => setStatusDialogOpen(false)}
         onConfirm={confirmToggleStatus}
-        title={`${
-          productToToggle?.status === 1 ? "Deactivate" : "Activate"
-        } Product`}
-        message={`Are you sure you want to ${
-          productToToggle?.status === 1 ? "deactivate" : "activate"
-        } "${productToToggle?.productName}"?`}
+        title={`${productToToggle?.status === 1 ? "Deactivate" : "Activate"
+          } Product`}
+        message={`Are you sure you want to ${productToToggle?.status === 1 ? "deactivate" : "activate"
+          } "${productToToggle?.productName}"?`}
         confirmText={productToToggle?.status === 1 ? "Deactivate" : "Activate"}
         cancelText="Cancel"
         type="warning"
+      />
+
+      {/* Product Details Modal */}
+      <ProductDetailsModal
+        open={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
+        product={selectedProduct}
       />
     </div>
   );

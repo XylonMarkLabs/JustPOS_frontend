@@ -4,6 +4,8 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 const ProductCard = ({ product, onAddToCart }) => {
   const isLowStock = product.stock <= product.minStock && product.stock > 0;
   const isOutOfStock = product.stock <= 0;
+
+  console.log("ProductCard", product);
   
   return (
     <div 
@@ -39,15 +41,16 @@ const ProductCard = ({ product, onAddToCart }) => {
                     {product.discount > 0 ? (
                         <>
                             <span className="text-lg font-bold text-green-600">
-                                ${(product.sellingPrice * (1 - product.discount / 100)).toFixed(2)}
+                                Rs.{(product.sellingPrice * (1 - product.discount / 100)).toFixed(2)}
                             </span>
                             <span className="text-sm text-gray-500 line-through">
-                                ${product.sellingPrice.toFixed(2)}
+                                Rs.{product.sellingPrice.toFixed(2)}
+                                {product.discount}
                             </span>
                         </>
                     ) : (
                         <span className="text-lg font-bold text-green-600">
-                            ${product.sellingPrice.toFixed(2)}
+                            Rs.{product.sellingPrice.toFixed(2)}
                         </span>
                     )}
                 </div>
