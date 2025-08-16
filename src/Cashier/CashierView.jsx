@@ -172,7 +172,7 @@ const CashierView = () => {
 
   return (
     <div className="lg:flex gap-5 h-screen p-5 ">
-      <Sidebar />
+      {/* <Sidebar /> */}
       <section className="space-y-5 border-primary  lg:w-[75%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg">
         {/*search bar and fltters  */}
         <div className="flex-none mb-6">
