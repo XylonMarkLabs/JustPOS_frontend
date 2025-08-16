@@ -40,41 +40,72 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
     imagePreview: null
   })
 
+  const [errors, setErrors] = useState({
+    price: '',
+    stock: '',
+    minStock: ''
+  })
+
   const handleChange = (field) => (event) => {
+    const value = event.target.value
+
+    // Inline validation for negative numbers
+    if ((field === 'price' || field === 'stock' || field === 'minStock') && value < 0) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: 'Value cannot be less than 0'
+      }))
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: ''
+      }))
+    }
+
     setFormData({
       ...formData,
-      [field]: event.target.value
+      [field]: value
     })
   }
 
   const handleImageChange = (event) => {
     const file = event.target.files[0]
     if (file) {
-      // Validate file type
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
       if (!allowedTypes.includes(file.type)) {
         showError('Please select a valid image file (JPEG, PNG, GIF, or WebP)', 'Invalid File Type')
         return
       }
 
-      // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024
       if (file.size > maxSize) {
         showError('Image file must be less than 5MB', 'File Too Large')
         return
       }
 
-      // Create preview URL
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setFormData({
-          ...formData,
-          image: file,
-          imagePreview: reader.result
-        })
-      }
-      reader.readAsDataURL(file)
+      // Create preview
+      setFormData({
+        ...formData,
+        image: file,
+        imagePreview: URL.createObjectURL(file)
+      })
     }
+  }
+
+  const uploadImageToCloudinary = async (file) => {
+    const data = new FormData()
+    data.append('file', file)
+    data.append('upload_preset', 'just_pos')
+    data.append('cloud_name', 'dszxdrfy0')
+
+    const res = await fetch(
+      'https://api.cloudinary.com/v1_1/dszxdrfy0/image/upload',
+      { method: 'POST', body: data }
+    )
+
+    const result = await res.json();
+
+    return { url: result.secure_url, publicId: result.public_id }
   }
 
   const handleRemoveImage = () => {
@@ -85,7 +116,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
     })
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Basic validation
     if (!formData.name || !formData.price || !formData.stock || !formData.barcode) {
       showError('Please fill in all required fields', 'Missing Information')
@@ -98,6 +129,20 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       return
     }
 
+    let imageUrl = getCategoryEmoji(formData.category)
+    let publicId = null;
+
+    if (formData.image) {
+      try {
+        const imageResponse = await uploadImageToCloudinary(formData.image);
+        imageUrl = imageResponse.url;
+        publicId = imageResponse.publicId;
+      } catch (error) {
+        showError('Image upload failed. Please try again.', 'Upload Error')
+        return
+      }
+    }
+
     // Create new product object
     const newProduct = {
       productName: formData.name,
@@ -106,12 +151,13 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       sellingPrice: `${parseFloat(formData.price).toFixed(2)}`,
       quantityInStock: parseInt(formData.stock),
       minStock: formData.minStock ? parseInt(formData.minStock) : 0,
-      image: formData.imagePreview || getCategoryEmoji(formData.category),
+      imageURL: imageUrl,
+      imagePublicId: publicId,
       discount: formData.discount ? parseFloat(formData.discount) : 0
     }
 
     onAddProduct(newProduct)
-    showSuccess(`Product "${formData.name}" has been added successfully!`, 'Product Added')
+    // showSuccess(`Product "${formData.name}" has been added successfully!`, 'Product Added')
     handleClose()
   }
 
@@ -331,6 +377,8 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 onChange={handleChange('price')}
                 variant="outlined"
                 size="small"
+                error={!!errors.price}
+                helperText={errors.price || ''}
                 inputProps={{
                   min: 0,
                   step: 0.01,
@@ -398,6 +446,8 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 onChange={handleChange('stock')}
                 variant="outlined"
                 size="small"
+                error={!!errors.stock}
+                helperText={errors.stock || ''}
                 inputProps={{
                   min: 0,
                   style: { fontSize: '0.875rem' }
@@ -428,6 +478,8 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 onChange={handleChange('minStock')}
                 variant="outlined"
                 size="small"
+                error={!!errors.minStock}
+                helperText={errors.minStock || ''}
                 inputProps={{
                   min: 0,
                   style: { fontSize: '0.875rem' }
@@ -444,7 +496,6 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                     }
                   }
                 }}
-                helperText="Alert threshold"
               />
             </Grid>
           </Grid>

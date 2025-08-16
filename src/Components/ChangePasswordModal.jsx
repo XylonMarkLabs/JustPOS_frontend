@@ -17,6 +17,7 @@ import {
   VisibilityOff
 } from '@mui/icons-material';
 import { useAlert } from './AlertProvider';
+import ApiCall from '../Services/ApiCall';
 
 const ChangePasswordModal = ({ open, onClose, logo }) => {
     const { showSuccess, showError } = useAlert()
@@ -127,15 +128,27 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
         );
     };
 
-    const handleSubmitPasswordChange = () => {
+    const handleSubmitPasswordChange = async () => {
         if (!isFormValid()) {
             showError('Please fix the form errors before submitting', 'Invalid Form')
             return;
         }
-        // TODO: Add API call to change password here
-        console.log('Password change submitted:', passwordForm);
-        showSuccess('Password changed successfully!', 'Password Updated')
-        handleClose();
+        
+        try {
+            const res = await ApiCall.user.changePassword(
+                passwordForm.oldPassword,
+                passwordForm.newPassword,
+                passwordForm.confirmPassword
+            )
+            if (res) {
+                showSuccess('Password changed successfully!', 'Password Updated')
+                handleClose();
+            }
+        } catch (error) {
+            console.error('Error changing password:', error);
+            showError('Failed to change password. Please try again.', 'Password Change Error');
+            return;
+        }
     };
 
     return (

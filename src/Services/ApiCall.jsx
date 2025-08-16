@@ -101,6 +101,25 @@ const ApiCall = {
             }
         },
 
+        changePassword: async (oldPassword, newPassword, confirmPassword) => {
+            const username = AuthService.getConfirm().username;
+            try {
+                const response = await axios.post(`${baseURL}/user/change-password`, {
+                    username,
+                    oldPassword,
+                    newPassword,
+                    confirmPassword
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error changing password:', error);
+                throw error;
+            }
+        }
+
     },
 
     product: {
@@ -126,6 +145,8 @@ const ApiCall = {
                     category: product.category,
                     quantityInStock: product.quantityInStock,
                     minStock: product.minStock,
+                    imageURL: product.imageURL,
+                    imagePublicId: product.imagePublicId,
                     discount: product.discount
                 });
                 if (!response.data.success) {
@@ -164,6 +185,20 @@ const ApiCall = {
             }
         },
 
+        deleteImage: async (publicId) => {
+            console.log("Request to delete image with publicId:", publicId);
+            try {
+                const response = await axios.post(`${baseURL}/product/deleteImage`, { publicId });
+                if (!response.data.success) {  
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error deleting product image:', error);
+                throw error;
+            }
+        },
+
         editProduct: async (product) => {
             try {
                 const response = await axios.put(`${baseURL}/product/edit`, {
@@ -173,6 +208,8 @@ const ApiCall = {
                     category: product.category,
                     quantityInStock: product.quantityInStock,
                     minStock: product.minStock,
+                    imageURL: product.imageURL,
+                    imagePublicId: product.imagePublicId,
                     discount: product.discount
                 });
                 if (!response.data.success) {
