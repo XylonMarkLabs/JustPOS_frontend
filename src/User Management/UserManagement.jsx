@@ -385,11 +385,21 @@ const UserManagement = () => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
+                
                 <TableBody>
-                  {paginatedUsers.map((user) => (
-                    <TableRow
-                      key={user.id}
-                      sx={{
+                  {paginatedUsers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center">
+                        <div className="text-xl text-gray-500 h-80 flex justify-center items-center">
+                          No users found.
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    paginatedUsers.map((user) => (
+                      <TableRow
+                        key={user.id}
+                        sx={{
                         "&:hover": { backgroundColor: "#f9fafb" },
                         height: 60,
                       }}
@@ -538,7 +548,7 @@ const UserManagement = () => {
                         </Box>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )))}
                 </TableBody>
               </Table>
             </TableContainer>
