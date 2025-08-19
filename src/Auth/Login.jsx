@@ -9,6 +9,7 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import { useAlert } from "../Components/AlertProvider";
 import logo from "../assets/JUSTPOS_transparent.png";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -18,6 +19,7 @@ import ApiCall from "../Services/ApiCall";
 import { AuthContext } from "../Services/AuthContext";
 
 const Login = () => {
+  const { showError,showSuccess, showInfo } = useAlert();
   const [showPassword, setShowPassword] = React.useState(false);
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -45,11 +47,11 @@ const Login = () => {
         login();
         navigate("/home");
       } else {
-        alert("Login failed: " + response.data.message);
+        showError("Login failed: " + response.data.message);
       }
     } catch (err) {
       console.error("Login error:", err);
-      alert(
+      showError(
         "Login failed: " +
           (err.response ? err.response.data.message : "Network error")
       );
@@ -68,6 +70,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      showError("Failed to fetch user data: " + (error.message || "Unknown error"));
     }
   };
 

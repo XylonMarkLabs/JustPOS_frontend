@@ -334,17 +334,6 @@ const ProductManagement = () => {
                     >
                       PRODUCT
                     </TableCell>
-                    {/* <TableCell
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#6b7280",
-                        textTransform: "uppercase",
-                        fontSize: "0.75rem",
-                        py: 1.5,
-                      }}
-                    >
-                      BARCODE 
-                    </TableCell> */}
                     <TableCell
                       sx={{
                         fontWeight: "bold",
@@ -424,11 +413,21 @@ const ProductManagement = () => {
                     </TableCell>
                   </TableRow>
                 </TableHead>
+                {/* No products found */}
                 <TableBody>
-                  {paginatedProducts.map((product) => (
-                    <TableRow
-                      key={product.productCode}
-                      sx={{
+                  {paginatedProducts.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center">
+                        <div className="text-xl text-gray-500 h-80 flex justify-center items-center">
+                          No products found.
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    paginatedProducts.map((product) => (
+                      <TableRow
+                        key={product.productCode}
+                        sx={{
                         "&:hover": { backgroundColor: "#f9fafb" },
                         height: 60,
                       }}
@@ -466,11 +465,6 @@ const ProductManagement = () => {
                           </Box>
                         </Box>
                       </TableCell>
-                      {/* <TableCell sx={{ py: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {product.productCode}
-                        </Typography>
-                      </TableCell> */}
                       <TableCell sx={{ py: 1 }}>
                         <Typography variant="body2" color="text.secondary">
                           {product.category}
@@ -668,7 +662,7 @@ const ProductManagement = () => {
                         </Box>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )))}
                 </TableBody>
               </Table>
             </TableContainer>

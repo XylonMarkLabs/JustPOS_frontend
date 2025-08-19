@@ -6,7 +6,6 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import { Badge, IconButton, Tooltip, Pagination, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import ApiCall from "../Services/ApiCall";
-import Sidebar from "../Components/Sidebar";
 import { useAlert } from "../Components/AlertProvider";
 
 const CashierView = () => {
@@ -122,10 +121,20 @@ const CashierView = () => {
       : originalPrice;
   };
 
+  const calculateSavedAmount = () => {
+    return cart.reduce((total, item) => {
+      const itemPrice = calculateItemPrice(item);
+      return total + (item.product.price * item.product.quantity - itemPrice);
+    }, 0);
+  };
+
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + calculateItemPrice(item), 0);
   };
 
+
+
+  // Handle checkout process
   const handleCheckout = () => {
     if (cart.length === 0) {
       showWarning("Your cart is empty!", "Cannot Checkout");
@@ -133,14 +142,15 @@ const CashierView = () => {
     }
 
     const total = calculateTotal().toFixed(2);
+    const discountedTotal = calculateSavedAmount().toFixed(2);
     const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     // Here you would normally integrate with a payment system
     showSuccess(
-      `Order completed successfully! Total: $${total} for ${itemCount} items`,
+      `Order completed successfully! Total: Rs.${total} for ${itemCount} items , Discounted Total: Rs.${discountedTotal}`,
       "Order Completed"
     );
-    setCart([]);
+    clearCart();
   };
 
   const filteredProducts = products.filter((product) => {
@@ -164,11 +174,11 @@ const CashierView = () => {
   };
 
   return (
-    <div className="lg:flex gap-5 h-screen p-5 ">
+    <div className="lg:flex gap-5  p-5 ">
       {/* <Sidebar /> */}
-      <section className="space-y-5 border-primary  lg:w-[75%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg">
+      <section className="space-y-5 border-primary h-[calc(90vh-2.5rem)]   lg:w-[80%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg">
         {/*search bar and fltters  */}
-        <div className="flex-none mb-6">
+        <div className="flex-none ">
           <div className="flex gap-4 items-center">
             {/* search bar */}
             <div className="relative flex-grow">
@@ -258,8 +268,9 @@ const CashierView = () => {
               ))}
             </div>
           </div>
+
           {pageCount > 1 && (
-            <div className="flex-none pt-2 flex justify-end border-t mt-4">
+            <div className="flex-none pt-2 flex justify-end border-t ">
               <Pagination
                 count={pageCount}
                 page={currentPage}
@@ -273,7 +284,7 @@ const CashierView = () => {
       </section>
 
       {/* cart */}
-      <section className="space-y-5 lg:w-[25%] p-5 rounded-lg bg-background shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
+      <section className="space-y-5 lg:w-[20%] p-5 rounded-lg bg-background shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
         <div className="flex-none">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -338,8 +349,12 @@ const CashierView = () => {
               <div className="flex justify-between items-center text-xl font-bold">
                 <span>Total:</span>
                 <span className="text-green-600">
-                  ${calculateTotal().toFixed(2)}
+                  Rs.{calculateTotal().toFixed(2)}
                 </span>
+              </div>
+              <div className="flex justify-between items-center text-sm text-gray-500">
+                <span>Save:</span>
+                <span>Rs.{calculateSavedAmount().toFixed(2)}</span>
               </div>
               <button
                 className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
