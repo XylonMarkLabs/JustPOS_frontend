@@ -70,6 +70,7 @@ const CategoryManagement = () => {
 
   // Handle adding new category
   const handleAddCategory = async (newCategory) => {
+    console.log(newCategory)
     const response = await ApiCall.category.addCategory(newCategory);
     if (response) {
       getCategories();
@@ -116,15 +117,14 @@ const CategoryManagement = () => {
   };
 
   const confirmDeleteCategory = async () => {
-    if (!isAuthorized(userRole)) {
-      showInfo("You are not authorized to delete categories.", "Unauthorized");
-      return;
-    }
+    // if (!isAuthorized(userRole)) {
+    //   showInfo("You are not authorized to delete categories.", "Unauthorized");
+    //   return;
+    // }
 
-    const categoryId = categoryToDelete.categoryId;
     const categoryName = categoryToDelete.categoryName;
 
-    const response = await ApiCall.category.deleteCategory(categoryId);
+    const response = await ApiCall.category.deleteCategory(categoryName);
 
     if (response) {
       getCategories();
@@ -147,16 +147,15 @@ const CategoryManagement = () => {
   };
 
   const confirmToggleStatus = async () => {
-    if (!isAuthorized(userRole)) {
-      showInfo("You are not authorized to change category status.", "Unauthorized");
-      return;
-    }
+    // if (!isAuthorized(userRole)) {
+    //   showInfo("You are not authorized to change category status.", "Unauthorized");
+    //   return;
+    // }
 
     const newStatus = categoryToToggle.status === 1 ? 0 : 1;
-    const categoryId = categoryToToggle.categoryId;
     const categoryName = categoryToToggle.categoryName;
 
-    const response = await ApiCall.category.updateStatus(categoryId, newStatus);
+    const response = await ApiCall.category.updateStatus(categoryName, newStatus);
 
     if (response) {
       getCategories();
@@ -356,7 +355,7 @@ const CategoryManagement = () => {
                 <TableBody>
                   {paginatedCategories.map((category) => (
                     <TableRow
-                      key={category.categoryId}
+                      key={category._id}
                       sx={{
                         "&:hover": { backgroundColor: "#f9fafb" },
                         height: 60,
