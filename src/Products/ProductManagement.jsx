@@ -56,9 +56,11 @@ const ProductManagement = () => {
   const [productToDelete, setProductToDelete] = useState(null);
   const [productToToggle, setProductToToggle] = useState(null);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     getProducts();
+    getCategories();
   }, []);
 
   // Fetch all products from the API
@@ -68,6 +70,17 @@ const ProductManagement = () => {
       setProducts(products);
     } catch (error) {
       console.error("Error fetching products:", error);
+    }
+  };
+
+  const getCategories = async () => {
+    try {
+      const categories = await ApiCall.category.getAll();
+      const categoryNames = categories.map((cat) => cat.categoryName);
+
+      setCategories(categoryNames);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   };
 
@@ -282,9 +295,11 @@ const ProductManagement = () => {
                 onChange={handleCategoryChange}
               >
                 <MenuItem value="All">All</MenuItem>
-                <MenuItem value="Beverages">Beverages</MenuItem>
-                <MenuItem value="Food">Food</MenuItem>
-                <MenuItem value="Bakery">Bakery</MenuItem>
+                {categories.map((categoryName, index) => (
+                  <MenuItem key={index} value={categoryName}>
+                    {categoryName}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl sx={{ minWidth: 120 }}>
@@ -441,7 +456,7 @@ const ProductManagement = () => {
                             gap: 1.5,
                           }}
                         >
-                          <div >
+                          <div>
                             <img
                               src={product.imageURL}
                               alt={product.productName}
@@ -511,21 +526,21 @@ const ProductManagement = () => {
                               ) === "success"
                                 ? "#f0fdf4"
                                 : getStockColor(
-                                  product.quantityInStock,
-                                  product.minStock
-                                ) === "warning"
-                                  ? "#fffbeb"
-                                  : getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "warning"
+                                ? "#fffbeb"
+                                : getStockColor(
                                     product.quantityInStock,
                                     product.minStock
                                   ) === "info"
-                                    ? "#f0f9ff"
-                                    : getStockColor(
-                                      product.quantityInStock,
-                                      product.minStock
-                                    ) === "error"
-                                      ? "#fef2f2"
-                                      : "#f9fafb",
+                                ? "#f0f9ff"
+                                : getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "error"
+                                ? "#fef2f2"
+                                : "#f9fafb",
                             borderColor:
                               getStockColor(
                                 product.quantityInStock,
@@ -533,21 +548,21 @@ const ProductManagement = () => {
                               ) === "success"
                                 ? "#dcfce7"
                                 : getStockColor(
-                                  product.quantityInStock,
-                                  product.minStock
-                                ) === "warning"
-                                  ? "#fef3c7"
-                                  : getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "warning"
+                                ? "#fef3c7"
+                                : getStockColor(
                                     product.quantityInStock,
                                     product.minStock
                                   ) === "info"
-                                    ? "#dbeafe"
-                                    : getStockColor(
-                                      product.quantityInStock,
-                                      product.minStock
-                                    ) === "error"
-                                      ? "#fecaca"
-                                      : "#e5e7eb",
+                                ? "#dbeafe"
+                                : getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "error"
+                                ? "#fecaca"
+                                : "#e5e7eb",
                             color:
                               getStockColor(
                                 product.quantityInStock,
@@ -555,35 +570,35 @@ const ProductManagement = () => {
                               ) === "success"
                                 ? "#059669"
                                 : getStockColor(
-                                  product.quantityInStock,
-                                  product.minStock
-                                ) === "warning"
-                                  ? "#d97706"
-                                  : getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "warning"
+                                ? "#d97706"
+                                : getStockColor(
                                     product.quantityInStock,
                                     product.minStock
                                   ) === "info"
-                                    ? "#2563eb"
-                                    : getStockColor(
-                                      product.quantityInStock,
-                                      product.minStock
-                                    ) === "error"
-                                      ? "#dc2626"
-                                      : "#6b7280",
+                                ? "#2563eb"
+                                : getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "error"
+                                ? "#dc2626"
+                                : "#6b7280",
                           }}
                         />
                         {isLowStock(
                           product.quantityInStock,
                           product.minStock
                         ) && (
-                            <Typography
-                              variant="caption"
-                              color="warning.main"
-                              sx={{ display: "block", fontSize: "0.65rem" }}
-                            >
-                              Low Stock!
-                            </Typography>
-                          )}
+                          <Typography
+                            variant="caption"
+                            color="warning.main"
+                            sx={{ display: "block", fontSize: "0.65rem" }}
+                          >
+                            Low Stock!
+                          </Typography>
+                        )}
                         {isOutOfStock(product.quantityInStock) && (
                           <Typography
                             variant="caption"
@@ -698,10 +713,10 @@ const ProductManagement = () => {
                     minHeight: 48,
                   },
                   "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-                  {
-                    fontSize: "0.875rem",
-                    color: "#6b7280",
-                  },
+                    {
+                      fontSize: "0.875rem",
+                      color: "#6b7280",
+                    },
                   "& .MuiTablePagination-select": {
                     fontSize: "0.875rem",
                   },
@@ -747,10 +762,8 @@ const ProductManagement = () => {
         open={statusDialogOpen}
         onClose={() => setStatusDialogOpen(false)}
         onConfirm={confirmToggleStatus}
-        title={`${productToToggle?.status === 1 ? "Deactivate" : "Activate"
-          } Product`}
-        message={`Are you sure you want to ${productToToggle?.status === 1 ? "deactivate" : "activate"
-          } "${productToToggle?.productName}"?`}
+        title={`${productToToggle?.status === 1 ? "Deactivate" : "Activate" } Product`}
+        message={`Are you sure you want to ${productToToggle?.status === 1 ? "deactivate" : "activate" } "${productToToggle?.productName}"?`} 
         confirmText={productToToggle?.status === 1 ? "Deactivate" : "Activate"}
         cancelText="Cancel"
         type="warning"

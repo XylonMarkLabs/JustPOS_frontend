@@ -22,7 +22,7 @@ const EditCategoryModal = ({ open, onClose, onEditCategory, category }) => {
   useEffect(() => {
     if (category) {
       setCategoryData({
-        categoryId: category.categoryId,
+        categoryId: category._id,
         categoryName: category.categoryName,
         description: category.description || "",
         status: category.status,

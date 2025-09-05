@@ -299,8 +299,65 @@ const ApiCall = {
                 throw error;
             }
         }
-    }
+    },
 
+    category: {
+        getAll: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/category/getAll`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.data.categories;
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                throw error;
+            }
+        },
+
+        addCategory: async (category) => {
+            try {
+                const response = await axios.post(`${baseURL}/category/add`, {
+                    categoryName: category.categoryName,
+                    description: category.description
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error adding category:', error);
+                throw error;
+            }
+        },
+
+        updateStatus: async (categoryName, status) => {
+            try {
+                const response = await axios.post(`${baseURL}/category/update-status`, { categoryName, status });
+                if (!response.data.success) {
+                    throw new Error('Network reponse was not ok')
+                }
+                return true;
+            } catch (error) {
+                console.error('Error updating category status: ', error);
+                throw error;
+            }
+        },
+
+        deleteCategory: async (categoryName) => {
+            try {
+                const response = await axios.post(`${baseURL}/category/delete`, { categoryName });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                throw error;
+            }
+        },
+
+    }
 }
 
 export default ApiCall;
