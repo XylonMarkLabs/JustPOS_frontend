@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import CartItem from "./CartItem";
+import CheckoutModal from "./CheckoutModal";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
@@ -10,6 +11,7 @@ import { useAlert } from "../Components/AlertProvider";
 
 const CashierView = () => {
   const { showSuccess, showInfo, showWarning } = useAlert();
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -140,17 +142,13 @@ const CashierView = () => {
       showWarning("Your cart is empty!", "Cannot Checkout");
       return;
     }
+    setIsCheckoutModalOpen(true);
+  };
 
-    const total = calculateTotal().toFixed(2);
-    const discountedTotal = calculateSavedAmount().toFixed(2);
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-    // Here you would normally integrate with a payment system
-    showSuccess(
-      `Order completed successfully! Total: Rs.${total} for ${itemCount} items , Discounted Total: Rs.${discountedTotal}`,
-      "Order Completed"
-    );
-    clearCart();
+  const handleCloseCheckoutModal = () => {
+    setIsCheckoutModalOpen(false);
+    getCart();
+    getProducts();
   };
 
   const filteredProducts = products.filter((product) => {
@@ -366,6 +364,14 @@ const CashierView = () => {
           )}
         </div>
       </section>
+
+      <CheckoutModal
+        open={isCheckoutModalOpen}
+        onClose={handleCloseCheckoutModal}
+        cart={cart}
+        total={calculateTotal()}
+        discount={calculateSavedAmount().toFixed(2)}
+      />
     </div>
   );
 };

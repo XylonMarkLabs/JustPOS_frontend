@@ -147,7 +147,7 @@ const EditCategoryModal = ({ open, onClose, onEditCategory, category }) => {
             variant="contained"
             sx={{
               bgcolor: "#b0a892",
-              color: "white",
+              color: "black",
               "&:hover": {
                 bgcolor: "#e0dac5",
               },

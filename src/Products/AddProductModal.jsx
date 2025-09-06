@@ -51,7 +51,6 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
 
   useEffect(() => {
     getCategories();
-    console.log(categories)
   }, []);
 
   const getCategories = async () => {

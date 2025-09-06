@@ -70,7 +70,6 @@ const CategoryManagement = () => {
 
   // Handle adding new category
   const handleAddCategory = async (newCategory) => {
-    console.log(newCategory)
     const response = await ApiCall.category.addCategory(newCategory);
     if (response) {
       getCategories();

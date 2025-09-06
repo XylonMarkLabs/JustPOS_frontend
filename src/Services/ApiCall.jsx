@@ -186,7 +186,6 @@ const ApiCall = {
         },
 
         deleteImage: async (publicId) => {
-            console.log("Request to delete image with publicId:", publicId);
             try {
                 const response = await axios.post(`${baseURL}/product/deleteImage`, { publicId });
                 if (!response.data.success) {  
@@ -296,6 +295,25 @@ const ApiCall = {
                 return response.data.orders;
             } catch (error) {
                 console.error('Error fetching orders:', error);
+                throw error;
+            }
+        },
+
+        checkout: async (order) => {
+            try {
+                const response = await axios.post(`${baseURL}/order/checkout`, {
+                    username: order.username,
+                    totalAmount: order.totalAmount,
+                    paymentMethod: order.paymentMethod,
+                    cashReceived: order.cashReceived,
+                    changeGiven: order.changeGiven
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error during cash checkout:', error);
                 throw error;
             }
         }
