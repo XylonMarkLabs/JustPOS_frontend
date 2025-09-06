@@ -63,8 +63,20 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
         existingImageURL: product.imageURL,
         imagePublicId: product.imagePublicId || null,
       });
+      getCategories();
     }
   }, [product]);
+
+  const getCategories = async () => {
+    try {
+      const categories = await ApiCall.category.getAll();
+      const categoryNames = categories.map((cat) => cat.categoryName);
+
+      setCategories(categoryNames);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const handleChange = (field) => (event) => {
     const value = event.target.value;
@@ -153,7 +165,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       showError("Failed to delete image from Cloudinary", "Deletion Error");
       return false;
     }
-  }
+  };
 
   const handleRemoveImage = () => {
     setFormData({
@@ -185,18 +197,17 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       return;
     }
 
-    let imageUrl = formData.existingImageURL
-    let imagePublicId = formData.imagePublicId
+    let imageUrl = formData.existingImageURL;
+    let imagePublicId = formData.imagePublicId;
 
     if (formData.image) {
+      const uploadRes = await uploadImageToCloudinary(formData.image);
 
-      const uploadRes = await uploadImageToCloudinary(formData.image)
-
-      imageUrl = uploadRes.secure_url
-      imagePublicId = uploadRes.public_id
+      imageUrl = uploadRes.secure_url;
+      imagePublicId = uploadRes.public_id;
 
       if (formData.imagePublicId) {
-        await deleteImageFromCloudinary(formData.imagePublicId)
+        await deleteImageFromCloudinary(formData.imagePublicId);
       }
     }
 
@@ -449,9 +460,11 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                     },
                   }}
                 >
-                  <MenuItem value="Beverages">Beverages</MenuItem>
-                  <MenuItem value="Food">Food</MenuItem>
-                  <MenuItem value="Bakery">Bakery</MenuItem>
+                  {categories.map((categoryName, index) => (
+                    <MenuItem key={index} value={categoryName}>
+                      {categoryName}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
