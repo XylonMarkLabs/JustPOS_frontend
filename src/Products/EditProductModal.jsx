@@ -46,6 +46,8 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
     minStock: "",
   });
 
+  const [categories, setCategories] = useState([]);
+
   // Populate form data when product changes
   useEffect(() => {
     if (product) {

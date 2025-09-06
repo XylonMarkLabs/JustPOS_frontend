@@ -162,7 +162,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Payment Method
                 </Typography>
                 <Typography variant="body1">
-                  {order.payment}
+                  {order.paymentMethod}
                 </Typography>
               </Box>
               {/* <Box>

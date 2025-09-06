@@ -213,7 +213,7 @@ const Orders = () => {
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            {order.payment}
+                            {order.paymentMethod}
                           </Typography>
                         </TableCell>
                         {/* <TableCell sx={{ py: 1 }}>
