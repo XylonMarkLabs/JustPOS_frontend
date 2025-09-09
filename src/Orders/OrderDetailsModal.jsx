@@ -162,7 +162,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Payment Method
                 </Typography>
                 <Typography variant="body1">
-                  {order.payment}
+                  {order.paymentMethod}
                 </Typography>
               </Box>
               {/* <Box>
@@ -342,7 +342,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontWeight: 'bold', color: '#000' }}>Payment:</Typography>
-            <Typography sx={{ color: '#000' }}>{order.payment}</Typography>
+            <Typography sx={{ color: '#000' }}>{order.paymentMethod}</Typography>
           </Box>
           {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontWeight: 'bold', color: '#000' }}>Status:</Typography>
