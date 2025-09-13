@@ -29,7 +29,8 @@ import ApiCall from '../Services/ApiCall'
 
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All Status')
+  const [paymentFilter, setPaymentFilter] = useState('All')
+  const [dateFilter, setDateFilter] = useState('')
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [orderDetailsOpen, setOrderDetailsOpen] = useState(false)
@@ -44,7 +45,9 @@ const Orders = () => {
   const getOrders = async () => {
     await ApiCall.order.getorders()
       .then((orders) => {
-        setOrders(orders);
+        // Sort orders by date in descending order (most recent first)
+        const sortedOrders = orders.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setOrders(sortedOrders);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -57,17 +60,19 @@ const Orders = () => {
     setOrderDetailsOpen(true)
   }
 
-  // Filter orders based on search term and status
+  // Filter orders based on search term, status, payment type, and date
   const filteredOrders = orders.filter(order => {
     const orderIdStr = String(order.orderId);
 
     const matchesSearch = 
       orderIdStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchTerm.toLowerCase());
+      order.username.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesPayment = paymentFilter === 'All' || order.paymentMethod === paymentFilter;
 
-    const matchesStatus = statusFilter === 'All Status' || order.status === statusFilter;
+    const matchesDate = !dateFilter || new Date(order.date).toISOString().split('T')[0] === dateFilter;
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesPayment && matchesDate;
 });
 
 
@@ -94,8 +99,13 @@ const Orders = () => {
     setPage(0)
   }
 
-  const handleStatusChange = (e) => {
-    setStatusFilter(e.target.value)
+  const handlePaymentChange = (e) => {
+    setPaymentFilter(e.target.value)
+    setPage(0)
+  }
+
+  const handleDateChange = (e) => {
+    setDateFilter(e.target.value)
     setPage(0)
   }
 
@@ -138,19 +148,28 @@ const Orders = () => {
                 }}
               />
               <FormControl sx={{ minWidth: 120 }}>
-                <InputLabel>Status</InputLabel>
+                <InputLabel>Payment Type</InputLabel>
                 <Select
-                  value={statusFilter}
-                  label="Status"
-                  onChange={handleStatusChange}
+                  value={paymentFilter}
+                  label="Payment Type"
+                  onChange={handlePaymentChange}
                 >
-                  <MenuItem value="All Status">All Status</MenuItem>
-                  <MenuItem value="Completed">Completed</MenuItem>
-                  <MenuItem value="Pending">Pending</MenuItem>
-                  <MenuItem value="Preparing">Preparing</MenuItem>
-                  <MenuItem value="Cancelled">Cancelled</MenuItem>
+                  <MenuItem value="All">All</MenuItem>
+                  <MenuItem value="Cash">Cash</MenuItem>
+                  <MenuItem value="Card">Card</MenuItem>
                 </Select>
               </FormControl>
+
+              <TextField
+                type="date"
+                value={dateFilter}
+                onChange={handleDateChange}
+                sx={{ minWidth: 200 }}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                label="Filter by Date"
+              />
             </Box>
 
             {/* Orders Table */}
@@ -208,7 +227,7 @@ const Orders = () => {
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                            {order.totalAmount}
+                            Rs.{order.totalAmount.toFixed(2)}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
