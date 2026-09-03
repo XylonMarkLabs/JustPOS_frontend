@@ -54,12 +54,12 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       setFormData({
         name: product.productName || "",
         category: product.category || "Beverages",
-        price: product.sellingPrice,
-        stock: product.quantityInStock || "",
+        // price: product.sellingPrice,
+        // stock: product.quantityInStock || "",
         minStock: product.minStock || "",
         barcode: product.productCode || "",
         status: product.status === 1 ? "Active" : "Inactive",
-        discount: product.discount || 0,
+        // discount: product.discount || 0,
         image: null,
         imagePreview: product.imageURL,
         existingImageURL: product.imageURL,
@@ -218,10 +218,10 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       productName: formData.name,
       productCode: formData.barcode,
       category: formData.category,
-      sellingPrice: `${parseFloat(formData.price).toFixed(2)}`,
-      quantityInStock: parseInt(formData.stock),
+      // sellingPrice: `${parseFloat(formData.price).toFixed(2)}`,
+      // quantityInStock: parseInt(formData.stock),
       minStock: formData.minStock ? parseInt(formData.minStock) : 0,
-      discount: formData.discount ? parseFloat(formData.discount) : 0,
+      // discount: formData.discount ? parseFloat(formData.discount) : 0,
       imageURL: imageUrl,
       imagePublicId: imagePublicId,
     };
@@ -236,15 +236,6 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
 
   const handleClose = () => {
     onClose();
-  };
-
-  const getCategoryEmoji = (category) => {
-    const emojiMap = {
-      Beverages: "☕",
-      Food: "🍕",
-      Bakery: "🧁",
-    };
-    return emojiMap[category] || "📦";
   };
 
   return (
@@ -473,7 +464,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
           </Grid>
 
           {/* Price and Discount */}
-          <Grid container spacing={2}>
+          {/* <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography
                 variant="body2"
@@ -543,7 +534,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                 }}
               />
             </Grid>
-          </Grid>
+          </Grid> */}
 
           {/* Current Stock and Min Stock Level */}
           <Grid container spacing={2}>
@@ -559,7 +550,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                 type="number"
                 placeholder="0"
                 value={formData.stock}
-                onChange={handleChange("stock")}
+                // onChange={handleChange("stock")}
                 variant="outlined"
                 size="small"
                 error={!!errors.stock}
@@ -567,6 +558,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                 inputProps={{
                   min: 0,
                   style: { fontSize: "0.875rem" },
+                  readOnly: true,
                 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {

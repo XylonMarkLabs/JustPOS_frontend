@@ -32,12 +32,19 @@ const Login = () => {
   const handleMouseUpPassword = (event) => event.preventDefault();
 
   const handleLogin = async () => {
+    const businessId = localStorage.getItem('businessId');
+    if (!businessId) {
+      showError("Please select a business first");
+      return;
+    }
+
     try {
       const response = await axios.post(
         "http://localhost:4000/api/user/login",
         {
           username: username,
           password: password,
+          businessId: businessId,
         }
       );
 

@@ -5,6 +5,25 @@ const AuthService = {
     return localStorage.getItem("token");
   },
 
+  getBusinessData: () => {
+    const data = localStorage.getItem("businessData");
+    return data ? JSON.parse(data) : null;
+  },
+
+  isBusinessLoggedIn: () => {
+    return !!localStorage.getItem("businessData");
+  },
+
+  getBusinessId: () => {
+    const businessData = localStorage.getItem("businessData");
+    return businessData ? JSON.parse(businessData).id : null;
+  },
+
+  getBusinessData: () => {
+    const data = localStorage.getItem("businessData");
+    return data ? JSON.parse(data) : null;
+  },
+
   getConfirm: () => {
     let answer = jwtDecode(AuthService.getToken());
     return answer;
@@ -38,7 +57,9 @@ const AuthService = {
   logout: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/";
+    // localStorage.removeItem("businessId");
+    // localStorage.removeItem("businessData");
+    window.location.href = "/user-login";
   },
 };
 

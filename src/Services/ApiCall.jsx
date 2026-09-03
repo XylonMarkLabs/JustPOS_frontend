@@ -136,18 +136,28 @@ const ApiCall = {
             }
         },
 
+        getAllCashier: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/product/get-all-cashier`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.products;
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                throw error;
+            }
+        },
+
         addProduct: async (product) => {
             try {
                 const response = await axios.post(`${baseURL}/product/add`, {
                     productCode: product.productCode,
                     productName: product.productName,
-                    sellingPrice: product.sellingPrice,
                     category: product.category,
-                    quantityInStock: product.quantityInStock,
                     minStock: product.minStock,
                     imageURL: product.imageURL,
                     imagePublicId: product.imagePublicId,
-                    discount: product.discount
                 });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
@@ -203,13 +213,10 @@ const ApiCall = {
                 const response = await axios.put(`${baseURL}/product/edit`, {
                     productCode: product.productCode,
                     productName: product.productName,
-                    sellingPrice: product.sellingPrice,
                     category: product.category,
-                    quantityInStock: product.quantityInStock,
                     minStock: product.minStock,
                     imageURL: product.imageURL,
                     imagePublicId: product.imagePublicId,
-                    discount: product.discount
                 });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
@@ -374,8 +381,133 @@ const ApiCall = {
                 throw error;
             }
         },
+    },
 
-    }
+    supplier: {
+        getAll: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/supplier/get-all`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.suppliers;
+            } catch (error) {
+                console.error('Error fetching suppliers:', error);
+                throw error;
+            }
+        },
+
+        addSupplier: async (supplier) => {
+            try {
+                const response = await axios.post(`${baseURL}/supplier/add`, {
+                    supplierId: supplier.supplierId,
+                    supplierName: supplier.supplierName,
+                    contactPerson: supplier.contactPerson,
+                    contactNo: supplier.contactNo,
+                    email: supplier.email
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error adding supplier:', error);
+                throw error;
+            }
+        },
+
+        updateStatus: async (productCode, status) => {
+            try {
+                const response = await axios.post(`${baseURL}/product/update-status`, { productCode, status });
+                if (!response.data.success) {
+                    throw new Error('Network reponse was not ok')
+                }
+                return true;
+            } catch (error) {
+                console.error('Error updating product status: ', error);
+                throw error;
+            }
+        },
+
+        editSupplier: async (supplier) => {
+            try {
+                const response = await axios.put(`${baseURL}/supplier/edit`, {
+                    supplierId: supplier.supplierId,
+                    supplierName: supplier.supplierName,
+                    contactPerson: supplier.contactPerson,
+                    contactNo: supplier.contactNo,
+                    email: supplier.email
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error editing product:', error);
+                throw error;
+            }
+        }
+    },
+
+    stock: {
+        getAll: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/stock/get-all`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.stocks;
+            } catch (error) {
+                console.error('Error fetching stocks:', error);
+                throw error;
+            }
+        },
+
+        addStock: async (stock) => {
+            try {
+                const response = await axios.post(`${baseURL}/stock/add`, {
+                    stockId: stock.stockId,
+                    items: stock.items,
+                    supplierId: stock.supplierId,
+                    supplierName: stock.supplierName,
+                    totalPrice: stock.totalPrice,
+                    receivedDate: stock.receivedDate,
+                    invoiceNo: stock.invoiceNo,
+                    addedBy: stock.addedBy,
+                    notes: stock.notes,
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error adding stock:', error);
+                throw error;
+            }
+        },
+
+        editStock: async (stock) => {
+            try {
+                const response = await axios.put(`${baseURL}/stock/edit`, {
+                    stockId: stock.stockId,
+                    items: stock.items,
+                    supplierId: stock.supplierId,
+                    supplierName: stock.supplierName,
+                    totalPrice: stock.totalPrice,
+                    receivedDate: stock.receivedDate,
+                    invoiceNo: stock.invoiceNo,
+                    notes: stock.notes,
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error editing stock:', error);
+                throw error;
+            }
+        }
+    },
 }
 
 export default ApiCall;
