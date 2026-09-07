@@ -35,7 +35,7 @@ const ProtectedManagerDashboard = withAuth(ManagerDashboard);
 function AppContent() {
   const { isAuthenticated } = useContext(AuthContext);
   const user = JSON.parse(localStorage.getItem("user"));
-  const businessData = localStorage.getItem("businessData");
+  // const businessData = localStorage.getItem("businessData");
   const token = localStorage.getItem("token");
   const role = user?.role;
 
@@ -54,29 +54,20 @@ function AppContent() {
   };
 
   // Function to handle root path navigation
-  const handleRootNavigation = () => {
-    // If both business data and user token exist
-    if (businessData && token) {
-      return getHomePage();
-    }
-    // If only business data exists
-    if (businessData && !token) {
-      return <Navigate to="/user-login" />;
-    }
-    // If neither exists
-    return <BusinessLogin />;
-  };
+  // const handleRootNavigation = () => {
+  //   // If both business data and user token exist
+  //   if (token) {
+  //     return getHomePage();
+  //   } else {
+  //     return <Navigate to="/user-login" />;
+  //   }
+  // };
 
   return (
     <>
       {isAuthenticated && <Navbar />}
       <Routes>
-        <Route path="/" element={handleRootNavigation()} />
-        <Route path="/register-business" element={<BusinessRegister />} />
-        <Route 
-          path="/user-login" 
-          element={businessData ? <Login /> : <Navigate to="/" />} 
-        />
+        <Route path="/" element={<Login />} />
         <Route path="/home" element={getHomePage()} />
         
         {/* Admin Routes */}

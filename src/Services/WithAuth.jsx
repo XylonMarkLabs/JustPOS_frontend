@@ -12,7 +12,7 @@ export default function withAuth(AuthComponent) {
 
     useEffect(() => {
       const checkAuth = async () => {
-        if (!Auth.loggedIn() || !Auth.getBusinessId()) {
+        if (!Auth.loggedIn()) {
           navigate("/");
         } else {
           try {
