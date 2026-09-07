@@ -5,6 +5,8 @@ export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!AuthService.isTokenExpired());
+  const [businessData, setBusinessData] = useState(JSON.parse(localStorage.getItem('businessData')));
+  const [isBusinessSelected, setIsBusinessSelected] = useState(!!localStorage.getItem('businessId'));
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,10 +23,24 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     AuthService.logout();
     setIsAuthenticated(false);
+    setBusinessData(null);
+    setIsBusinessSelected(false);
+  };
+
+  const selectBusiness = (business) => {
+    setBusinessData(business);
+    setIsBusinessSelected(true);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      login, 
+      logout, 
+      selectBusiness,
+      businessData,
+      isBusinessSelected 
+    }}>
       {children}
     </AuthContext.Provider>
   );

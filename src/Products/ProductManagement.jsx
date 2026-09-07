@@ -360,7 +360,7 @@ const ProductManagement = () => {
                     >
                       CATEGORY
                     </TableCell>
-                    <TableCell
+                    {/* <TableCell
                       sx={{
                         fontWeight: "bold",
                         color: "#6b7280",
@@ -381,7 +381,7 @@ const ProductManagement = () => {
                       }}
                     >
                       DISCOUNT
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell
                       sx={{
                         fontWeight: "bold",
@@ -485,7 +485,7 @@ const ProductManagement = () => {
                           {product.category}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ py: 1 }}>
+                      {/* <TableCell sx={{ py: 1 }}>
                         <Typography
                           variant="body2"
                           sx={{ fontWeight: "medium" }}
@@ -500,7 +500,7 @@ const ProductManagement = () => {
                         >
                           {product.discount}%
                         </Typography>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell sx={{ py: 1 }}>
                         <Chip
                           label={product.quantityInStock}

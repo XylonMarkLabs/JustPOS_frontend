@@ -212,12 +212,12 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                       </TableCell>
                       <TableCell align="right" sx={{ py: 1.5 }}>
                         <Typography variant="body2">
-                          ${item.price.toFixed(2)}
+                          Rs.{item.price.toFixed(2)}
                         </Typography>
                       </TableCell>
                       <TableCell align="right" sx={{ py: 1.5 }}>
                         <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                          ${(item.price * item.quantity).toFixed(2)}
+                          Rs.{(item.price * item.quantity).toFixed(2)}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -237,7 +237,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Subtotal:
                 </Typography>
                 <Typography variant="body2">
-                  ${calculateSubtotal()}
+                  Rs.{calculateSubtotal()}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -245,7 +245,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Tax (8.5%):
                 </Typography>
                 <Typography variant="body2">
-                  ${calculateTax()}
+                  Rs.{calculateTax()}
                 </Typography>
               </Box>
               <Divider sx={{ my: 1 }} />
@@ -254,7 +254,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Total:
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                  ${calculateTotal()}
+                  Rs.{calculateTotal()}
                 </Typography>
               </Box>
             </Box>
@@ -384,8 +384,8 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
               }}>
                 <Typography>{item.name}</Typography>
                 <Typography sx={{ textAlign: 'center' }}>{item.quantity}</Typography>
-                <Typography sx={{ textAlign: 'right' }}>${item.price.toFixed(2)}</Typography>
-                <Typography sx={{ textAlign: 'right' }}>${(item.price * item.quantity).toFixed(2)}</Typography>
+                <Typography sx={{ textAlign: 'right' }}>Rs.{item.price.toFixed(2)}</Typography>
+                <Typography sx={{ textAlign: 'right' }}>Rs.{(item.price * item.quantity).toFixed(2)}</Typography>
               </Box>
             ))}
           </Box>
@@ -398,11 +398,11 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
           <Box sx={{ minWidth: '200px' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography sx={{ color: '#000' }}>Subtotal:</Typography>
-              <Typography sx={{ color: '#000' }}>${calculateSubtotal()}</Typography>
+              <Typography sx={{ color: '#000' }}>Rs.{calculateSubtotal()}</Typography>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography sx={{ color: '#000' }}>Tax (8.5%):</Typography>
-              <Typography sx={{ color: '#000' }}>${calculateTax()}</Typography>
+              <Typography sx={{ color: '#000' }}>Rs.{calculateTax()}</Typography>
             </Box>
             <Box sx={{ borderTop: '1px solid #000', pt: 1, mt: 1 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -410,7 +410,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Total:
                 </Typography>
                 <Typography sx={{ fontWeight: 'bold', fontSize: '16px', color: '#000' }}>
-                  ${calculateTotal()}
+                  Rs.{calculateTotal()}
                 </Typography>
               </Box>
             </Box>

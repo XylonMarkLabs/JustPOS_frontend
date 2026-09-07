@@ -8,6 +8,8 @@ import AlertProvider from './Components/AlertProvider.jsx';
 import AuthProvider, { AuthContext } from './Services/AuthContext.jsx';
 import AuthService from './Services/AuthService.jsx';
 import Login from './Auth/Login.jsx';
+import BusinessLogin from './Auth/BusinessLogin.jsx';
+import BusinessRegister from './Auth/BusinessRegister.jsx';
 import CashierView from './Cashier/CashierView.jsx';
 import ProductManagement from './Products/ProductManagement.jsx';
 import CategoryManagement from './Categories/CategoryManagement.jsx';
@@ -18,6 +20,8 @@ import AdminDashboard from './Dashboard/AdminDashboard.jsx';
 import ManagerDashboard from './Dashboard/ManagerDashboard.jsx';
 import withAuth from './Services/WithAuth.jsx';
 import { useContext } from 'react';
+import StockManagement from './Stock Management/StockManagement.jsx';
+import SupplierManagement from './Supplier Manament/SupplierManagement.jsx';
 
 const ProtectedCashierView = withAuth(CashierView);
 const ProtectedProductManagement = withAuth(ProductManagement);
@@ -31,6 +35,8 @@ const ProtectedManagerDashboard = withAuth(ManagerDashboard);
 function AppContent() {
   const { isAuthenticated } = useContext(AuthContext);
   const user = JSON.parse(localStorage.getItem("user"));
+  // const businessData = localStorage.getItem("businessData");
+  const token = localStorage.getItem("token");
   const role = user?.role;
 
   // Function to redirect based on user role
@@ -42,8 +48,20 @@ function AppContent() {
         return <Navigate to="/manager/dashboard" />;
       case 'Cashier':
         return <Navigate to="/cashier" />;
+      default:
+        return <Navigate to="/" />;
     }
   };
+
+  // Function to handle root path navigation
+  // const handleRootNavigation = () => {
+  //   // If both business data and user token exist
+  //   if (token) {
+  //     return getHomePage();
+  //   } else {
+  //     return <Navigate to="/user-login" />;
+  //   }
+  // };
 
   return (
     <>
@@ -64,6 +82,8 @@ function AppContent() {
         <Route path="/products" element={<ProtectedProductManagement />} />
         <Route path="/categories" element={<ProtectedCategoryManagement />} />
         <Route path="/orders" element={<ProtectedOrders />} />
+        <Route path="/stock" element={<StockManagement />} />
+        <Route path="/suppliers" element={<SupplierManagement />} />
         <Route path="/reports" element={<ProtectedReports />} />
       </Routes>
     </>
