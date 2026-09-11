@@ -12,6 +12,9 @@ import {
   TableRow,
   Chip,
   CircularProgress,
+  useTheme,
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import {
   ResponsiveContainer,
@@ -28,6 +31,7 @@ import {
   ShoppingCart as OrdersIcon,
   Inventory as ProductsIcon,
   Paid as RevenueIcon,
+  TrendingUp as GrowthIcon
 } from '@mui/icons-material';
 import {
   BarChart,
