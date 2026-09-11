@@ -242,6 +242,7 @@ const ApiCall = {
                 throw error;
             }
         },
+
         clearCart: async (username) => {
             try {
                 const response = await axios.put(`${baseURL}/cart/clear/${username}`);
@@ -254,9 +255,10 @@ const ApiCall = {
                 throw error;
             }
         },
-        addToCart: async (username, productCode) => {
+
+        addToCart: async (username, product) => {
             try {
-                const response = await axios.post(`${baseURL}/cart/add`, { username, productCode });
+                const response = await axios.post(`${baseURL}/cart/add`, { username, product });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -266,9 +268,10 @@ const ApiCall = {
                 throw error;
             }
         },
-        removeFromCart: async (username, productCode) => {
+
+        removeFromCart: async (username, productCode, unitPrice) => {
             try {
-                const response = await axios.post(`${baseURL}/cart/remove`, { username, productCode });
+                const response = await axios.post(`${baseURL}/cart/remove`, { username, productCode, unitPrice });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -278,9 +281,10 @@ const ApiCall = {
                 throw error;
             }
         },
-        updateCartQuantity: async (username, productCode, quantity) => {
+        
+        updateCartQuantity: async (username, productCode, unitPrice, quantity) => {
             try {
-                const response = await axios.put(`${baseURL}/cart/update-quantity`, { username, productCode, quantity });
+                const response = await axios.put(`${baseURL}/cart/update-quantity`, { username, productCode, unitPrice, quantity });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -506,7 +510,161 @@ const ApiCall = {
                 console.error('Error editing stock:', error);
                 throw error;
             }
+        },
+
+        getByProduct: async (productId) => {
+            try {
+                const response = await axios.post(`${baseURL}/stock/get-by-product`, { productId });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.items;
+            } catch (error) {
+                console.error('Error fetching stocks by product:', error);
+                throw error;
+            }
         }
+    },
+
+    discount: {
+        getAll: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/discount/get-all`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.discounts;
+            } catch (error) {
+                console.error('Error fetching discounts:', error);
+                throw error;
+            }
+        },
+
+        getById: async (discountId) => {
+            try {
+                const response = await axios.post(`${baseURL}/discount/get`, { discountId });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.discount;
+            } catch (error) {
+                console.error('Error fetching discount:', error);
+                throw error;
+            }
+        },
+
+        addDiscount: async (discount) => {
+            console.log("Request came to ApiCall")
+            try {
+                const response = await axios.post(`${baseURL}/discount/add`, {
+                    productId: discount.productId,
+                    stockItemId: discount.stockItemId,
+                    discountType: discount.discountType,
+                    discountValue: discount.discountValue,
+                    quantity: discount.quantity,
+                    startDate: discount.startDate,
+                    endDate: discount.endDate,
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error adding discount:', error);
+                throw error;
+            }
+        },
+
+        editDiscount: async (discount) => {
+            try {
+                const response = await axios.put(`${baseURL}/discount/edit`, {
+                    discountId: discount.discountId,
+                    discountType: discount.discountType,
+                    discountValue: discount.discountValue,
+                    quantity: discount.quantity,
+                    startDate: discount.startDate,
+                    endDate: discount.endDate,
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error editing discount:', error);
+                throw error;
+            }
+        },
+
+        updateStatus: async (discountId, status) => {
+            try {
+                const response = await axios.post(`${baseURL}/discount/update-status`, { discountId, status });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error updating discount status:', error);
+                throw error;
+            }
+        },
+
+        deleteDiscount: async (discountId) => {
+            try {
+                const response = await axios.post(`${baseURL}/discount/delete`, { discountId });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error deleting discount:', error);
+                throw error;
+            }
+        },
+    },
+
+    report: {
+        getSalesReport: async (startDate, endDate) => {
+            try {
+                const response = await axios.get(`${baseURL}/report/sales`, {
+                    params: { startDate, endDate },
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.report;
+            } catch (error) {
+                console.error('Error fetching sales report:', error);
+                throw error;
+            }
+        },
+
+        getInventoryReport: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/report/inventory`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.report;
+            } catch (error) {
+                console.error('Error fetching inventory report:', error);
+                throw error;
+            }
+        },
+    },
+
+    dashboard: {
+        getOverview: async () => {
+            try {
+                const response = await axios.get(`${baseURL}/dashboard/overview`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.data.overview;
+            } catch (error) {
+                console.error('Error fetching dashboard overview:', error);
+                throw error;
+            }
+        },
     },
 }
 

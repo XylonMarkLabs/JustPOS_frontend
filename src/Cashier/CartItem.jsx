@@ -16,25 +16,25 @@ const CartItem = ({ item, itemTotal, onUpdateQuantity, onRemove }) => {
         <div className="flex justify-between items-start">
           <h3 className="font-semibold truncate pr-2">{item.product.name}</h3>
           <IconButton
-            onClick={() => onRemove(item.product.productCode)}
+            onClick={onRemove}
             size="small"
             color="error"
           >
             <DeleteIcon />
           </IconButton>
         </div>
-        
+
         <div className="flex justify-between items-center gap-2">
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
-              onClick={() => onUpdateQuantity(item.product.productCode, item.product.quantity - 1)}
+              onClick={() => onUpdateQuantity(item.product.quantity - 1)}
               className="h-5 w-5 flex items-center justify-center  font-medium hover:bg-gray-200 rounded-lg transition-colors"
             >
               -
             </button>
             <span className="px-2 font-semibold">{item.product.quantity}</span>
             <button
-              onClick={() => onUpdateQuantity(item.product.productCode, item.product.quantity + 1)}
+              onClick={() => onUpdateQuantity(item.product.quantity + 1)}
               className="h-5 w-5 flex items-center justify-center font-medium hover:bg-gray-200 rounded-lg transition-colors"
             >
               +

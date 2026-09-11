@@ -29,15 +29,12 @@ const CashierView = () => {
     getCart();
   }, []);
 
-  // Fetch all products from the API
+  // Fetch all products from stockItem
   const getProducts = async () => {
     await ApiCall.product
-      .getAll()
+      .getAllCashier()
       .then((products) => {
-        const filteredProducts = products.filter(
-          (product) => product.status !== 0
-        );
-        setProducts(filteredProducts);
+        setProducts(products);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -56,55 +53,49 @@ const CashierView = () => {
       });
   };
 
-  // Add a product to the cart
   const addToCart = async (product) => {
     if (!username) {
       alert("Please log in to add items to the cart.");
       return;
     }
 
-    if (product.quantityInStock <= 0) {
+    if (product.quantityAvailable <= 0) {
       showWarning(`${product.productName} is out of stock!`, "Out of Stock");
       return;
     }
 
-    await ApiCall.cart.addToCart(username, product.productCode);
-
-    const existingItem = cart.find(
-      (item) => item.product.productCode === product.productCode
-    );
-    if (existingItem) {
-      setCart(
-        cart.map((item) =>
-          item.product.productCode === product.productCode
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
+    try {
+      await ApiCall.cart.addToCart(
+        username,
+        product
       );
-    } else {
-      setCart([...cart, { product, quantity: 1 }]);
+    } catch (error) {
+      showWarning(
+        error?.response?.data?.message ||
+          "Could not add this item to the cart.",
+        "Add to Cart Failed"
+      );
+      return;
     }
 
     getCart();
   };
 
-  // Remove a product from the cart
-  const removeFromCart = async (productId) => {
-    let productCode = productId;
-    await ApiCall.cart.removeFromCart(username, productCode);
-
-    const removedItem = cart.find(
-      (item) => item.product.productCode === productCode
-    );
-    setCart(cart.filter((item) => item.product.productCode !== productCode));
+  // Remove a product (at a specific price) from the cart
+  const removeFromCart = async (productCode, unitPrice) => {
+    await ApiCall.cart.removeFromCart(username, productCode, unitPrice);
+    getCart();
   };
 
-  // Update the quantity of a product in the cart
-  const updateQuantity = async (productId, newQuantity) => {
-    const productCode = productId;
+  // Update the quantity of a specific cart line (product + price)
+  const updateQuantity = async (productCode, unitPrice, newQuantity) => {
     if (newQuantity < 1) return;
-    await ApiCall.cart.updateCartQuantity(username, productCode, newQuantity);
-
+    await ApiCall.cart.updateCartQuantity(
+      username,
+      productCode,
+      unitPrice,
+      newQuantity
+    );
     getCart();
   };
 
@@ -117,24 +108,21 @@ const CashierView = () => {
   };
 
   const calculateItemPrice = (item) => {
-    const originalPrice = item.product.price * item.product.quantity;
-    return item.product.discount > 0
-      ? originalPrice * (1 - item.product.discount / 100)
-      : originalPrice;
+    const originalPrice = item.product.unitPrice * item.product.quantity;
+    return originalPrice;
   };
 
   const calculateSavedAmount = () => {
     return cart.reduce((total, item) => {
       const itemPrice = calculateItemPrice(item);
-      return total + (item.product.price * item.product.quantity - itemPrice);
+
+      return total + (item.product.originalPrice * item.product.quantity - itemPrice);
     }, 0);
   };
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + calculateItemPrice(item), 0);
   };
-
-
 
   // Handle checkout process
   const handleCheckout = () => {
@@ -259,7 +247,7 @@ const CashierView = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 gap-4">
               {paginatedProducts.map((product) => (
                 <ProductCard
-                  key={product._id}
+                  key={`${product.productCode}_${product.sellingPrice}`}
                   product={product}
                   onAddToCart={addToCart}
                 />
@@ -330,11 +318,19 @@ const CashierView = () => {
             <div className="space-y-4">
               {cart.map((item) => (
                 <CartItem
-                  key={item.product.productCode}
+                  key={`${item.product.productCode}_${item.product.unitPrice}`}
                   item={item}
                   itemTotal={calculateItemPrice(item)}
-                  onUpdateQuantity={updateQuantity}
-                  onRemove={removeFromCart}
+                  onUpdateQuantity={(newQuantity) =>
+                    updateQuantity(
+                      item.product.productCode,
+                      item.product.unitPrice,
+                      newQuantity
+                    )
+                  }
+                  onRemove={() =>
+                    removeFromCart(item.product.productCode, item.product.unitPrice)
+                  }
                 />
               ))}
             </div>

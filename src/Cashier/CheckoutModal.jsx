@@ -184,7 +184,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                                 {item.product.name} x {item.product.quantity}
                             </Typography>
                             <Typography>
-                                Rs.{(item.product.price * item.product.quantity).toFixed(2)}
+                                Rs.{(item.product.unitPrice * item.product.quantity).toFixed(2)}
                             </Typography>
                         </Box>
                     ))}
