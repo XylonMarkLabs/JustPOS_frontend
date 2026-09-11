@@ -35,6 +35,7 @@ import {
   PersonAdd as ActivateIcon,
 } from "@mui/icons-material";
 import ApiCall from "../Services/ApiCall";
+import AdminPageShell from "../Components/AdminPageShell";
 
 const UserManagement = () => {
   const { showSuccess, showInfo } = useAlert();
@@ -216,10 +217,7 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="lg:flex gap-5  p-5 ">
-      <Sidebar />
-
-      <section className="space-y-5 border-primary lg:w-[85%] p-3 bg-background rounded-lg shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
+    <AdminPageShell>
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
           {/* Header */}
           <Box
@@ -593,7 +591,6 @@ const UserManagement = () => {
             </Box>
           </Box>
         </Box>
-      </section>
 
       {/* Add User Modal */}
       <AddUserModal
@@ -635,7 +632,7 @@ const UserManagement = () => {
         cancelText="Cancel"
         type="warning"
       />
-    </div>
+    </AdminPageShell>
   );
 };
 

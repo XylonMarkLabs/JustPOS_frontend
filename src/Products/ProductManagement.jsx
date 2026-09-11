@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../Components/Sidebar";
 import AddProductModal from "./AddProductModal";
 import EditProductModal from "./EditProductModal";
 import ProductDetailsModal from "./ProductDetailsModal";
@@ -38,6 +37,7 @@ import {
   Visibility as VisibilityIcon,
 } from "@mui/icons-material";
 import ApiCall from "../Services/ApiCall";
+import AdminPageShell from "../Components/AdminPageShell";
 
 const ProductManagement = () => {
   const { showSuccess, showInfo } = useAlert();
@@ -235,11 +235,8 @@ const ProductManagement = () => {
   };
 
   return (
-    <div className="lg:flex gap-5  p-5 ">
-      <Sidebar />
-
-      <section className="space-y-5 border-primary lg:w-[85%] p-3 bg-background rounded-lg shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <AdminPageShell>
+        <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
           {/* Header */}
           <Box
             sx={{
@@ -360,28 +357,6 @@ const ProductManagement = () => {
                     >
                       CATEGORY
                     </TableCell>
-                    {/* <TableCell
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#6b7280",
-                        textTransform: "uppercase",
-                        fontSize: "0.75rem",
-                        py: 1.5,
-                      }}
-                    >
-                      PRICE
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#6b7280",
-                        textTransform: "uppercase",
-                        fontSize: "0.75rem",
-                        py: 1.5,
-                      }}
-                    >
-                      DISCOUNT
-                    </TableCell> */}
                     <TableCell
                       sx={{
                         fontWeight: "bold",
@@ -485,22 +460,6 @@ const ProductManagement = () => {
                           {product.category}
                         </Typography>
                       </TableCell>
-                      {/* <TableCell sx={{ py: 1 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: "medium" }}
-                        >
-                          Rs.{product.sellingPrice.toFixed(2)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ py: 1 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: "medium" }}
-                        >
-                          {product.discount}%
-                        </Typography>
-                      </TableCell> */}
                       <TableCell sx={{ py: 1 }}>
                         <Chip
                           label={product.quantityInStock}
@@ -722,7 +681,6 @@ const ProductManagement = () => {
             </Box>
           </Box>
         </Box>
-      </section>
 
       {/* Add Product Modal */}
       <AddProductModal
@@ -769,7 +727,7 @@ const ProductManagement = () => {
         onClose={() => setDetailsModalOpen(false)}
         product={selectedProduct}
       />
-    </div>
+    </AdminPageShell>
   );
 };
 

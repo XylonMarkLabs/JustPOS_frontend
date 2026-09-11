@@ -26,6 +26,7 @@ import {
   Visibility as ViewIcon
 } from '@mui/icons-material'
 import ApiCall from '../Services/ApiCall'
+import AdminPageShell from '../Components/AdminPageShell'
 
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -110,11 +111,8 @@ const Orders = () => {
   }
 
   return (
-    <div className="lg:flex gap-5  p-5 ">
-        <Sidebar/>
-
-        <section className="space-y-5 border-primary lg:w-[85%] p-3 bg-background rounded-lg shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
-          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <AdminPageShell>
+          <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
@@ -297,7 +295,6 @@ const Orders = () => {
               </Box>
             </Box>
           </Box>
-        </section>
 
         {/* Order Details Modal */}
         <OrderDetailsModal
@@ -305,7 +302,7 @@ const Orders = () => {
           onClose={() => setOrderDetailsOpen(false)}
           order={selectedOrder}
         />
-    </div>
+    </AdminPageShell>
   )
 }
 

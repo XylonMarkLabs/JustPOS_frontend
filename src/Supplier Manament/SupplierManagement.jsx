@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../Components/Sidebar";
+import AdminPageShell from "../Components/AdminPageShell";
 import ConfirmationDialog from "../Components/ConfirmationDialog";
 import { useAlert } from "../Components/AlertProvider";
 import {
@@ -206,11 +206,8 @@ const SupplierManagement = () => {
   };
 
   return (
-    <div className="lg:flex gap-5  p-5 ">
-      <Sidebar />
-
-      <section className="space-y-5 border-primary lg:w-[85%] p-3 bg-background rounded-lg shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <AdminPageShell>
+      <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
           {/* Header */}
           <Box
             sx={{
@@ -405,6 +402,22 @@ const SupplierManagement = () => {
                               gap: 1.5,
                             }}
                           >
+                            <Avatar
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                backgroundColor: "#3b82f6",
+                                fontSize: "0.875rem",
+                                fontWeight: "bold",
+                                color: "white",
+                              }}
+                            >
+                              {supplier.supplierName
+                                .split(" ")
+                                .map((word) => word[0])
+                                .join("")
+                                .toUpperCase()}
+                            </Avatar>
                             <Typography
                               variant="body2"
                               sx={{ fontWeight: "medium" }}
@@ -420,7 +433,7 @@ const SupplierManagement = () => {
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
                           <Typography variant="body2" color="text.secondary">
-                            {supplier.contactNo}
+                            {supplier.phone}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
@@ -470,32 +483,32 @@ const SupplierManagement = () => {
                               size="small"
                               sx={{
                                 color:
-                                  supplier.status === 1
+                                  supplier.status === "Active"
                                     ? "#f59e0b"
                                     : "#10b981",
                                 padding: "4px",
                               }}
                               onClick={() => handleToggleStatus(supplier)}
                               title={
-                                supplier.status === 1
+                                supplier.status === "Active"
                                   ? "Deactivate Supplier"
                                   : "Activate Supplier"
                               }
                             >
-                              {supplier.status === 1 ? (
+                              {supplier.status === "Active" ? (
                                 <DeactivateIcon fontSize="small" />
                               ) : (
                                 <ActivateIcon fontSize="small" />
                               )}
                             </IconButton>
-                            {/* <IconButton
+                            <IconButton
                               size="small"
                               sx={{ color: "#ef4444", padding: "4px" }}
                               onClick={() => handleDeleteSupplier(supplier)}
                               title="Delete Supplier"
                             >
                               <DeleteIcon fontSize="small" />
-                            </IconButton> */}
+                            </IconButton>
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -545,7 +558,6 @@ const SupplierManagement = () => {
             </Box>
           </Box>
         </Box>
-      </section>
 
       {/* Add Supplier Modal */}
       <AddSupplierModal
@@ -592,7 +604,7 @@ const SupplierManagement = () => {
         cancelText="Cancel"
         type="warning"
       />
-    </div>
+    </AdminPageShell>
   );
 };
 
