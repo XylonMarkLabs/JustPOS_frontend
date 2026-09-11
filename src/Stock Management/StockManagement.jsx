@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../Components/Sidebar";
+import AdminPageShell from "../Components/AdminPageShell";
 import AddStockModal from "./AddStockModal";
 import EditStockModal from "./EditStockModal";
 import StockDetailsModal from "./StockDetailsModal";
@@ -173,11 +173,8 @@ const StockManagement = () => {
   };
 
   return (
-    <div className="lg:flex gap-5  p-5 ">
-      <Sidebar />
-
-      <section className="space-y-5 border-primary lg:w-[85%] p-3 bg-background rounded-lg shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <AdminPageShell>
+      <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}>
           {/* Header */}
           <Box
             sx={{
@@ -414,6 +411,14 @@ const StockManagement = () => {
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
+                            <IconButton
+                              size="small"
+                              sx={{ color: "#ef4444", padding: "4px" }}
+                              onClick={() => handleDeleteStock(stock)}
+                              title="Delete Stock Record"
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -463,7 +468,6 @@ const StockManagement = () => {
             </Box>
           </Box>
         </Box>
-      </section>
 
       {/* Add Stock Modal */}
       <AddStockModal
@@ -499,7 +503,7 @@ const StockManagement = () => {
         onClose={() => setDetailsModalOpen(false)}
         stock={selectedStock}
       />
-    </div>
+    </AdminPageShell>
   );
 };
 

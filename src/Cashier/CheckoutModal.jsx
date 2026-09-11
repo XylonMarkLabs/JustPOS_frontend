@@ -331,25 +331,9 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                             <Typography>
                                 {item.product.name} x {item.product.quantity}
                             </Typography>
-                            <Box sx={{ textAlign: 'right' }}>
-                                {item.product.discount > 0 ? (
-                                    <>
-                                        <Typography sx={{ textDecoration: 'line-through', color: 'text.secondary', fontSize: '0.875rem' }}>
-                                            Rs.{(item.product.price * item.product.quantity).toFixed(2)}
-                                        </Typography>
-                                        <Typography color="primary">
-                                            Rs.{((item.product.price * (1 - item.product.discount / 100)) * item.product.quantity).toFixed(2)}
-                                        </Typography>
-                                        <Typography variant="caption" color="success.main">
-                                            Save: {item.product.discount}%
-                                        </Typography>
-                                    </>
-                                ) : (
-                                    <Typography>
-                                        Rs.{(item.product.price * item.product.quantity).toFixed(2)}
-                                    </Typography>
-                                )}
-                            </Box>
+                            <Typography>
+                                Rs.{(item.product.unitPrice * item.product.quantity).toFixed(2)}
+                            </Typography>
                         </Box>
                     ))}
                     <Divider sx={{ my: 2 }} />

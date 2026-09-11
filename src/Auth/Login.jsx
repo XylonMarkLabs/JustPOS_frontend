@@ -18,8 +18,14 @@ import { useNavigate } from "react-router-dom";
 import ApiCall from "../Services/ApiCall";
 import { AuthContext } from "../Services/AuthContext";
 
+const ROLE_HOME_PATH = {
+  Admin: "/admin/dashboard",
+  Manager: "/manager/dashboard",
+  Cashier: "/cashier",
+};
+
 const Login = () => {
-  const { showError,showSuccess, showInfo } = useAlert();
+  const { showError, showSuccess, showInfo } = useAlert();
   const [showPassword, setShowPassword] = React.useState(false);
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -32,52 +38,46 @@ const Login = () => {
   const handleMouseUpPassword = (event) => event.preventDefault();
 
   const handleLogin = async () => {
-    // const businessId = localStorage.getItem('businessId');
-    // if (!businessId) {
-    //   showError("Please select a business first");
-    //   return;
-    // }
-
     try {
       const response = await axios.post(
         "http://localhost:4000/api/user/login",
         {
           username: username,
           password: password,
-          // businessId: businessId,
         }
       );
 
-      if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
-        await getuserData();
-        login();
-        navigate("/home");
-      } else {
+      if (!response.data.success) {
         showError("Login failed: " + response.data.message);
+        return;
       }
+
+      localStorage.setItem("token", response.data.token);
+      const userData = await ApiCall.user.getUserData();
+
+      if (!userData || !userData.role) {
+        showError(
+          "Login succeeded but we couldn't load your account details. Please try again."
+        );
+        return;
+      }
+
+      const user = {
+        username: userData.username,
+        role: userData.role,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+
+      login();
+
+      const destination = ROLE_HOME_PATH[user.role] || "/";
+      navigate(destination, { replace: true });
     } catch (err) {
       console.error("Login error:", err);
       showError(
         "Login failed: " +
           (err.response ? err.response.data.message : "Network error")
       );
-    }
-  };
-
-  const getuserData = async () => {
-    try {
-      const userData = await ApiCall.user.getUserData();
-      if (userData) {
-        const user = {
-          username: userData.username,
-          role: userData.role,
-        };
-        localStorage.setItem("user", JSON.stringify(user));
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      showError("Failed to fetch user data: " + (error.message || "Unknown error"));
     }
   };
 

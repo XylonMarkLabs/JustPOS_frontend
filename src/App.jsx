@@ -22,6 +22,8 @@ import withAuth from './Services/WithAuth.jsx';
 import { useContext } from 'react';
 import StockManagement from './Stock Management/StockManagement.jsx';
 import SupplierManagement from './Supplier Manament/SupplierManagement.jsx';
+import DiscountManagement from './Discount/DiscountManagement.jsx';
+import { getCurrentUserRole } from './Services/authRole.js';
 
 const ProtectedCashierView = withAuth(CashierView);
 const ProtectedProductManagement = withAuth(ProductManagement);
@@ -34,10 +36,9 @@ const ProtectedManagerDashboard = withAuth(ManagerDashboard);
 
 function AppContent() {
   const { isAuthenticated } = useContext(AuthContext);
-  const user = JSON.parse(localStorage.getItem("user"));
   // const businessData = localStorage.getItem("businessData");
   const token = localStorage.getItem("token");
-  const role = user?.role;
+  const role = getCurrentUserRole();
 
   // Function to redirect based on user role
   const getHomePage = () => {
@@ -65,7 +66,7 @@ function AppContent() {
 
   return (
     <>
-      {isAuthenticated && <Navbar />}
+      {isAuthenticated && role === 'Cashier' && <Navbar />}
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/home" element={getHomePage()} />
@@ -84,6 +85,7 @@ function AppContent() {
         <Route path="/orders" element={<ProtectedOrders />} />
         <Route path="/stock" element={<StockManagement />} />
         <Route path="/suppliers" element={<SupplierManagement />} />
+        <Route path="/discounts" element={<DiscountManagement />} />
         <Route path="/reports" element={<ProtectedReports />} />
       </Routes>
     </>
