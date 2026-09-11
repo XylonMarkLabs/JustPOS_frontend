@@ -29,6 +29,16 @@ import {
   Inventory as ProductsIcon,
   Paid as RevenueIcon,
 } from '@mui/icons-material';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from 'recharts';
 import ApiCall from '../Services/ApiCall';
 import AdminPageShell from '../Components/AdminPageShell';
 
