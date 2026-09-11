@@ -76,7 +76,6 @@ const Orders = () => {
     return matchesSearch && matchesPayment && matchesDate;
 });
 
-
   // Get current page orders
   const paginatedOrders = filteredOrders.slice(
     page * rowsPerPage,
@@ -153,8 +152,8 @@ const Orders = () => {
                   onChange={handlePaymentChange}
                 >
                   <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="Cash">Cash</MenuItem>
-                  <MenuItem value="Card">Card</MenuItem>
+                  <MenuItem value="cash">Cash</MenuItem>
+                  <MenuItem value="card">Card</MenuItem>
                 </Select>
               </FormControl>
 
