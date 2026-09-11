@@ -59,7 +59,7 @@ const AuthService = {
     localStorage.removeItem("user");
     // localStorage.removeItem("businessId");
     // localStorage.removeItem("businessData");
-    window.location.href = "/user-login";
+    window.location.href = "/";
   },
 };
 

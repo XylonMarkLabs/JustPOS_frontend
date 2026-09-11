@@ -8,21 +8,18 @@ import {
     MenuItem,
     Avatar,
     Chip,
-    useTheme
 } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import logo from '../assets/JUSTPOS_transparent.png';
 import ChangePasswordModal from './ChangePasswordModal';
 import AuthService from '../Services/AuthService';
+import { getCurrentUserRole } from '../Services/authRole';
 
 const Navbar = () => {
-    const theme = useTheme();
     const [anchorEl, setAnchorEl] = useState(null);
     const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    const role = user?.role;
-
+    const role = getCurrentUserRole();
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -67,8 +64,6 @@ const Navbar = () => {
             return;
         }
 
-        // TODO: Add API call to change password here
-        console.log('Password change submitted:', passwordForm);
         handlePasswordModalClose();
     };
 
@@ -79,7 +74,7 @@ const Navbar = () => {
 
     return (
         <div className='px-5 pt-2'>
-            <AppBar position="static" sx={{ borderRadius: '8px', backgroundColor:'#FBF8EF', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+            <AppBar position="static" sx={{ borderRadius: '8px', backgroundColor: '#FBF8EF', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     {/* Logo */}
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -123,8 +118,8 @@ const Navbar = () => {
                             </MenuItem>
                         </Menu>
 
-                        <ChangePasswordModal 
-                            open={openPasswordModal} 
+                        <ChangePasswordModal
+                            open={openPasswordModal}
                             onClose={handlePasswordModalClose}
                             logo={logo}
                         />
