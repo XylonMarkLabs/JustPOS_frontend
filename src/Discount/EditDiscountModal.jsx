@@ -37,15 +37,6 @@ const STATUS_STYLES = {
   expired: { backgroundColor: "#fef2f2", borderColor: "#fecaca", color: "#dc2626" },
 };
 
-// NOTE: productId / stockItemId are set at creation time and aren't editable
-// here — same idea as stockId being locked in EditStockModal. If a discount
-// needs to move to a different batch, that reads as "delete and re-add"
-// rather than an edit.
-//
-// NOTE: status (active/inactive) isn't edited here either, matching the
-// app's existing convention (ProductManagement toggles status via its own
-// confirmation dialog, not through the edit form) — use updateStatus for that.
-
 const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
   const { showError, showWarning } = useAlert();
 
@@ -66,8 +57,10 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
     }
   }, [discount, open]);
 
-  const sellingPrice = discount?.sellingPrice ?? discount?.stockItem?.sellingPrice;
-  const quantityRemaining = discount?.stockItem?.quantityRemaining;
+  const isInventory = Boolean(discount?.stockItemId);
+
+  const referencePrice = discount?.sellingPrice ?? discount?.stockItem?.sellingPrice;
+  const quantityRemaining = isInventory ? discount?.stockItem?.quantityRemaining : undefined;
 
   const handleSubmit = () => {
     if (discountValue === "" || isNaN(parseFloat(discountValue)) || parseFloat(discountValue) <= 0) {
@@ -78,7 +71,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
       showWarning("Percentage discount cannot exceed 100%", "Invalid Discount Value");
       return;
     }
-    if (discountType === "fixed" && sellingPrice != null && parseFloat(discountValue) >= Number(sellingPrice)) {
+    if (discountType === "fixed" && referencePrice != null && parseFloat(discountValue) >= Number(referencePrice)) {
       showWarning(
         "Fixed discount must be less than the item's selling price",
         "Invalid Discount Value"
@@ -89,7 +82,8 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
       showWarning("Please enter a valid quantity", "Invalid Quantity");
       return;
     }
-    if (quantityRemaining != null && parseInt(quantity) > Number(quantityRemaining)) {
+
+    if (isInventory && quantityRemaining != null && parseInt(quantity) > Number(quantityRemaining)) {
       showWarning(
         `Quantity cannot exceed the available stock (${quantityRemaining})`,
         "Invalid Quantity"
@@ -196,20 +190,40 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
               />
             </Box>
             <Box sx={{ flex: 1 }}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
-              >
-                Stock Batch
-              </Typography>
-              <TextField
-                fullWidth
-                value={discount.stockItemId || ""}
-                size="small"
-                disabled
-                helperText="Batch can't be changed — delete and re-add to move it"
-                sx={fieldSx}
-              />
+              {isInventory ? (
+                <>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+                  >
+                    Stock Batch
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    value={discount.stockId || discount.stockItemId || ""}
+                    size="small"
+                    disabled
+                    helperText="Batch can't be changed — delete and re-add to move it"
+                    sx={fieldSx}
+                  />
+                </>
+              ) : (
+                <>
+                  <Typography
+                    variant="body2"
+                    sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+                  >
+                    Scope
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    value="Made to order — no stock batch"
+                    size="small"
+                    disabled
+                    sx={fieldSx}
+                  />
+                </>
+              )}
             </Box>
           </Box>
 
@@ -264,7 +278,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
           </Box>
 
           {/* Quantity */}
-          <Box sx={{ maxWidth: 220 }}>
+          <Box sx={{ maxWidth: 260 }}>
             <Typography
               variant="body2"
               sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -278,8 +292,14 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
               placeholder="0"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
-              inputProps={{ min: 1, max: quantityRemaining }}
-              helperText={quantityRemaining != null ? `Available: ${quantityRemaining}` : " "}
+              inputProps={{ min: 1, max: isInventory ? quantityRemaining : undefined }}
+              helperText={
+                isInventory
+                  ? quantityRemaining != null
+                    ? `Available: ${quantityRemaining}`
+                    : " "
+                  : "Number of discounted servings to offer — no stock limit"
+              }
               sx={fieldSx}
             />
           </Box>

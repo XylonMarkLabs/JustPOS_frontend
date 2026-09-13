@@ -59,7 +59,7 @@ const CashierView = () => {
       return;
     }
 
-    if (product.quantityAvailable <= 0) {
+    if (product.quantityAvailable != null && product.quantityAvailable <= 0) {
       showWarning(`${product.productName} is out of stock!`, "Out of Stock");
       return;
     }
@@ -81,19 +81,18 @@ const CashierView = () => {
     getCart();
   };
 
-  // Remove a product (at a specific price) from the cart
-  const removeFromCart = async (productCode, unitPrice) => {
-    await ApiCall.cart.removeFromCart(username, productCode, unitPrice);
+  const removeFromCart = async (productId, stockItemId) => {
+    await ApiCall.cart.removeFromCart(username, productId, stockItemId);
     getCart();
   };
 
-  // Update the quantity of a specific cart line (product + price)
-  const updateQuantity = async (productCode, unitPrice, newQuantity) => {
+  // Update the quantity of a specific cart line, same identity rule as above.
+  const updateQuantity = async (productId, stockItemId, newQuantity) => {
     if (newQuantity < 1) return;
     await ApiCall.cart.updateCartQuantity(
       username,
-      productCode,
-      unitPrice,
+      productId,
+      stockItemId,
       newQuantity
     );
     getCart();
@@ -247,7 +246,7 @@ const CashierView = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 gap-4">
               {paginatedProducts.map((product) => (
                 <ProductCard
-                  key={`${product.productCode}_${product.sellingPrice}`}
+                  key={`${product.productCode}_${product.sellingPrice}_${product.discountId || "none"}`}
                   product={product}
                   onAddToCart={addToCart}
                 />
@@ -318,18 +317,18 @@ const CashierView = () => {
             <div className="space-y-4">
               {cart.map((item) => (
                 <CartItem
-                  key={`${item.product.productCode}_${item.product.unitPrice}`}
+                  key={`${item.product.productId}_${item.product.stockItemId || "none"}`}
                   item={item}
                   itemTotal={calculateItemPrice(item)}
                   onUpdateQuantity={(newQuantity) =>
                     updateQuantity(
-                      item.product.productCode,
-                      item.product.unitPrice,
+                      item.product.productId,
+                      item.product.stockItemId,
                       newQuantity
                     )
                   }
                   onRemove={() =>
-                    removeFromCart(item.product.productCode, item.product.unitPrice)
+                    removeFromCart(item.product.productId, item.product.stockItemId)
                   }
                 />
               ))}

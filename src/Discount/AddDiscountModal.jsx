@@ -42,9 +42,10 @@ const getStockItemId = (stockItem, index) =>
 // discountId is generated server-side in addDiscount, so there's no
 // equivalent field here for the user to see.
 
-// NOTE: assumes ApiCall.stockItem.getByProduct(productId) returns the stock
-// item batches (with quantityRemaining, sellingPrice, stockItemId, etc.)
-// belonging to that product. Swap this for your actual endpoint/shape.
+// INVENTORY products are discounted per stock batch (a specific
+// stockItemId). NON_INVENTORY products (made to order — juices, etc.) have
+// no batch, so the discount is scoped to the product itself — the batch
+// picker and its stock-ceiling checks simply don't apply.
 
 const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
   const { showError, showWarning } = useAlert();
@@ -61,6 +62,8 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
   const [quantity, setQuantity] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const isInventory = selectedProduct?.productType === "INVENTORY";
 
   useEffect(() => {
     if (open) {
@@ -79,10 +82,8 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
 
   const getStockItemsForProduct = async (productId) => {
     setLoadingStockItems(true);
-    console.log("ProductId", productId);
     try {
       const items = await ApiCall.stock.getByProduct(productId);
-      console.log("Fetched stock items:", items);
       setStockItems(items);
     } catch (error) {
       console.error("Error fetching stock items:", error);
@@ -98,7 +99,9 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
     setStockItems([]);
     setQuantity("");
 
-    if (product) {
+    // Only INVENTORY products have batches to fetch — a NON_INVENTORY
+    // product's price/quantity is read straight off the product itself.
+    if (product && product.productType === "INVENTORY") {
       getStockItemsForProduct(getProductId(product, products.indexOf(product)));
     }
   };
@@ -116,12 +119,19 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
     return `${id} - Qty: ${remaining} - Rs.${price}`;
   };
 
+  // The price a fixed discount is checked against, and the price shown to
+  // the user — from the chosen batch for INVENTORY, or straight from the
+  // product for NON_INVENTORY.
+  const referencePrice = isInventory
+    ? selectedStockItem?.sellingPrice
+    : selectedProduct?.sellingPrice;
+
   const handleSubmit = () => {
     if (!selectedProduct) {
       showError("Please select a product", "Missing Information");
       return;
     }
-    if (!selectedStockItem) {
+    if (isInventory && !selectedStockItem) {
       showError("Please select a stock batch for this product", "Missing Information");
       return;
     }
@@ -135,8 +145,8 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
     }
     if (
       discountType === "fixed" &&
-      selectedStockItem.sellingPrice != null &&
-      parseFloat(discountValue) >= Number(selectedStockItem.sellingPrice)
+      referencePrice != null &&
+      parseFloat(discountValue) >= Number(referencePrice)
     ) {
       showWarning(
         "Fixed discount must be less than the item's selling price",
@@ -148,8 +158,12 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
       showWarning("Please enter a valid quantity", "Invalid Quantity");
       return;
     }
+    // Stock ceiling only applies to INVENTORY — a NON_INVENTORY discount's
+    // quantity is just "how many discounted servings to offer," with no
+    // physical stock to exceed.
     if (
-      selectedStockItem.quantityRemaining != null &&
+      isInventory &&
+      selectedStockItem?.quantityRemaining != null &&
       parseInt(quantity) > Number(selectedStockItem.quantityRemaining)
     ) {
       showWarning(
@@ -169,7 +183,11 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
 
     const discountData = {
       productId: getProductId(selectedProduct, products.indexOf(selectedProduct)),
-      stockItemId: getStockItemId(selectedStockItem, stockItems.indexOf(selectedStockItem)),
+      // Omitted entirely for NON_INVENTORY — the backend scopes the
+      // discount to productId alone when there's no stockItemId.
+      ...(isInventory
+        ? { stockItemId: getStockItemId(selectedStockItem, stockItems.indexOf(selectedStockItem)) }
+        : {}),
       discountType,
       discountValue: parseFloat(discountValue),
       quantity: parseInt(quantity),
@@ -234,35 +252,56 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
             />
           </Box>
 
-          {/* Stock batch */}
-          <Box>
-            <Typography
-              variant="body2"
-              sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+          {/* Stock batch — INVENTORY only */}
+          {isInventory ? (
+            <Box>
+              <Typography
+                variant="body2"
+                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+              >
+                Stock Batch
+              </Typography>
+              <Autocomplete
+                size="small"
+                options={stockItems}
+                loading={loadingStockItems}
+                getOptionLabel={(option) => stockItemLabel(option)}
+                value={selectedStockItem}
+                onChange={handleStockItemChange}
+                disabled={!selectedProduct}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={
+                      selectedProduct
+                        ? "Select which batch to discount"
+                        : "Select a product first"
+                    }
+                    sx={fieldSx}
+                  />
+                )}
+              />
+            </Box>
+          ) : selectedProduct ? (
+            // NON_INVENTORY: no batch to pick — just show the product's
+            // own price for context, matching what the batch picker would
+            // have communicated for an INVENTORY product.
+            <Box
+              sx={{
+                p: 1.5,
+                borderRadius: 1,
+                backgroundColor: "#f9fafb",
+                border: "1px solid #e5e7eb",
+              }}
             >
-              Stock Batch
-            </Typography>
-            <Autocomplete
-              size="small"
-              options={stockItems}
-              loading={loadingStockItems}
-              getOptionLabel={(option) => stockItemLabel(option)}
-              value={selectedStockItem}
-              onChange={handleStockItemChange}
-              disabled={!selectedProduct}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder={
-                    selectedProduct
-                      ? "Select which batch to discount"
-                      : "Select a product first"
-                  }
-                  sx={fieldSx}
-                />
-              )}
-            />
-          </Box>
+              <Typography variant="body2" sx={{ color: "#374151" }}>
+                Made to order — no stock batch. Current price: Rs.
+                {selectedProduct.sellingPrice != null
+                  ? Number(selectedProduct.sellingPrice).toFixed(2)
+                  : "-"}
+              </Typography>
+            </Box>
+          ) : null}
 
           {/* Discount type + value */}
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -315,7 +354,7 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
           </Box>
 
           {/* Quantity */}
-          <Box sx={{ maxWidth: 220 }}>
+          <Box sx={{ maxWidth: 260 }}>
             <Typography
               variant="body2"
               sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -329,12 +368,14 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
               placeholder="0"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
-              inputProps={{ min: 1, max: selectedStockItem?.quantityRemaining }}
-              disabled={!selectedStockItem}
+              inputProps={{ min: 1, max: isInventory ? selectedStockItem?.quantityRemaining : undefined }}
+              disabled={isInventory ? !selectedStockItem : !selectedProduct}
               helperText={
-                selectedStockItem?.quantityRemaining != null
-                  ? `Available: ${selectedStockItem.quantityRemaining}`
-                  : " "
+                isInventory
+                  ? selectedStockItem?.quantityRemaining != null
+                    ? `Available: ${selectedStockItem.quantityRemaining}`
+                    : " "
+                  : "Number of discounted servings to offer — no stock limit"
               }
               sx={fieldSx}
             />

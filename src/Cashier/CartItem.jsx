@@ -2,8 +2,8 @@ import { IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const CartItem = ({ item, itemTotal, onUpdateQuantity, onRemove }) => {
-  const hasDiscount = item.product.discount > 0;
-  const originalTotal = item.product.price * item.product.quantity;
+  const hasDiscount = Boolean(item.product.discountId);
+  const originalTotal = item.product.originalPrice * item.product.quantity;
 
   return (
     <div className="flex items-center bg-white p-2 rounded-lg shadow h-24">

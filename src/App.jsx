@@ -33,6 +33,9 @@ const ProtectedUserManagement = withAuth(UserManagement);
 const ProtectedReports = withAuth(Reports);
 const ProtectedAdminDashboard = withAuth(AdminDashboard);
 const ProtectedManagerDashboard = withAuth(ManagerDashboard);
+const ProtectedStockManagement = withAuth(StockManagement);
+const ProtectedSupplierManagement = withAuth(SupplierManagement);
+const ProtectedDiscountManagement = withAuth(DiscountManagement);
 
 function AppContent() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -83,9 +86,9 @@ function AppContent() {
         <Route path="/products" element={<ProtectedProductManagement />} />
         <Route path="/categories" element={<ProtectedCategoryManagement />} />
         <Route path="/orders" element={<ProtectedOrders />} />
-        <Route path="/stock" element={<StockManagement />} />
-        <Route path="/suppliers" element={<SupplierManagement />} />
-        <Route path="/discounts" element={<DiscountManagement />} />
+        <Route path="/stock" element={<ProtectedStockManagement />} />
+        <Route path="/suppliers" element={<ProtectedSupplierManagement />} />
+        <Route path="/discounts" element={<ProtectedDiscountManagement />} />
         <Route path="/reports" element={<ProtectedReports />} />
       </Routes>
     </>
