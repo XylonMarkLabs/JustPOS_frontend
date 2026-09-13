@@ -21,6 +21,13 @@ import {
 const ProductDetailsModal = ({ open, onClose, product }) => {
   if (!product) return null;
 
+  const isInventory = product.productType === 'INVENTORY';
+
+  const money = (value) => {
+    const num = Number(value);
+    return isNaN(num) ? '0.00' : num.toFixed(2);
+  };
+
   const getStockColor = (quantityInStock, minStock = 0) => {
     if (quantityInStock <= 0) return "error";
     if (quantityInStock <= minStock) return "warning";
@@ -68,7 +75,17 @@ const ProductDetailsModal = ({ open, onClose, product }) => {
               Product Code: {product.productCode}
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Chip
+              label={isInventory ? "Inventory" : "Made to Order"}
+              variant="outlined"
+              size="small"
+              sx={{
+                backgroundColor: isInventory ? '#f9fafb' : '#f0f9ff',
+                borderColor: isInventory ? '#e5e7eb' : '#dbeafe',
+                color: isInventory ? '#6b7280' : '#2563eb',
+              }}
+            />
             <Chip
               label={product.status === 1 ? "Active" : "Inactive"}
               color={product.status === 1 ? "success" : "error"}
@@ -139,78 +156,105 @@ const ProductDetailsModal = ({ open, onClose, product }) => {
                 </InfoSection>
               </Grid>
 
-              {/* Price Information */}
-              <Grid item xs={12}>
-                <InfoSection 
-                  icon={<PriceIcon sx={{ color: '#475569' }} />}
-                  title="Price Information"
-                >
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Selling Price
-                      </Typography>
-                      <Typography variant="h6" sx={{ color: '#047857', mt: 0.5 }}>
-                        Rs.{product.sellingPrice.toFixed(2)}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Discount
-                      </Typography>
-                      <Typography variant="h6" sx={{ color: '#0369a1', mt: 0.5 }}>
-                        {product.discount}%
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </InfoSection>
-              </Grid>
-
-              {/* Stock Information */}
-              <Grid item xs={12}>
-                <InfoSection 
-                  icon={<InventoryIcon sx={{ color: '#475569' }} />}
-                  title="Stock Information"
-                >
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Current Stock
-                      </Typography>
-                      <Box sx={{ mt: 0.5 }}>
-                        <Chip
-                          label={product.quantityInStock}
-                          color={getStockColor(product.quantityInStock, product.minStock)}
-                          sx={{
-                            fontSize: '1rem',
-                            fontWeight: 600,
-                          }}
-                        />
-                        {product.quantityInStock <= product.minStock && (
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              display: 'block', 
-                              mt: 0.5,
-                              color: product.quantityInStock <= 0 ? '#dc2626' : '#d97706'
-                            }}
-                          >
-                            {product.quantityInStock <= 0 ? 'Out of Stock!' : 'Low Stock Warning!'}
+              {isInventory ? (
+                <Grid item xs={12}>
+                  <InfoSection
+                    icon={<PriceIcon sx={{ color: '#475569' }} />}
+                    title="Price Information"
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Priced per batch — see Stock Management for the current selling price of each received batch.
+                    </Typography>
+                  </InfoSection>
+                </Grid>
+              ) : (
+                /* NON_INVENTORY: a real, single price lives on the product itself. */
+                <Grid item xs={12}>
+                  <InfoSection
+                    icon={<PriceIcon sx={{ color: '#475569' }} />}
+                    title="Price Information"
+                  >
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          Selling Price
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: '#047857', mt: 0.5 }}>
+                          Rs.{money(product.sellingPrice)}
+                        </Typography>
+                      </Grid>
+                      {product.costPrice > 0 && (
+                        <Grid item xs={6}>
+                          <Typography variant="subtitle2" color="text.secondary">
+                            Estimated Cost
                           </Typography>
-                        )}
-                      </Box>
+                          <Typography variant="h6" sx={{ color: '#475569', mt: 0.5 }}>
+                            Rs.{money(product.costPrice)}
+                          </Typography>
+                        </Grid>
+                      )}
                     </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="subtitle2" color="text.secondary">
-                        Minimum Stock Level
-                      </Typography>
-                      <Typography variant="h6" sx={{ color: '#475569', mt: 0.5 }}>
-                        {product.minStock}
-                      </Typography>
+                  </InfoSection>
+                </Grid>
+              )}
+
+              {isInventory ? (
+                <Grid item xs={12}>
+                  <InfoSection
+                    icon={<InventoryIcon sx={{ color: '#475569' }} />}
+                    title="Stock Information"
+                  >
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          Current Stock
+                        </Typography>
+                        <Box sx={{ mt: 0.5 }}>
+                          <Chip
+                            label={product.quantityInStock}
+                            color={getStockColor(product.quantityInStock, product.minStock)}
+                            sx={{
+                              fontSize: '1rem',
+                              fontWeight: 600,
+                            }}
+                          />
+                          {product.quantityInStock <= product.minStock && (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                display: 'block',
+                                mt: 0.5,
+                                color: product.quantityInStock <= 0 ? '#dc2626' : '#d97706'
+                              }}
+                            >
+                              {product.quantityInStock <= 0 ? 'Out of Stock!' : 'Low Stock Warning!'}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          Minimum Stock Level
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: '#475569', mt: 0.5 }}>
+                          {product.minStock}
+                        </Typography>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </InfoSection>
-              </Grid>
+                  </InfoSection>
+                </Grid>
+              ) : (
+                <Grid item xs={12}>
+                  <InfoSection
+                    icon={<InventoryIcon sx={{ color: '#475569' }} />}
+                    title="Stock Information"
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Made to order — prepared when a customer orders it, so no stock is tracked for this product.
+                    </Typography>
+                  </InfoSection>
+                </Grid>
+              )}
             </Grid>
           </Grid>
         </Grid>

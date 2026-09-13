@@ -109,7 +109,8 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
   const getProducts = async () => {
     try {
       const productList = await ApiCall.product.getAll();
-      setProducts(productList);
+
+      setProducts(productList.filter((product) => product.productType === "INVENTORY"));
     } catch (error) {
       console.error("Error fetching products:", error);
     }

@@ -44,6 +44,7 @@ const ProductManagement = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -173,17 +174,19 @@ const ProductManagement = () => {
     }
   };
 
-  // Filter products based on search term, category, and status
+  // Filter products based on search term, category, type, and status
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.productCode.includes(searchTerm);
     const matchesCategory =
       categoryFilter === "All" || product.category === categoryFilter;
+    const matchesType =
+      typeFilter === "All" || product.productType === typeFilter;
     const matchesStatus =
       statusFilter === "All Status" || product.status === statusFilter;
 
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory && matchesType && matchesStatus;
   });
 
   // Get current page products
@@ -211,6 +214,11 @@ const ProductManagement = () => {
 
   const handleCategoryChange = (e) => {
     setCategoryFilter(e.target.value);
+    setPage(0);
+  };
+
+  const handleTypeChange = (e) => {
+    setTypeFilter(e.target.value);
     setPage(0);
   };
 
@@ -299,6 +307,18 @@ const ProductManagement = () => {
                 ))}
               </Select>
             </FormControl>
+            <FormControl sx={{ minWidth: 140 }}>
+              <InputLabel>Type</InputLabel>
+              <Select
+                value={typeFilter}
+                label="Type"
+                onChange={handleTypeChange}
+              >
+                <MenuItem value="All">All</MenuItem>
+                <MenuItem value="INVENTORY">Inventory</MenuItem>
+                <MenuItem value="NON_INVENTORY">Made to Order</MenuItem>
+              </Select>
+            </FormControl>
             <FormControl sx={{ minWidth: 120 }}>
               <InputLabel>Status</InputLabel>
               <Select
@@ -366,6 +386,17 @@ const ProductManagement = () => {
                         py: 1.5,
                       }}
                     >
+                      TYPE
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#6b7280",
+                        textTransform: "uppercase",
+                        fontSize: "0.75rem",
+                        py: 1.5,
+                      }}
+                    >
                       CURRENT STOCK
                     </TableCell>
                     <TableCell
@@ -407,15 +438,17 @@ const ProductManagement = () => {
                 <TableBody>
                   {paginatedProducts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} align="center">
+                      <TableCell colSpan={7} align="center">
                         <div className="text-xl text-gray-500 h-80 flex justify-center items-center">
                           No products found.
                         </div>
                       </TableCell>
                     </TableRow>
                   ) : (
-                    paginatedProducts.map((product) => (
-                      <TableRow
+                    paginatedProducts.map((product) => {
+                      const isInventory = product.productType === "INVENTORY";
+                      return (
+                    <TableRow
                         key={product.productCode}
                         sx={{
                         "&:hover": { backgroundColor: "#f9fafb" },
@@ -462,111 +495,145 @@ const ProductManagement = () => {
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
                         <Chip
-                          label={product.quantityInStock}
-                          color={getStockColor(
-                            product.quantityInStock,
-                            product.minStock
-                          )}
-                          variant="outlined"
+                          label={isInventory ? "Inventory" : "Made to Order"}
                           size="small"
+                          variant="outlined"
                           sx={{
                             height: 24,
-                            fontSize: "0.75rem",
-                            backgroundColor:
-                              getStockColor(
-                                product.quantityInStock,
-                                product.minStock
-                              ) === "success"
-                                ? "#f0fdf4"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "warning"
-                                ? "#fffbeb"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "info"
-                                ? "#f0f9ff"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "error"
-                                ? "#fef2f2"
-                                : "#f9fafb",
-                            borderColor:
-                              getStockColor(
-                                product.quantityInStock,
-                                product.minStock
-                              ) === "success"
-                                ? "#dcfce7"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "warning"
-                                ? "#fef3c7"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "info"
-                                ? "#dbeafe"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "error"
-                                ? "#fecaca"
-                                : "#e5e7eb",
-                            color:
-                              getStockColor(
-                                product.quantityInStock,
-                                product.minStock
-                              ) === "success"
-                                ? "#059669"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "warning"
-                                ? "#d97706"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "info"
-                                ? "#2563eb"
-                                : getStockColor(
-                                    product.quantityInStock,
-                                    product.minStock
-                                  ) === "error"
-                                ? "#dc2626"
-                                : "#6b7280",
+                            fontSize: "0.7rem",
+                            backgroundColor: isInventory ? "#f0f9ff" : "#f0fdf4",
+                            borderColor: isInventory ? "#dbeafe" : "#dcfce7",
+                            color: isInventory ? "#2563eb" : "#059669",
                           }}
                         />
-                        {isLowStock(
-                          product.quantityInStock,
-                          product.minStock
-                        ) && (
-                          <Typography
-                            variant="caption"
-                            color="warning.main"
-                            sx={{ display: "block", fontSize: "0.65rem" }}
-                          >
-                            Low Stock!
-                          </Typography>
-                        )}
-                        {isOutOfStock(product.quantityInStock) && (
-                          <Typography
-                            variant="caption"
-                            color="error.main"
-                            sx={{ display: "block", fontSize: "0.65rem" }}
-                          >
-                            Out of Stock!
-                          </Typography>
-                        )}
                       </TableCell>
-                      <TableCell sx={{ py: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {product.minStock || 0}
-                        </Typography>
-                      </TableCell>
+                      {isInventory ? (
+                        <>
+                          <TableCell sx={{ py: 1 }}>
+                            <Chip
+                              label={product.quantityInStock}
+                              color={getStockColor(
+                                product.quantityInStock,
+                                product.minStock
+                              )}
+                              variant="outlined"
+                              size="small"
+                              sx={{
+                                height: 24,
+                                fontSize: "0.75rem",
+                                backgroundColor:
+                                  getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "success"
+                                    ? "#f0fdf4"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "warning"
+                                    ? "#fffbeb"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "info"
+                                    ? "#f0f9ff"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "error"
+                                    ? "#fef2f2"
+                                    : "#f9fafb",
+                                borderColor:
+                                  getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "success"
+                                    ? "#dcfce7"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "warning"
+                                    ? "#fef3c7"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "info"
+                                    ? "#dbeafe"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "error"
+                                    ? "#fecaca"
+                                    : "#e5e7eb",
+                                color:
+                                  getStockColor(
+                                    product.quantityInStock,
+                                    product.minStock
+                                  ) === "success"
+                                    ? "#059669"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "warning"
+                                    ? "#d97706"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "info"
+                                    ? "#2563eb"
+                                    : getStockColor(
+                                        product.quantityInStock,
+                                        product.minStock
+                                      ) === "error"
+                                    ? "#dc2626"
+                                    : "#6b7280",
+                              }}
+                            />
+                            {isLowStock(
+                              product.quantityInStock,
+                              product.minStock
+                            ) && (
+                              <Typography
+                                variant="caption"
+                                color="warning.main"
+                                sx={{ display: "block", fontSize: "0.65rem" }}
+                              >
+                                Low Stock!
+                              </Typography>
+                            )}
+                            {isOutOfStock(product.quantityInStock) && (
+                              <Typography
+                                variant="caption"
+                                color="error.main"
+                                sx={{ display: "block", fontSize: "0.65rem" }}
+                              >
+                                Out of Stock!
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell sx={{ py: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              {product.minStock || 0}
+                            </Typography>
+                          </TableCell>
+                        </>
+                      ) : (
+                        <>
+                          <TableCell sx={{ py: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: "medium" }}>
+                              Rs.{Number(product.sellingPrice || 0).toFixed(2)}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Made to order
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 1 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              —
+                            </Typography>
+                          </TableCell>
+                        </>
+                      )}
                       <TableCell sx={{ py: 1 }}>
                         <Chip
                           label={product.status === 1 ? "Active" : "Inactive"}
@@ -636,7 +703,9 @@ const ProductManagement = () => {
                         </Box>
                       </TableCell>
                     </TableRow>
-                  )))}
+                      );
+                    })
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

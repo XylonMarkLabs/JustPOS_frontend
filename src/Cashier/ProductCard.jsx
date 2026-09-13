@@ -2,10 +2,12 @@ import { Chip, Button } from "@mui/material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 
 const ProductCard = ({ product, onAddToCart }) => {
+  const isUnlimited = product.quantityAvailable == null;
+  const isOutOfStock = !isUnlimited && product.quantityAvailable <= 0;
   const isLowStock =
+    !isUnlimited &&
     product.quantityAvailable <= product.minStock &&
     product.quantityAvailable > 0;
-  const isOutOfStock = product.quantityAvailable <= 0;
 
   const hasDiscount = product.discount != null;
 
@@ -27,6 +29,11 @@ const ProductCard = ({ product, onAddToCart }) => {
         {isLowStock && !isOutOfStock && !hasDiscount && (
           <div className="absolute top-0 left-0 bg-orange-500 text-white px-2 py-1 rounded-br-lg text-xs font-medium z-10">
             Low Stock
+          </div>
+        )}
+        {isUnlimited && !hasDiscount && (
+          <div className="absolute top-0 left-0 bg-blue-500 text-white px-2 py-1 rounded-br-lg text-xs font-medium z-10">
+            Made to Order
           </div>
         )}
         <div className="absolute bottom-0 left-0 px-2 py-1 rounded-br-lg text-xs font-medium z-10">
@@ -52,41 +59,41 @@ const ProductCard = ({ product, onAddToCart }) => {
         </div>
         <div className="flex justify-between items-center">
           <div className="flex flex-col">
-            {product.discount > 0 ? (
-              <>
-                <span className="text-lg font-bold text-green-600">
-                  Rs.
-                  {(
-                    product.sellingPrice *
-                    (1 - product.discount / 100)
-                  ).toFixed(2)}
-                </span>
-                <span className="text-xs text-gray-500 line-through ">
-                  Rs.{product.sellingPrice.toFixed(2)}
-                </span>
-              </>
-            ) : (
-              <span className="text-lg font-bold text-green-600">
-                Rs.{product.sellingPrice.toFixed(2)}
+            <span className="text-lg font-bold text-green-600">
+              Rs.{Number(product.sellingPrice).toFixed(2)}
+            </span>
+            {hasDiscount && (
+              <span className="text-xs text-gray-500 line-through">
+                Rs.{Number(product.originalPrice).toFixed(2)}
               </span>
             )}
           </div>
           <div className="text-right">
-            <span
-              className={`text-xs whitespace-nowrap ${
-                isOutOfStock
-                  ? "text-red-600 font-semibold"
-                  : isLowStock
-                    ? "text-orange-600 font-semibold"
-                    : "text-gray-500"
-              }`}
-            >
-              Stock: {product.quantityAvailable}
-            </span>
-            {product.minStock > 0 && (
-              <div className="text-xs text-gray-400">
-                Min: {product.minStock}
-              </div>
+            {isUnlimited ? (
+              <span className="text-xs text-gray-500 whitespace-nowrap">
+                Made to order
+              </span>
+            ) : (
+              <>
+                <span
+                  className={`text-xs whitespace-nowrap ${
+                    isOutOfStock
+                      ? "text-red-600 font-semibold"
+                      : isLowStock
+                        ? "text-orange-600 font-semibold"
+                        : "text-gray-500"
+                  }`}
+                >
+                  {hasDiscount
+                    ? `Left: ${product.quantityAvailable}`
+                    : `Stock: ${product.quantityAvailable}`}
+                </span>
+                {product.minStock > 0 && (
+                  <div className="text-xs text-gray-400">
+                    Min: {product.minStock}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

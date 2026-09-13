@@ -15,8 +15,8 @@ import {
   Grid,
   Avatar,
   IconButton,
-  Card,
-  CardContent,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import {
   PhotoCamera as PhotoCameraIcon,
@@ -26,25 +26,38 @@ import {
 import { useAlert } from "../Components/AlertProvider";
 import ApiCall from "../Services/ApiCall";
 
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "#f9fafb",
+    height: "40px",
+    "&:hover": {
+      backgroundColor: "#f3f4f6",
+    },
+    "&.Mui-focused": {
+      backgroundColor: "#fff",
+    },
+  },
+};
+
 const AddProductModal = ({ open, onClose, onAddProduct }) => {
   const { showError, showWarning, showSuccess } = useAlert();
 
   const [formData, setFormData] = useState({
+    productType: "INVENTORY",
     name: "",
     category: "Beverages",
-    price: "",
-    stock: "",
-    minStock: "",
-    discount: "",
     barcode: "",
+    minStock: "",
+    sellingPrice: "",
+    costPrice: "",
     image: null,
     imagePreview: null,
   });
 
   const [errors, setErrors] = useState({
-    price: "",
-    stock: "",
     minStock: "",
+    sellingPrice: "",
+    costPrice: "",
   });
 
   const [categories, setCategories] = useState([]);
@@ -67,9 +80,8 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
   const handleChange = (field) => (event) => {
     const value = event.target.value;
 
-    // Inline validation for negative numbers
     if (
-      (field === "price" || field === "stock" || field === "minStock") &&
+      (field === "minStock" || field === "sellingPrice" || field === "costPrice") &&
       value < 0
     ) {
       setErrors((prev) => ({
@@ -86,6 +98,17 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
     setFormData({
       ...formData,
       [field]: value,
+    });
+  };
+
+  const handleProductTypeChange = (event, newType) => {
+    if (!newType) return; // ignore re-clicking the already-selected option
+    setFormData({
+      ...formData,
+      productType: newType,
+      minStock: newType === "INVENTORY" ? formData.minStock : "",
+      sellingPrice: newType === "NON_INVENTORY" ? formData.sellingPrice : "",
+      costPrice: newType === "NON_INVENTORY" ? formData.costPrice : "",
     });
   };
 
@@ -112,7 +135,6 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
         return;
       }
 
-      // Create preview
       setFormData({
         ...formData,
         image: file,
@@ -146,29 +168,28 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
   };
 
   const handleSubmit = async () => {
-    // Basic validation
-    if (
-      !formData.name ||
-      !formData.price ||
-      !formData.stock ||
-      !formData.barcode
-    ) {
+    const isInventory = formData.productType === "INVENTORY";
+
+    if (!formData.name || !formData.barcode) {
       showError("Please fill in all required fields", "Missing Information");
       return;
     }
 
-    // Validate minimum stock
-    if (
-      formData.minStock &&
-      parseInt(formData.minStock) > parseInt(formData.stock)
-    ) {
-      showWarning(
-        "Minimum stock level cannot be greater than current stock",
-        "Invalid Stock Level"
-      );
+    if (!isInventory && !formData.sellingPrice) {
+      showError("Please enter a selling price for this product", "Missing Information");
       return;
     }
 
+    if (
+      !isInventory &&
+      formData.sellingPrice &&
+      parseFloat(formData.sellingPrice) <= 0
+    ) {
+      showWarning("Selling price must be greater than 0", "Invalid Price");
+      return;
+    }
+
+    let imageUrl = null;
     let publicId = null;
 
     if (formData.image) {
@@ -182,38 +203,38 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
       }
     }
 
-    // Create new product object
     const newProduct = {
       productName: formData.name,
       productCode: formData.barcode,
       category: formData.category,
-      sellingPrice: `${parseFloat(formData.price).toFixed(2)}`,
-      quantityInStock: parseInt(formData.stock),
-      minStock: formData.minStock ? parseInt(formData.minStock) : 0,
+      productType: formData.productType,
+      minStock: isInventory && formData.minStock ? parseInt(formData.minStock) : undefined,
+      sellingPrice: !isInventory && formData.sellingPrice ? parseFloat(formData.sellingPrice) : undefined,
+      costPrice: !isInventory && formData.costPrice ? parseFloat(formData.costPrice) : undefined,
       imageURL: imageUrl,
       imagePublicId: publicId,
-      discount: formData.discount ? parseFloat(formData.discount) : 0,
     };
 
     onAddProduct(newProduct);
-    // showSuccess(`Product "${formData.name}" has been added successfully!`, 'Product Added')
     handleClose();
   };
 
   const handleClose = () => {
     setFormData({
+      productType: "INVENTORY",
       name: "",
       category: "Beverages",
-      price: "",
-      stock: "",
-      minStock: "",
       barcode: "",
-      discount: "",
+      minStock: "",
+      sellingPrice: "",
+      costPrice: "",
       image: null,
       imagePreview: null,
     });
     onClose();
   };
+
+  const isInventory = formData.productType === "INVENTORY";
 
   return (
     <Dialog
@@ -236,6 +257,46 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
 
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {/* Product Type */}
+          <Box>
+            <Typography
+              variant="body2"
+              sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+            >
+              Product Type
+            </Typography>
+            <ToggleButtonGroup
+              value={formData.productType}
+              exclusive
+              onChange={handleProductTypeChange}
+              size="small"
+              fullWidth
+              sx={{
+                "& .MuiToggleButton-root": {
+                  textTransform: "none",
+                  fontWeight: "medium",
+                  "&.Mui-selected": {
+                    backgroundColor: "#b0a892",
+                    color: "#fff",
+                    "&:hover": { backgroundColor: "#9a9078" },
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="INVENTORY">
+                Inventory (from supplier)
+              </ToggleButton>
+              <ToggleButton value="NON_INVENTORY">
+                Made to order
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Typography variant="caption" sx={{ color: "#9ca3af", mt: 0.5, display: "block" }}>
+              {isInventory
+                ? "Stock is added afterward via Add Stock — this just creates the product record."
+                : "No stock to track — price is set directly, and prepared when ordered (e.g. fresh juice)."}
+            </Typography>
+          </Box>
+
           {/* Product Image Upload */}
           <Box>
             <Typography
@@ -328,6 +389,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
               </Box>
             </Box>
           </Box>
+
           {/* Product Name */}
           <Box>
             <Typography
@@ -343,22 +405,11 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
               onChange={handleChange("name")}
               variant="outlined"
               size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  backgroundColor: "#f9fafb",
-                  height: "40px",
-                  "&:hover": {
-                    backgroundColor: "#f3f4f6",
-                  },
-                  "&.Mui-focused": {
-                    backgroundColor: "#fff",
-                  },
-                },
-              }}
+              sx={fieldSx}
             />
           </Box>
 
-          {/* Category */}
+          {/* Barcode + Category */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography
@@ -374,19 +425,7 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 onChange={handleChange("barcode")}
                 variant="outlined"
                 size="small"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                      borderColor: "#000000",
-                    },
-                  },
-                }}
+                sx={fieldSx}
               />
             </Grid>
             <Grid item xs={6}>
@@ -423,119 +462,9 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
             </Grid>
           </Grid>
 
-          {/* Price and Discount */}
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
-              >
-                Price
-              </Typography>
-              <TextField
-                fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.price}
-                onChange={handleChange("price")}
-                variant="outlined"
-                size="small"
-                error={!!errors.price}
-                helperText={errors.price || ""}
-                inputProps={{
-                  min: 0,
-                  step: 0.01,
-                  style: { fontSize: "0.875rem" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
-              >
-                Discount (%)
-              </Typography>
-              <TextField
-                fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.discount}
-                onChange={handleChange("discount")}
-                variant="outlined"
-                size="small"
-                inputProps={{
-                  min: 0,
-                  step: 0.01,
-                  style: { fontSize: "0.875rem" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                      borderColor: "#000000",
-                    },
-                  },
-                }}
-              />
-            </Grid>
-          </Grid>
-
-          {/* Current Stock and Minimum Stock Level */}
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
-              >
-                Current Stock
-              </Typography>
-              <TextField
-                fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.stock}
-                onChange={handleChange("stock")}
-                variant="outlined"
-                size="small"
-                error={!!errors.stock}
-                helperText={errors.stock || ""}
-                inputProps={{
-                  min: 0,
-                  style: { fontSize: "0.875rem" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={6}>
+          {/* Type-specific fields */}
+          {isInventory ? (
+            <Box sx={{ maxWidth: "50%", pr: 1 }}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -551,26 +480,57 @@ const AddProductModal = ({ open, onClose, onAddProduct }) => {
                 variant="outlined"
                 size="small"
                 error={!!errors.minStock}
-                helperText={errors.minStock || ""}
-                inputProps={{
-                  min: 0,
-                  style: { fontSize: "0.875rem" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
+                helperText={errors.minStock || "Used to trigger low-stock alerts once stock is received"}
+                inputProps={{ min: 0, style: { fontSize: "0.875rem" } }}
+                sx={fieldSx}
               />
+            </Box>
+          ) : (
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+                >
+                  Selling Price
+                </Typography>
+                <TextField
+                  fullWidth
+                  type="number"
+                  placeholder="0.00"
+                  value={formData.sellingPrice}
+                  onChange={handleChange("sellingPrice")}
+                  variant="outlined"
+                  size="small"
+                  error={!!errors.sellingPrice}
+                  helperText={errors.sellingPrice || ""}
+                  inputProps={{ min: 0, step: 0.01, style: { fontSize: "0.875rem" } }}
+                  sx={fieldSx}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+                >
+                  Cost Price (optional)
+                </Typography>
+                <TextField
+                  fullWidth
+                  type="number"
+                  placeholder="0.00"
+                  value={formData.costPrice}
+                  onChange={handleChange("costPrice")}
+                  variant="outlined"
+                  size="small"
+                  error={!!errors.costPrice}
+                  helperText={errors.costPrice || "Estimated ingredient/prep cost, for profit reports"}
+                  inputProps={{ min: 0, step: 0.01, style: { fontSize: "0.875rem" } }}
+                  sx={fieldSx}
+                />
+              </Grid>
             </Grid>
-          </Grid>
+          )}
         </Box>
       </DialogContent>
 

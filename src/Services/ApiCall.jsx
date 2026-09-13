@@ -155,7 +155,11 @@ const ApiCall = {
                     productCode: product.productCode,
                     productName: product.productName,
                     category: product.category,
+                    productType: product.productType,
+                    taxRate: product.taxRate,
                     minStock: product.minStock,
+                    sellingPrice: product.sellingPrice,
+                    costPrice: product.costPrice,
                     imageURL: product.imageURL,
                     imagePublicId: product.imagePublicId,
                 });
@@ -215,6 +219,8 @@ const ApiCall = {
                     productName: product.productName,
                     category: product.category,
                     minStock: product.minStock,
+                    sellingPrice: product.sellingPrice,
+                    costPrice: product.costPrice,
                     imageURL: product.imageURL,
                     imagePublicId: product.imagePublicId,
                 });
@@ -269,9 +275,9 @@ const ApiCall = {
             }
         },
 
-        removeFromCart: async (username, productCode, unitPrice) => {
+        removeFromCart: async (username, productId, stockItemId) => {
             try {
-                const response = await axios.post(`${baseURL}/cart/remove`, { username, productCode, unitPrice });
+                const response = await axios.post(`${baseURL}/cart/remove`, { username, productId, stockItemId });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -281,10 +287,10 @@ const ApiCall = {
                 throw error;
             }
         },
-        
-        updateCartQuantity: async (username, productCode, unitPrice, quantity) => {
+
+        updateCartQuantity: async (username, productId, stockItemId, quantity) => {
             try {
-                const response = await axios.put(`${baseURL}/cart/update-quantity`, { username, productCode, unitPrice, quantity });
+                const response = await axios.put(`${baseURL}/cart/update-quantity`, { username, productId, stockItemId, quantity });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -314,17 +320,15 @@ const ApiCall = {
             try {
                 const response = await axios.post(`${baseURL}/order/checkout`, {
                     username: order.username,
-                    totalAmount: order.totalAmount,
                     paymentMethod: order.paymentMethod,
                     cashReceived: order.cashReceived,
-                    changeGiven: order.changeGiven
                 });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
-                return true;
+                return response.data.order;
             } catch (error) {
-                console.error('Error during cash checkout:', error);
+                console.error('Error during checkout:', error);
                 throw error;
             }
         }
@@ -554,7 +558,6 @@ const ApiCall = {
         },
 
         addDiscount: async (discount) => {
-            console.log("Request came to ApiCall")
             try {
                 const response = await axios.post(`${baseURL}/discount/add`, {
                     productId: discount.productId,

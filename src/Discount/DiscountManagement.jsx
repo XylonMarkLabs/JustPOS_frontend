@@ -38,21 +38,12 @@ import {
 import ApiCall from "../Services/ApiCall";
 import AdminPageShell from "../Components/AdminPageShell";
 
-// NOTE: this assumes ApiCall.discount.{getAll, addDiscount, editDiscount, updateStatus, deleteDiscount}
-// exist and follow the same call/response shape as ApiCall.product. If your ApiCall.js doesn't have
-// a `discount` group yet, add one that hits the discountRouter endpoints (/add, /edit, /update-status,
-// /get-all, /delete).
-//
-// This also assumes getAll() returns each discount already carrying the product's display info
-// (e.g. productName, productCode) alongside productId/stockItemId — either via a populate/join on the
-// backend, or by merging with your existing product list on the frontend. Swap the `product.productName`
-// references below for whatever field your API actually returns.
-
 const DiscountManagement = () => {
   const { showSuccess, showInfo } = useAlert();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("All");
+  const [productTypeFilter, setProductTypeFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -166,7 +157,7 @@ const DiscountManagement = () => {
     }
   };
 
-  // Filter discounts based on search term, type, and status
+  // Filter discounts based on search term, discount type, product type, and status
   const filteredDiscounts = discounts.filter((discount) => {
     const productLabel = `${discount.productName || ""} ${discount.productId || ""}`.toLowerCase();
     const matchesSearch =
@@ -174,10 +165,12 @@ const DiscountManagement = () => {
       discount.discountId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType =
       typeFilter === "All" || discount.discountType === typeFilter;
+    const matchesProductType =
+      productTypeFilter === "All" || discount.productType === productTypeFilter;
     const matchesStatus =
       statusFilter === "All Status" || discount.status === statusFilter;
 
-    return matchesSearch && matchesType && matchesStatus;
+    return matchesSearch && matchesType && matchesProductType && matchesStatus;
   });
 
   // Get current page discounts
@@ -205,6 +198,11 @@ const DiscountManagement = () => {
 
   const handleTypeChange = (e) => {
     setTypeFilter(e.target.value);
+    setPage(0);
+  };
+
+  const handleProductTypeChange = (e) => {
+    setProductTypeFilter(e.target.value);
     setPage(0);
   };
 
@@ -307,9 +305,17 @@ const DiscountManagement = () => {
                 ),
               }}
             />
+            <FormControl sx={{ minWidth: 150 }}>
+              <InputLabel>Product Type</InputLabel>
+              <Select value={productTypeFilter} label="Product Type" onChange={handleProductTypeChange}>
+                <MenuItem value="All">All</MenuItem>
+                <MenuItem value="INVENTORY">Inventory</MenuItem>
+                <MenuItem value="NON_INVENTORY">Made to Order</MenuItem>
+              </Select>
+            </FormControl>
             <FormControl sx={{ minWidth: 140 }}>
-              <InputLabel>Type</InputLabel>
-              <Select value={typeFilter} label="Type" onChange={handleTypeChange}>
+              <InputLabel>Discount Type</InputLabel>
+              <Select value={typeFilter} label="Discount Type" onChange={handleTypeChange}>
                 <MenuItem value="All">All</MenuItem>
                 <MenuItem value="percentage">Percentage</MenuItem>
                 <MenuItem value="fixed">Fixed Amount</MenuItem>
@@ -382,7 +388,7 @@ const DiscountManagement = () => {
                 <TableBody>
                   {paginatedDiscounts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} align="center">
+                      <TableCell colSpan={9} align="center">
                         <div className="text-xl text-gray-500 h-80 flex justify-center items-center">
                           No discounts found.
                         </div>
@@ -391,6 +397,7 @@ const DiscountManagement = () => {
                   ) : (
                     paginatedDiscounts.map((discount) => {
                       const statusStyles = getStatusStyles(discount.status);
+                      const isNonInventory = discount.productType === "NON_INVENTORY";
                       return (
                         <TableRow
                           key={discount.discountId}
@@ -409,7 +416,7 @@ const DiscountManagement = () => {
                               {discount.productName || discount.productId}
                             </Typography>
                             <Typography variant="body" color="text.secondary" sx={{ lineHeight: 1 }}>
-                              {discount.stockId}
+                              {isNonInventory ? "Made to order" : discount.stockId || "-"}
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 1 }}>

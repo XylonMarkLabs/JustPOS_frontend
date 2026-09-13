@@ -14,8 +14,7 @@ import {
   Grid,
   Avatar,
   IconButton,
-  Card,
-  CardContent,
+  Chip,
 } from "@mui/material";
 import {
   PhotoCamera as PhotoCameraIcon,
@@ -25,25 +24,40 @@ import {
 import { useAlert } from "../Components/AlertProvider";
 import ApiCall from "../Services/ApiCall";
 
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "#f9fafb",
+    height: "40px",
+    "&:hover": {
+      backgroundColor: "#f3f4f6",
+    },
+    "&.Mui-focused": {
+      backgroundColor: "#fff",
+    },
+  },
+};
+
 const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   const { showError, showWarning, showSuccess } = useAlert();
 
   const [formData, setFormData] = useState({
+    productType: "INVENTORY",
     name: "",
     category: "Beverages",
-    price: 0,
-    stock: 0,
-    minStock: 0,
-    discount: 0,
     barcode: "",
+    minStock: "",
+    sellingPrice: "",
+    costPrice: "",
     image: null,
     imagePreview: null,
+    existingImageURL: null,
+    imagePublicId: null,
   });
 
   const [errors, setErrors] = useState({
-    price: "",
-    stock: "",
     minStock: "",
+    sellingPrice: "",
+    costPrice: "",
   });
 
   const [categories, setCategories] = useState([]);
@@ -52,14 +66,13 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   useEffect(() => {
     if (product) {
       setFormData({
+        productType: product.productType || "INVENTORY",
         name: product.productName || "",
         category: product.category || "Beverages",
-        // price: product.sellingPrice,
-        // stock: product.quantityInStock || "",
-        minStock: product.minStock || "",
         barcode: product.productCode || "",
-        status: product.status === 1 ? "Active" : "Inactive",
-        // discount: product.discount || 0,
+        minStock: product.minStock ?? "",
+        sellingPrice: product.sellingPrice ?? "",
+        costPrice: product.costPrice ?? "",
         image: null,
         imagePreview: product.imageURL,
         existingImageURL: product.imageURL,
@@ -83,9 +96,8 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   const handleChange = (field) => (event) => {
     const value = event.target.value;
 
-    // Inline validation for negative numbers
     if (
-      (field === "price" || field === "stock" || field === "minStock") &&
+      (field === "minStock" || field === "sellingPrice" || field === "costPrice") &&
       value < 0
     ) {
       setErrors((prev) => ({
@@ -108,7 +120,6 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Validate file type
       const allowedTypes = [
         "image/jpeg",
         "image/png",
@@ -123,14 +134,12 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
         return;
       }
 
-      // Validate file size (max 5MB)
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         showError("Image file must be less than 5MB", "File Too Large");
         return;
       }
 
-      // Create preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData({
@@ -178,24 +187,24 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   };
 
   const handleSubmit = async () => {
-    if (
-      !formData.name ||
-      !formData.price ||
-      !formData.stock ||
-      !formData.barcode
-    ) {
+    const isInventory = formData.productType === "INVENTORY";
+
+    if (!formData.name || !formData.barcode) {
       showError("Please fill in all required fields", "Missing Information");
       return;
     }
 
+    if (!isInventory && !formData.sellingPrice) {
+      showError("Please enter a selling price for this product", "Missing Information");
+      return;
+    }
+
     if (
-      formData.minStock &&
-      parseInt(formData.minStock) > parseInt(formData.stock)
+      !isInventory &&
+      formData.sellingPrice &&
+      parseFloat(formData.sellingPrice) <= 0
     ) {
-      showWarning(
-        "Minimum stock level cannot be greater than current stock",
-        "Invalid Stock Level"
-      );
+      showWarning("Selling price must be greater than 0", "Invalid Price");
       return;
     }
 
@@ -214,29 +223,25 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
     }
 
     const updatedProduct = {
-      ...product,
-      productName: formData.name,
       productCode: formData.barcode,
+      productName: formData.name,
       category: formData.category,
-      // sellingPrice: `${parseFloat(formData.price).toFixed(2)}`,
-      // quantityInStock: parseInt(formData.stock),
-      minStock: formData.minStock ? parseInt(formData.minStock) : 0,
-      // discount: formData.discount ? parseFloat(formData.discount) : 0,
+      minStock: isInventory && formData.minStock !== "" ? parseInt(formData.minStock) : undefined,
+      sellingPrice: !isInventory && formData.sellingPrice !== "" ? parseFloat(formData.sellingPrice) : undefined,
+      costPrice: !isInventory && formData.costPrice !== "" ? parseFloat(formData.costPrice) : undefined,
       imageURL: imageUrl,
       imagePublicId: imagePublicId,
     };
 
     onEditProduct(updatedProduct);
-    // showSuccess(
-    //   `Product "${formData.name}" has been updated successfully!`,
-    //   "Product Updated"
-    // );
     handleClose();
   };
 
   const handleClose = () => {
     onClose();
   };
+
+  const isInventory = formData.productType === "INVENTORY";
 
   return (
     <Dialog
@@ -259,6 +264,29 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
 
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {/* Product Type — locked */}
+          <Box>
+            <Typography
+              variant="body2"
+              sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+            >
+              Product Type
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Chip
+                label={isInventory ? "Inventory (from supplier)" : "Made to order"}
+                sx={{
+                  backgroundColor: "#f3f4f6",
+                  color: "#374151",
+                  fontWeight: "medium",
+                }}
+              />
+              <Typography variant="caption" sx={{ color: "#9ca3af" }}>
+                Can't be changed after creation
+              </Typography>
+            </Box>
+          </Box>
+
           {/* Product Image Upload */}
           <Box>
             <Typography
@@ -304,18 +332,6 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                     <DeleteIcon sx={{ fontSize: 12 }} />
                   </IconButton>
                 </Box>
-              ) : product?.image &&
-                !product.image.match(
-                  /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u
-                ) ? (
-                <Avatar
-                  src={product.image}
-                  sx={{
-                    width: 50,
-                    height: 50,
-                    border: "2px solid #e5e7eb",
-                  }}
-                />
               ) : (
                 <Avatar
                   sx={{ width: 50, height: 50, backgroundColor: "#e5e7eb" }}
@@ -350,13 +366,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                       },
                     }}
                   >
-                    {formData.imagePreview ||
-                    (product?.image &&
-                      !product.image.match(
-                        /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}]/u
-                      ))
-                      ? "Change"
-                      : "Upload"}
+                    {formData.imagePreview ? "Change" : "Upload"}
                   </Button>
                 </label>
                 <Typography
@@ -369,6 +379,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
               </Box>
             </Box>
           </Box>
+
           {/* Product Name */}
           <Box>
             <Typography
@@ -384,22 +395,11 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
               onChange={handleChange("name")}
               variant="outlined"
               size="small"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  backgroundColor: "#f9fafb",
-                  height: "40px",
-                  "&:hover": {
-                    backgroundColor: "#f3f4f6",
-                  },
-                  "&.Mui-focused": {
-                    backgroundColor: "#fff",
-                  },
-                },
-              }}
+              sx={fieldSx}
             />
           </Box>
 
-          {/* Category and Barcode */}
+          {/* Barcode (locked) + Category */}
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography
@@ -410,23 +410,12 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
               </Typography>
               <TextField
                 fullWidth
-                placeholder="Enter barcode"
                 value={formData.barcode}
-                onChange={handleChange("barcode")}
                 variant="outlined"
                 size="small"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
+                disabled
+                helperText="Can't be changed — used to identify this product"
+                sx={fieldSx}
               />
             </Grid>
             <Grid item xs={6}>
@@ -463,118 +452,9 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
             </Grid>
           </Grid>
 
-          {/* Price and Discount */}
-          {/* <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
-              >
-                Price
-              </Typography>
-              <TextField
-                fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.price}
-                onChange={handleChange("price")}
-                variant="outlined"
-                size="small"
-                error={!!errors.price}
-                helperText={errors.price || ""}
-                inputProps={{
-                  min: 0,
-                  step: 0.01,
-                  style: { fontSize: "0.875rem" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
-              >
-                Discount (%)
-              </Typography>
-              <TextField
-                fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.discount}
-                onChange={handleChange("discount")}
-                variant="outlined"
-                size="small"
-                inputProps={{
-                  min: 0,
-                  style: { fontSize: "0.875rem" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
-              />
-            </Grid>
-          </Grid> */}
-
-          {/* Current Stock and Min Stock Level */}
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography
-                variant="body2"
-                sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
-              >
-                Current Stock
-              </Typography>
-              <TextField
-                fullWidth
-                type="number"
-                placeholder="0"
-                value={formData.stock}
-                // onChange={handleChange("stock")}
-                variant="outlined"
-                size="small"
-                error={!!errors.stock}
-                helperText={errors.stock || ""}
-                inputProps={{
-                  min: 0,
-                  style: { fontSize: "0.875rem" },
-                  readOnly: true,
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={6}>
+          {/* Type-specific fields */}
+          {isInventory ? (
+            <Box sx={{ maxWidth: "50%", pr: 1 }}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -590,26 +470,57 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                 variant="outlined"
                 size="small"
                 error={!!errors.minStock}
-                helperText={errors.minStock || ""}
-                inputProps={{
-                  min: 0,
-                  style: { fontSize: "0.875rem" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#f9fafb",
-                    height: "40px",
-                    "&:hover": {
-                      backgroundColor: "#f3f4f6",
-                    },
-                    "&.Mui-focused": {
-                      backgroundColor: "#fff",
-                    },
-                  },
-                }}
+                helperText={errors.minStock || "Used to trigger low-stock alerts"}
+                inputProps={{ min: 0, style: { fontSize: "0.875rem" } }}
+                sx={fieldSx}
               />
+            </Box>
+          ) : (
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+                >
+                  Selling Price
+                </Typography>
+                <TextField
+                  fullWidth
+                  type="number"
+                  placeholder="0.00"
+                  value={formData.sellingPrice}
+                  onChange={handleChange("sellingPrice")}
+                  variant="outlined"
+                  size="small"
+                  error={!!errors.sellingPrice}
+                  helperText={errors.sellingPrice || ""}
+                  inputProps={{ min: 0, step: 0.01, style: { fontSize: "0.875rem" } }}
+                  sx={fieldSx}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+                >
+                  Cost Price (optional)
+                </Typography>
+                <TextField
+                  fullWidth
+                  type="number"
+                  placeholder="0.00"
+                  value={formData.costPrice}
+                  onChange={handleChange("costPrice")}
+                  variant="outlined"
+                  size="small"
+                  error={!!errors.costPrice}
+                  helperText={errors.costPrice || "Estimated ingredient/prep cost, for profit reports"}
+                  inputProps={{ min: 0, step: 0.01, style: { fontSize: "0.875rem" } }}
+                  sx={fieldSx}
+                />
+              </Grid>
             </Grid>
-          </Grid>
+          )}
         </Box>
       </DialogContent>
 
