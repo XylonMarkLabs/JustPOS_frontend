@@ -36,7 +36,7 @@ const BusinessLogin = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/business/login",
+        `${baseURL}/business/login`,
         {
           businessEmail: businessId,
           password: password,
