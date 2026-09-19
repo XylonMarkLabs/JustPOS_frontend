@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     AppBar,
@@ -12,14 +13,15 @@ import {
 import LogoutIcon from '@mui/icons-material/Logout';
 import logo from '../assets/JUSTPOS_transparent.png';
 import ChangePasswordModal from './ChangePasswordModal';
-import AuthService from '../Services/AuthService';
-import { getCurrentUserRole } from '../Services/authRole';
+import { AuthContext } from '../Services/AuthContext';
 
 const Navbar = () => {
+    const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [openPasswordModal, setOpenPasswordModal] = useState(false);
 
-    const role = getCurrentUserRole();
+    const { user, logout } = useContext(AuthContext);
+    const role = user?.role;
 
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
@@ -36,40 +38,12 @@ const Navbar = () => {
 
     const handlePasswordModalClose = () => {
         setOpenPasswordModal(false);
-        setPasswordForm({
-            oldPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-        });
-        setError('');
     };
 
-    const handlePasswordChange = (event) => {
-        const { name, value } = event.target;
-        setPasswordForm(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmitPasswordChange = () => {
-        // Validate passwords
-        if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
-            setError('All fields are required');
-            return;
-        }
-
-        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-            setError('New passwords do not match');
-            return;
-        }
-
-        handlePasswordModalClose();
-    };
-
-    const handleLogout = () => {
-        AuthService.logout();
+    const handleLogout = async () => {
         handleClose();
+        await logout();
+        navigate('/', { replace: true });
     }
 
     return (

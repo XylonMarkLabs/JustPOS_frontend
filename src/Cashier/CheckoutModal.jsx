@@ -18,6 +18,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import DownloadIcon from '@mui/icons-material/Download';
 import PaymentIcon from "@mui/icons-material/Payment";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useAlert } from "../Components/AlertProvider";
 import ApiCall from "../Services/ApiCall";
 
@@ -27,6 +28,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
     const [paymentMethod, setPaymentMethod] = useState("cash");
     const [cashReceived, setCashReceived] = useState("");
     const [step, setStep] = useState(1);
+    const [billDoc, setBillDoc] = useState(null);
 
     const handlePaymentMethodChange = (event) => {
         setPaymentMethod(event.target.value);
@@ -52,6 +54,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
         setStep(1);
         setCashReceived("");
         setPaymentMethod("cash");
+        setBillDoc(null);
     };
 
     const generateBill = (orderData) => {
@@ -96,9 +99,9 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                 yPos = 20;
             }
 
-            const originalPrice = item.product.price;
-            const discountedPrice = item.product.discount > 0 
-                ? originalPrice * (1 - item.product.discount / 100) 
+            const originalPrice = item.product.unitPrice;
+            const discountedPrice = item.product.discountValue > 0 
+                ? originalPrice * (1 - item.product.discountValue / 100) 
                 : originalPrice;
             const lineTotal = discountedPrice * item.product.quantity;
 
@@ -115,8 +118,8 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
             doc.text(`Rs.${originalPrice.toFixed(2)}`, 110, yPos);
             
             // Discount
-            if (item.product.discount > 0) {
-                doc.text(`${item.product.discount}%`, 135, yPos);
+            if (item.product.discountValue > 0) {
+                doc.text(`${item.product.discountValue}%`, 135, yPos);
             } else {
                 doc.text("-", 135, yPos);
             }
@@ -125,7 +128,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
             doc.text(`Rs.${lineTotal.toFixed(2)}`, 170, yPos);
 
             // If there's a discount, show the original total struck through
-            if (item.product.discount > 0) {
+            if (item.product.discountValue > 0) {
                 const originalTotal = originalPrice * item.product.quantity;
                 yPos += 4;
                 doc.setTextColor(128, 128, 128); // Gray color for struck through price
@@ -182,18 +185,22 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
         return doc;
     };
 
-    // const handlePrint = (doc) => {
-    //     const pdfUrl = doc.output('bloburl');
-    //     const printWindow = window.open(pdfUrl);
-    //     printWindow.onload = () => {
-    //         printWindow.print();
-    //     };
-    // };
+    const handlePrint = () => {
+        if (!billDoc) return;
+        const pdfUrl = billDoc.output('bloburl');
+        const printWindow = window.open(pdfUrl);
+        if (printWindow) {
+            printWindow.onload = () => {
+                printWindow.print();
+            };
+        }
+    };
 
-    const handleDownload = (doc) => {
+    const handleDownload = () => {
+        if (!billDoc) return;
         const now = new Date();
         const fileName = `receipt_${now.getTime()}.pdf`;
-        doc.save(fileName);
+        billDoc.save(fileName);
     };
 
     const handleCheckout = async () => {
@@ -207,13 +214,12 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                 changeGiven: paymentMethod === "cash" ? change : null,
                 discount: parseFloat(discount) || 0,
             });
+
             if (response) {
                 const bill = generateBill(response);
-                handleDownload(bill);
-                // handlePrint(bill);
+                setBillDoc(bill);
+                setStep(3);
                 showSuccess(`Sale recorded successfully!`, "Success");
-                resetModal();
-                onClose();
             } else {
                 showInfo("Failed to record the sale. Please try again.");
             }
@@ -400,6 +406,61 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
         </>
     );
 
+    const renderReceiptStep = () => (
+        <>
+            <DialogTitle>Payment Complete</DialogTitle>
+            <DialogContent>
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 1,
+                        py: 3,
+                    }}
+                >
+                    <CheckCircleIcon color="success" sx={{ fontSize: 56 }} />
+                    <Typography variant="h6">Sale recorded successfully!</Typography>
+                    <Typography color="text.secondary">
+                        Total charged: Rs.{total.toFixed(2)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        Print or download the receipt below, or just close this window.
+                    </Typography>
+                </Box>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                    <Button
+                        startIcon={<PrintIcon />}
+                        onClick={handlePrint}
+                        variant="outlined"
+                    >
+                        Print
+                    </Button>
+                    <Button
+                        startIcon={<DownloadIcon />}
+                        onClick={handleDownload}
+                        variant="outlined"
+                    >
+                        Download
+                    </Button>
+                </Box>
+                <Button
+                    onClick={() => {
+                        resetModal();
+                        onClose();
+                    }}
+                    variant="contained"
+                    color="primary"
+                    sx={{ color: "white" }}
+                >
+                    Done
+                </Button>
+            </DialogActions>
+        </>
+    );
+
     return (
         <Dialog 
             open={open} 
@@ -410,7 +471,9 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
             maxWidth="sm" 
             fullWidth
         >
-            {step === 1 ? renderPaymentMethodSelection() : renderOrderSummary()}
+            {step === 1 && renderPaymentMethodSelection()}
+            {step === 2 && renderOrderSummary()}
+            {step === 3 && renderReceiptStep()}
         </Dialog>
     );
 };

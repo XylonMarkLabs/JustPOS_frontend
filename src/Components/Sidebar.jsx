@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import Inventory2Icon from '@mui/icons-material/Inventory2'
@@ -9,15 +9,10 @@ import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { Avatar, Menu, MenuItem } from '@mui/material'
 import logo from '../assets/JUSTPOS_transparent.png'
-import AuthService from '../Services/AuthService'
+import { AuthContext } from '../Services/AuthContext'
 import { useSidebarMenu } from './SidebarMenuContext'
 import ChangePasswordModal from './ChangePasswordModal'
-import { getCurrentUserRole } from '../Services/authRole'
 
-// Only top-level entries show in the sidebar itself. An entry with
-// "submenus" doesn't navigate directly — clicking it activates its
-// submenu group (rendered elsewhere via SubMenuBar) and jumps to the
-// first available submenu page.
 const getMenuStructure = (role) => [
   {
     title: 'Dashboard',
@@ -67,8 +62,8 @@ const Sidebar = () => {
   const location = useLocation()
   const { activeMenu, setActiveMenu } = useSidebarMenu()
 
-  const user = JSON.parse(localStorage.getItem('user'))
-  const role = getCurrentUserRole();
+  const { user, logout } = useContext(AuthContext)
+  const role = user?.role
 
   // Cashiers use the top Navbar instead of this sidebar.
   if (role === 'Cashier') return null
@@ -77,9 +72,6 @@ const Sidebar = () => {
     item.roles.includes(role)
   )
 
-  // Keep the right main menu highlighted (and its submenu bar open) based
-  // on the current URL — covers page refresh and direct links, not just
-  // clicks from within the sidebar.
   useEffect(() => {
     const matched = menuItems.find((item) =>
       item.submenus
@@ -120,8 +112,10 @@ const Sidebar = () => {
     setOpenPasswordModal(false)
   }
 
-  const handleLogout = () => {
-    AuthService.logout()
+  const handleLogout = async () => {
+    handleAccountMenuClose()
+    await logout()
+    navigate('/', { replace: true })
   }
 
   return (

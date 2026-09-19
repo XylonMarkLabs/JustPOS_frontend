@@ -1,49 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthService from "./AuthService.jsx";
+import { AuthContext } from "./AuthContext.jsx";
 
-// HOC to wrap component and verify authentication
-export default function withAuth(AuthComponent) {
+export default function withAuth(AuthComponent, allowedRoles = null) {
   return function AuthWrapped(props) {
-    const [confirm, setConfirm] = useState(null);
-    const [loaded, setLoaded] = useState(false);
-    const Auth = AuthService;
+    const { isAuthenticated, authLoading, user } = useContext(AuthContext);
     const navigate = useNavigate();
 
+    const hasRequiredRole = !allowedRoles || (user && allowedRoles.includes(user.role));
+
     useEffect(() => {
-      const checkAuth = async () => {
-        if (!Auth.loggedIn()) {
-          navigate("/");
-        } else {
-          try {
-            const confirmData = await Auth.getConfirm();
-            setConfirm(confirmData);
-            setLoaded(true);
-          } catch (err) {
-            console.error(err);
-            Auth.logout();
-            navigate("/");
-          }
-        }
-      };
+      if (authLoading) return;
 
-      checkAuth();
-    }, [Auth, navigate]);
-
-    if (loaded) {
-      if (confirm) {
-        return (
-          <AuthComponent
-            {...props}
-            confirm={confirm}
-          />
-        );
-      } else {
-        console.log("not confirmed!");
-        return null;
+      if (!isAuthenticated) {
+        navigate("/", { replace: true });
+        return;
       }
+
+      if (!hasRequiredRole) {
+        navigate("/home", { replace: true });
+      }
+    }, [authLoading, isAuthenticated, hasRequiredRole, navigate]);
+
+    if (authLoading || !isAuthenticated || !hasRequiredRole) {
+      return null;
     }
 
-    return null;
+    return <AuthComponent {...props} confirm={user} />;
   };
 }

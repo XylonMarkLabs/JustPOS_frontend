@@ -44,7 +44,8 @@ const Login = () => {
         {
           username: username,
           password: password,
-        }
+        },
+        { withCredentials: true }
       );
 
       if (!response.data.success) {
@@ -52,25 +53,20 @@ const Login = () => {
         return;
       }
 
-      localStorage.setItem("token", response.data.token);
-      const userData = await ApiCall.user.getUserData();
+      const fullUser = await ApiCall.user.getUserData();
 
-      if (!userData || !userData.role) {
+      if (!fullUser || !fullUser.role) {
         showError(
           "Login succeeded but we couldn't load your account details. Please try again."
         );
         return;
       }
 
-      const user = {
-        username: userData.username,
-        role: userData.role,
-      };
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify({ username: fullUser.username, role: fullUser.role }));
 
-      login();
+      login(fullUser);
 
-      const destination = ROLE_HOME_PATH[user.role] || "/";
+      const destination = ROLE_HOME_PATH[fullUser.role] || "/";
       navigate(destination, { replace: true });
     } catch (err) {
       console.error("Login error:", err);

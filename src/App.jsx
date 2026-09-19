@@ -1,12 +1,10 @@
-// App.jsx
 import './App.css';
-import { ThemeProvider } from '@mui/material';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, CircularProgress, Box } from '@mui/material';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Theme from './Theme/Theme.js';
 import Navbar from './Components/Navbar.jsx';
 import AlertProvider from './Components/AlertProvider.jsx';
 import AuthProvider, { AuthContext } from './Services/AuthContext.jsx';
-import AuthService from './Services/AuthService.jsx';
 import Login from './Auth/Login.jsx';
 import BusinessLogin from './Auth/BusinessLogin.jsx';
 import BusinessRegister from './Auth/BusinessRegister.jsx';
@@ -23,25 +21,23 @@ import { useContext } from 'react';
 import StockManagement from './Stock Management/StockManagement.jsx';
 import SupplierManagement from './Supplier Manament/SupplierManagement.jsx';
 import DiscountManagement from './Discount/DiscountManagement.jsx';
-import { getCurrentUserRole } from './Services/authRole.js';
 
 const ProtectedCashierView = withAuth(CashierView);
-const ProtectedProductManagement = withAuth(ProductManagement);
-const ProtectedCategoryManagement = withAuth(CategoryManagement);
-const ProtectedOrders = withAuth(Orders);
-const ProtectedUserManagement = withAuth(UserManagement);
-const ProtectedReports = withAuth(Reports);
-const ProtectedAdminDashboard = withAuth(AdminDashboard);
-const ProtectedManagerDashboard = withAuth(ManagerDashboard);
-const ProtectedStockManagement = withAuth(StockManagement);
-const ProtectedSupplierManagement = withAuth(SupplierManagement);
-const ProtectedDiscountManagement = withAuth(DiscountManagement);
+const ProtectedProductManagement = withAuth(ProductManagement, ['Admin', 'Manager']);
+const ProtectedCategoryManagement = withAuth(CategoryManagement, ['Admin', 'Manager']);
+const ProtectedOrders = withAuth(Orders, ['Admin', 'Manager']);
+const ProtectedUserManagement = withAuth(UserManagement, ['Admin']);
+const ProtectedReports = withAuth(Reports, ['Admin', 'Manager']);
+const ProtectedAdminDashboard = withAuth(AdminDashboard, ['Admin']);
+const ProtectedManagerDashboard = withAuth(ManagerDashboard, ['Manager']);
+const ProtectedStockManagement = withAuth(StockManagement, ['Admin', 'Manager']);
+const ProtectedSupplierManagement = withAuth(SupplierManagement, ['Admin', 'Manager']);
+const ProtectedDiscountManagement = withAuth(DiscountManagement, ['Admin', 'Manager']);
 
 function AppContent() {
-  const { isAuthenticated } = useContext(AuthContext);
-  // const businessData = localStorage.getItem("businessData");
-  const token = localStorage.getItem("token");
-  const role = getCurrentUserRole();
+  const { isAuthenticated, authLoading, user } = useContext(AuthContext);
+  const location = useLocation();
+  const role = user?.role;
 
   // Function to redirect based on user role
   const getHomePage = () => {
@@ -57,19 +53,17 @@ function AppContent() {
     }
   };
 
-  // Function to handle root path navigation
-  // const handleRootNavigation = () => {
-  //   // If both business data and user token exist
-  //   if (token) {
-  //     return getHomePage();
-  //   } else {
-  //     return <Navigate to="/user-login" />;
-  //   }
-  // };
+  if (authLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress sx={{ color: '#b0a892' }} />
+      </Box>
+    );
+  }
 
   return (
     <>
-      {isAuthenticated && role === 'Cashier' && <Navbar />}
+      {isAuthenticated && location.pathname.startsWith('/cashier') && <Navbar />}
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/home" element={getHomePage()} />

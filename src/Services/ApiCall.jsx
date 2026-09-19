@@ -1,14 +1,14 @@
 import axios from "axios";
-import AuthService from "./AuthService";
 
 const baseURL = 'http://localhost:4000/api'
+
+axios.defaults.withCredentials = true
 
 const ApiCall = {
     user: {
         getUserData: async () => {
-            const id = AuthService.getConfirm().id
             try {
-                const response = await axios.post(`${baseURL}/user/getUserById`, { id });
+                const response = await axios.get(`${baseURL}/user/me`);
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
                 }
@@ -102,10 +102,8 @@ const ApiCall = {
         },
 
         changePassword: async (oldPassword, newPassword, confirmPassword) => {
-            const username = AuthService.getConfirm().username;
             try {
                 const response = await axios.post(`${baseURL}/user/change-password`, {
-                    username,
                     oldPassword,
                     newPassword,
                     confirmPassword
@@ -116,6 +114,19 @@ const ApiCall = {
                 return true;
             } catch (error) {
                 console.error('Error changing password:', error);
+                throw error;
+            }
+        },
+
+        logout: async () => {
+            try {
+                const response = await axios.post(`${baseURL}/user/logout`);
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error logging out:', error);
                 throw error;
             }
         }
@@ -325,7 +336,7 @@ const ApiCall = {
                 });
                 if (!response.data.success) {
                     throw new Error('Network response was not ok');
-                }
+                }   
                 return response.data.order;
             } catch (error) {
                 console.error('Error during checkout:', error);

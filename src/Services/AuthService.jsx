@@ -1,10 +1,8 @@
-import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+
+const baseURL = 'http://localhost:4000/api';
 
 const AuthService = {
-  getToken: () => {
-    return localStorage.getItem("token");
-  },
-
   getBusinessData: () => {
     const data = localStorage.getItem("businessData");
     return data ? JSON.parse(data) : null;
@@ -19,46 +17,34 @@ const AuthService = {
     return businessData ? JSON.parse(businessData).id : null;
   },
 
-  getBusinessData: () => {
-    const data = localStorage.getItem("businessData");
-    return data ? JSON.parse(data) : null;
-  },
-
   getConfirm: () => {
-    let answer = jwtDecode(AuthService.getToken());
-    return answer;
+    throw new Error(
+      "AuthService.getConfirm() is deprecated — the token is httpOnly and can't be decoded client-side. Use ApiCall.user.getUserData() (/user/me) instead."
+    );
   },
 
   isTokenExpired: () => {
-    try {
-      const token = AuthService.getToken();
-      if (!token) return true;
-
-      const decodedToken = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-
-      if (decodedToken.exp < currentTime) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/";
-        return true;
-      } else return false;
-    } catch (error) {
-      console.error("Error checking token expiration:", error);
-      return true;
-    }
+    console.warn(
+      "AuthService.isTokenExpired() is deprecated and can no longer check anything meaningful — use AuthContext's isAuthenticated instead."
+    );
+    return true;
   },
 
   loggedIn: () => {
-    const token = AuthService.getToken();
-    return !!token && !AuthService.isTokenExpired();
+    console.warn(
+      "AuthService.loggedIn() is deprecated — use AuthContext's isAuthenticated instead."
+    );
+    return false;
   },
 
-  logout: () => {
-    localStorage.removeItem("token");
+  logout: async () => {
+    try {
+      await axios.post(`${baseURL}/user/logout`, {}, { withCredentials: true });
+    } catch (error) {
+      console.error("Error clearing session on server:", error);
+    }
+
     localStorage.removeItem("user");
-    // localStorage.removeItem("businessId");
-    // localStorage.removeItem("businessData");
     window.location.href = "/";
   },
 };

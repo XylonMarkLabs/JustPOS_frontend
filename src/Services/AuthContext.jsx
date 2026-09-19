@@ -1,27 +1,48 @@
 import React, { createContext, useEffect, useState } from 'react';
-import AuthService from './AuthService';
+import ApiCall from './ApiCall';
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(!AuthService.isTokenExpired());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
   const [businessData, setBusinessData] = useState(JSON.parse(localStorage.getItem('businessData')));
   const [isBusinessSelected, setIsBusinessSelected] = useState(!!localStorage.getItem('businessId'));
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsAuthenticated(!AuthService.isTokenExpired());
-    }, 1000);
+    const checkSession = async () => {
+      try {
+        const userData = await ApiCall.user.getUserData();
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
 
-    return () => clearInterval(interval);
+    checkSession();
   }, []);
 
-  const login = () => {
+  const login = (userData) => {
+    setUser(userData);
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    AuthService.logout();
+  const logout = async () => {
+    try {
+      await ApiCall.user.logout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+
+    localStorage.removeItem('user');
+    setUser(null);
     setIsAuthenticated(false);
     setBusinessData(null);
     setIsBusinessSelected(false);
@@ -35,6 +56,8 @@ const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ 
       isAuthenticated, 
+      authLoading,
+      user,
       login, 
       logout, 
       selectBusiness,
