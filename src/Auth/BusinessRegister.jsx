@@ -83,7 +83,7 @@ const BusinessRegister = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/business/register",
+        `${baseURL}/business/register`,
         formData
       );
 

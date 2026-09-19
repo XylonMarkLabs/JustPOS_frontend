@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const baseURL = 'http://localhost:4000/api'
+export const baseURL = import.meta.env.VITE_BACKEND_URL
 
 axios.defaults.withCredentials = true
 

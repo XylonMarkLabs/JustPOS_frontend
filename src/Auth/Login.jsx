@@ -15,7 +15,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import ApiCall from "../Services/ApiCall";
+import ApiCall, {baseURL} from "../Services/ApiCall";
 import { AuthContext } from "../Services/AuthContext";
 
 const ROLE_HOME_PATH = {
@@ -40,7 +40,7 @@ const Login = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/user/login",
+        `${baseURL}/user/login`,
         {
           username: username,
           password: password,
