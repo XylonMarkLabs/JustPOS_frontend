@@ -10,6 +10,8 @@ import {
   Divider,
   Paper,
   Chip,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -34,6 +36,9 @@ const getStatusStyles = (status) => {
 };
 
 const DiscountDetailsModal = ({ open, onClose, discount }) => {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   if (!discount) return null;
 
   const formatDate = (value) => {
@@ -71,10 +76,10 @@ const DiscountDetailsModal = ({ open, onClose, discount }) => {
   const statusStyles = getStatusStyles(discount.status);
 
   const InfoSection = ({ icon, title, children }) => (
-    <Paper elevation={0} sx={{ p: 2, height: '100%', backgroundColor: '#f8fafc' }}>
+    <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, height: '100%', backgroundColor: '#f8fafc' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         {icon}
-        <Typography variant="h6" sx={{ ml: 1, fontSize: '1rem' }}>
+        <Typography variant="h6" sx={{ ml: 1, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
           {title}
         </Typography>
       </Box>
@@ -89,24 +94,25 @@ const DiscountDetailsModal = ({ open, onClose, discount }) => {
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: 2,
+          borderRadius: { xs: 0, sm: 2 },
         },
       }}
     >
       <DialogTitle
         sx={{
           m: 0,
-          p: 3,
+          p: { xs: 2, sm: 3 },
           backgroundColor: '#f8fafc',
           borderBottom: '1px solid #e2e8f0',
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Typography variant="h5" sx={{ fontWeight: 600, color: '#1e293b' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
+          <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: '#1e293b', fontSize: { xs: '1.1rem', sm: '1.5rem' }, wordBreak: 'break-word' }}>
                 {discount.discountId}
               </Typography>
               <Chip
@@ -116,15 +122,17 @@ const DiscountDetailsModal = ({ open, onClose, discount }) => {
                 sx={{ height: 24, fontSize: '0.75rem', ...statusStyles }}
               />
             </Box>
-            <Typography variant="subtitle1" sx={{ color: '#64748b', mt: 0.5 }}>
+            <Typography variant="subtitle1" sx={{ color: '#64748b', mt: 0.5, fontSize: { xs: '0.8rem', sm: '1rem' } }}>
               {discount.productName || discount.productId} &bull; {formatDate(discount.createdAt)}
             </Typography>
           </Box>
           <IconButton
             aria-label="close"
             onClick={onClose}
+            size="small"
             sx={{
               color: '#64748b',
+              flexShrink: 0,
               '&:hover': { color: '#475569' },
             }}
           >
@@ -133,8 +141,8 @@ const DiscountDetailsModal = ({ open, onClose, discount }) => {
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 3 }}>
-        <Grid container spacing={3}>
+      <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           {/* Discount Details */}
           <Grid item xs={12} md={6}>
             <InfoSection
@@ -143,37 +151,37 @@ const DiscountDetailsModal = ({ open, onClose, discount }) => {
             >
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     Type
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.85rem', sm: '1rem' } }}>
                     {discount.discountType === 'percentage' ? 'Percentage' : 'Fixed Amount'}
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     Value
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.85rem', sm: '1rem' } }}>
                     {discount.discountType === 'percentage'
                       ? `${discount.discountValue}%`
                       : `Rs.${formatCurrency(discount.discountValue)}`}
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     Quantity Covered
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.85rem', sm: '1rem' } }}>
                     {discount.quantity}
                   </Typography>
                 </Box>
                 {originalPrice != null && (
                   <Box>
-                    <Typography variant="subtitle2" color="text.secondary">
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                       Price
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={{ fontSize: { xs: '0.85rem', sm: '1rem' } }}>
                       <Box
                         component="span"
                         sx={{ textDecoration: 'line-through', color: '#94a3b8', mr: 1 }}
@@ -198,26 +206,26 @@ const DiscountDetailsModal = ({ open, onClose, discount }) => {
             >
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     Start Date
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.85rem', sm: '1rem' } }}>
                     {formatDate(discount.startDate)}
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     End Date
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.85rem', sm: '1rem' } }}>
                     {formatDate(discount.endDate)}
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                     Status
                   </Typography>
-                  <Typography variant="h6" sx={{ color: statusStyles.color, mt: 0.5, fontSize: '1rem' }}>
+                  <Typography variant="h6" sx={{ color: statusStyles.color, mt: 0.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                     {daysRemaining()}
                   </Typography>
                 </Box>
@@ -233,34 +241,34 @@ const DiscountDetailsModal = ({ open, onClose, discount }) => {
             >
               <Grid container spacing={2}>
                 <Grid item xs={6} sm={3}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                     Stock Item ID
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, wordBreak: 'break-word' }}>
                     {discount.stockItemId || '-'}
                   </Typography>
                 </Grid>
                 <Grid item xs={6} sm={3}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                     Product Code
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, wordBreak: 'break-word' }}>
                     {discount.productId || '-'}
                   </Typography>
                 </Grid>
                 <Grid item xs={6} sm={3}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                     Qty Remaining in Batch
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                     {discount.stockItem?.quantityRemaining ?? '-'}
                   </Typography>
                 </Grid>
                 <Grid item xs={6} sm={3}>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                     Batch Selling Price
                   </Typography>
-                  <Typography variant="body1">
+                  <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                     {originalPrice != null ? `Rs.${formatCurrency(originalPrice)}` : '-'}
                   </Typography>
                 </Grid>

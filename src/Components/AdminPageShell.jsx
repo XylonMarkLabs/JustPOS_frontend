@@ -3,16 +3,6 @@ import Sidebar from './Sidebar'
 import SubMenuBar from './SubMenuBar'
 import { SidebarMenuProvider } from './SidebarMenuContext'
 
-// Wraps Admin/Manager pages with the sidebar and its submenu bar.
-// Cashier pages should NOT use this — they keep the existing top Navbar
-// instead, with no sidebar at all.
-//
-// Usage (replaces the old per-page `<div className="lg:flex..."><Sidebar/><section>...</section></div>` boilerplate):
-//   return (
-//     <AdminPageShell>
-//       ...page content (header, filters, table, modals)...
-//     </AdminPageShell>
-//   )
 const AdminPageShell = ({ children }) => {
   return (
     <SidebarMenuProvider>

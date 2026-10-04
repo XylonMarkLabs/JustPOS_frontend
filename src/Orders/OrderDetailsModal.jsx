@@ -17,7 +17,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  useMediaQuery,
+  useTheme
 } from '@mui/material'
 import {
   Close as CloseIcon,
@@ -27,6 +29,8 @@ import {
 
 const OrderDetailsModal = ({ open, onClose, order }) => {
   const printRef = useRef()
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   if (!order) return null
 
@@ -112,10 +116,11 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
         onClose={onClose}
         maxWidth="md"
         fullWidth
+        fullScreen={fullScreen}
         PaperProps={{
           sx: {
-            borderRadius: 2,
-            minHeight: '500px'
+            borderRadius: { xs: 0, sm: 2 },
+            minHeight: { xs: 'auto', sm: '500px' }
           }
         }}
       >
@@ -124,67 +129,69 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            gap: 1,
             pb: 1,
+            px: { xs: 2, sm: 3 },
             borderBottom: '1px solid #e5e7eb'
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
             <ReceiptIcon sx={{ color: '#6b7280' }} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }} noWrap>
               Order Details - #{order.orderId}
             </Typography>
           </Box>
           <Button
             onClick={onClose}
-            sx={{ minWidth: 'auto', p: 1, color: '#6b7280' }}
+            sx={{ minWidth: 'auto', p: 1, color: '#6b7280', flexShrink: 0 }}
           >
             <CloseIcon />
           </Button>
         </DialogTitle>
 
-        <DialogContent sx={{ p: 3 }}>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
           {/* Order Header Information */}
           <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2, mb: 2 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(auto-fit, minmax(200px, 1fr))' }, gap: 2, mb: 2 }}>
               <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                   Cashier
                 </Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                <Typography variant="body1" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                   {order.username}
                 </Typography>
               </Box>
               <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                   Order Date
                 </Typography>
-                <Typography variant="body1">
+                <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                   {formatDateTime(order.date)}
                 </Typography>
               </Box>
               <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                   Payment Method
                 </Typography>
-                <Typography variant="body1" sx={{ textTransform: 'capitalize' }}>
+                <Typography variant="body1" sx={{ textTransform: 'capitalize', fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                   {order.paymentMethod}
                 </Typography>
               </Box>
               {order.paymentMethod === 'cash' && order.cashReceived != null && (
                 <>
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                       Cash Received
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                       Rs.{money(order.cashReceived)}
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium', mb: 0.5, fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
                       Change Given
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
                       Rs.{money(order.changeGiven)}
                     </Typography>
                   </Box>
@@ -197,17 +204,17 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
 
           {/* Order Items */}
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
               Order Items
             </Typography>
-            <TableContainer component={Paper} variant="outlined">
-              <Table size="small">
+            <TableContainer component={Paper} variant="outlined" sx={{ overflowX: 'auto' }}>
+              <Table size="small" sx={{ minWidth: 480 }}>
                 <TableHead>
                   <TableRow sx={{ backgroundColor: '#f9fafb' }}>
-                    <TableCell sx={{ fontWeight: 'bold', py: 1.5 }}>Item</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 'bold', py: 1.5 }}>Quantity</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 'bold', py: 1.5 }}>Unit Price</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 'bold', py: 1.5 }}>Total</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', py: 1.5, fontSize: { xs: '0.7rem', sm: '0.8125rem' } }}>Item</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 'bold', py: 1.5, fontSize: { xs: '0.7rem', sm: '0.8125rem' } }}>Quantity</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', py: 1.5, fontSize: { xs: '0.7rem', sm: '0.8125rem' } }}>Unit Price</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 'bold', py: 1.5, fontSize: { xs: '0.7rem', sm: '0.8125rem' } }}>Total</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -216,7 +223,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                     return (
                       <TableRow key={item._id || index}>
                         <TableCell sx={{ py: 1.5 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                             {item.name}
                           </Typography>
                           <Typography variant="caption" sx={{ color: '#94a3b8' }}>
@@ -224,12 +231,12 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                           </Typography>
                         </TableCell>
                         <TableCell align="center" sx={{ py: 1.5 }}>
-                          <Typography variant="body2">
+                          <Typography variant="body2" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                             {item.quantity}
                           </Typography>
                         </TableCell>
                         <TableCell align="right" sx={{ py: 1.5 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                             Rs.{money(item.unitPrice)}
                           </Typography>
                           {discountLabel && (
@@ -257,7 +264,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                           )}
                         </TableCell>
                         <TableCell align="right" sx={{ py: 1.5 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                             Rs.{money(item.subtotal)}
                           </Typography>
                         </TableCell>
@@ -272,32 +279,32 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
           <Divider sx={{ my: 2 }} />
 
           {/* Order Summary */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Box sx={{ minWidth: '260px' }}>
+          <Box sx={{ display: 'flex', justifyContent: { xs: 'stretch', sm: 'flex-end' } }}>
+            <Box sx={{ minWidth: { xs: '100%', sm: '260px' }, width: { xs: '100%', sm: 'auto' } }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                   Subtotal:
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                   Rs.{money(subtotalBeforeDiscount)}
                 </Typography>
               </Box>
               {totalDiscount > 0 && (
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                     Discount:
                   </Typography>
-                  <Typography variant="body2" sx={{ color: '#059669' }}>
+                  <Typography variant="body2" sx={{ color: '#059669', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                     -Rs.{money(totalDiscount)}
                   </Typography>
                 </Box>
               )}
               <Divider sx={{ my: 1 }} />
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
                   Total:
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
                   Rs.{money(total)}
                 </Typography>
               </Box>
@@ -306,20 +313,20 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
                   Deliberately left out of the printable receipt below. */}
               <Box sx={{ mt: 2, pt: 2, borderTop: '1px dashed #e5e7eb' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                     Cost of Goods:
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                     Rs.{money(totalCost)}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                     Profit:
                   </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ fontWeight: 'medium', color: profit >= 0 ? '#059669' : '#dc2626' }}
+                    sx={{ fontWeight: 'medium', color: profit >= 0 ? '#059669' : '#dc2626', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
                   >
                     Rs.{money(profit)}
                   </Typography>
@@ -329,10 +336,18 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ p: 3, pt: 0 }}>
+        <DialogActions
+          sx={{
+            p: { xs: 2, sm: 3 },
+            pt: 0,
+            gap: { xs: 1, sm: 2 },
+            flexDirection: { xs: 'column-reverse', sm: 'row' }
+          }}
+        >
           <Button
             onClick={onClose}
             variant="outlined"
+            fullWidth={fullScreen}
             sx={{
               textTransform: 'none',
               fontWeight: 'medium',
@@ -346,6 +361,7 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
             onClick={handlePrintReceipt}
             variant="contained"
             startIcon={<PrintIcon />}
+            fullWidth={fullScreen}
             sx={{
               backgroundColor: '#b0a892',
               '&:hover': { backgroundColor: '#9a9078' },
@@ -360,8 +376,6 @@ const OrderDetailsModal = ({ open, onClose, order }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Hidden Printable Receipt — customer-facing, so no cost/profit data
-          appears here regardless of what's shown in the admin dialog above. */}
       <Box
         ref={printRef}
         sx={{

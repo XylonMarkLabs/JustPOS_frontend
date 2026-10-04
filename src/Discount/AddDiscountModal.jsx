@@ -12,6 +12,8 @@ import {
   Select,
   MenuItem,
   InputAdornment,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useAlert } from "../Components/AlertProvider";
 import ApiCall from "../Services/ApiCall";
@@ -29,26 +31,17 @@ const fieldSx = {
   },
 };
 
-// Products (and stock items) from the API may key their unique identifier
-// differently. Fall back through the common options so Autocomplete always
-// has a truly unique value per row.
 const getProductId = (product, index) =>
   product?.id ?? product?._id ?? product?.productId ?? product?.productCode ?? `idx-${index}`;
 
 const getStockItemId = (stockItem, index) =>
   stockItem?.id ?? stockItem?._id ?? stockItem?.stockItemId ?? `idx-${index}`;
 
-// NOTE: unlike stockId (generated client-side and sent with the request),
-// discountId is generated server-side in addDiscount, so there's no
-// equivalent field here for the user to see.
-
-// INVENTORY products are discounted per stock batch (a specific
-// stockItemId). NON_INVENTORY products (made to order — juices, etc.) have
-// no batch, so the discount is scoped to the product itself — the batch
-// picker and its stock-ceiling checks simply don't apply.
 
 const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
   const { showError, showWarning } = useAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -99,8 +92,6 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
     setStockItems([]);
     setQuantity("");
 
-    // Only INVENTORY products have batches to fetch — a NON_INVENTORY
-    // product's price/quantity is read straight off the product itself.
     if (product && product.productType === "INVENTORY") {
       getStockItemsForProduct(getProductId(product, products.indexOf(product)));
     }
@@ -119,9 +110,6 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
     return `${id} - Qty: ${remaining} - Rs.${price}`;
   };
 
-  // The price a fixed discount is checked against, and the price shown to
-  // the user — from the chosen batch for INVENTORY, or straight from the
-  // product for NON_INVENTORY.
   const referencePrice = isInventory
     ? selectedStockItem?.sellingPrice
     : selectedProduct?.sellingPrice;
@@ -158,9 +146,7 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
       showWarning("Please enter a valid quantity", "Invalid Quantity");
       return;
     }
-    // Stock ceiling only applies to INVENTORY — a NON_INVENTORY discount's
-    // quantity is just "how many discounted servings to offer," with no
-    // physical stock to exceed.
+
     if (
       isInventory &&
       selectedStockItem?.quantityRemaining != null &&
@@ -183,8 +169,6 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
 
     const discountData = {
       productId: getProductId(selectedProduct, products.indexOf(selectedProduct)),
-      // Omitted entirely for NON_INVENTORY — the backend scopes the
-      // discount to productId alone when there's no stockItemId.
       ...(isInventory
         ? { stockItemId: getStockItemId(selectedStockItem, stockItems.indexOf(selectedStockItem)) }
         : {}),
@@ -217,15 +201,16 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          minHeight: "420px",
+          borderRadius: { xs: 0, sm: 2 },
+          minHeight: { xs: "auto", sm: "420px" },
         },
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a" }}>
+        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a", fontSize: { xs: "1.15rem", sm: "1.5rem" } }}>
           Add Discount
         </Typography>
       </DialogTitle>
@@ -283,9 +268,6 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
               />
             </Box>
           ) : selectedProduct ? (
-            // NON_INVENTORY: no batch to pick — just show the product's
-            // own price for context, matching what the batch picker would
-            // have communicated for an INVENTORY product.
             <Box
               sx={{
                 p: 1.5,
@@ -294,7 +276,7 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
                 border: "1px solid #e5e7eb",
               }}
             >
-              <Typography variant="body2" sx={{ color: "#374151" }}>
+              <Typography variant="body2" sx={{ color: "#374151", fontSize: { xs: "0.8rem", sm: "0.875rem" } }}>
                 Made to order — no stock batch. Current price: Rs.
                 {selectedProduct.sellingPrice != null
                   ? Number(selectedProduct.sellingPrice).toFixed(2)
@@ -304,7 +286,7 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
           ) : null}
 
           {/* Discount type + value */}
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
             <Box sx={{ flex: 1 }}>
               <Typography
                 variant="body2"
@@ -354,7 +336,7 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
           </Box>
 
           {/* Quantity */}
-          <Box sx={{ maxWidth: 260 }}>
+          <Box sx={{ maxWidth: { xs: "100%", sm: 260 } }}>
             <Typography
               variant="body2"
               sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -382,7 +364,7 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
           </Box>
 
           {/* Dates */}
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
             <Box sx={{ flex: 1 }}>
               <Typography
                 variant="body2"
@@ -421,10 +403,18 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+      <DialogActions
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pt: 2,
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: "column-reverse", sm: "row" },
+        }}
+      >
         <Button
           onClick={handleClose}
           variant="outlined"
+          fullWidth={fullScreen}
           sx={{
             color: "#6b7280",
             borderColor: "#d1d5db",
@@ -443,6 +433,7 @@ const AddDiscountModal = ({ open, onClose, onAddDiscount }) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
+          fullWidth={fullScreen}
           sx={{
             backgroundColor: "#b0a892",
             "&:hover": { backgroundColor: "#e0dac5" },

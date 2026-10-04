@@ -9,9 +9,14 @@ import {
   Box,
   Chip,
   Divider,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 const CategoryDetailsModal = ({ open, onClose, category }) => {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   if (!category) return null;
 
   return (
@@ -20,34 +25,36 @@ const CategoryDetailsModal = ({ open, onClose, category }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: "8px",
+          borderRadius: { xs: 0, sm: "8px" },
         },
       }}
     >
       <DialogTitle
         sx={{
-          fontSize: "1.25rem",
+          fontSize: { xs: "1.1rem", sm: "1.25rem" },
           fontWeight: "bold",
           color: "#1a1a1a",
           borderBottom: "1px solid #e5e7eb",
-          p: 2,
+          p: { xs: 1.5, sm: 2 },
+          wordBreak: "break-word",
         }}
       >
         Category Details
       </DialogTitle>
-      <DialogContent sx={{ p: 2 }}>
+      <DialogContent sx={{ p: { xs: 1.5, sm: 2 } }}>
         <Box sx={{ mt: 2 }}>
           {/* Category Name */}
           <Box sx={{ mb: 3 }}>
             <Typography
               variant="subtitle2"
-              sx={{ color: "#6b7280", mb: 1 }}
+              sx={{ color: "#6b7280", mb: 1, fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
             >
               Category Name
             </Typography>
-            <Typography variant="body1" sx={{ fontWeight: "medium" }}>
+            <Typography variant="body1" sx={{ fontWeight: "medium", fontSize: { xs: "0.9rem", sm: "1rem" }, wordBreak: "break-word" }}>
               {category.categoryName}
             </Typography>
           </Box>
@@ -56,11 +63,11 @@ const CategoryDetailsModal = ({ open, onClose, category }) => {
           <Box sx={{ mb: 3 }}>
             <Typography
               variant="subtitle2"
-              sx={{ color: "#6b7280", mb: 1 }}
+              sx={{ color: "#6b7280", mb: 1, fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
             >
               Description
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ fontSize: { xs: "0.9rem", sm: "1rem" }, wordBreak: "break-word" }}>
               {category.description || "No description provided"}
             </Typography>
           </Box>
@@ -71,11 +78,11 @@ const CategoryDetailsModal = ({ open, onClose, category }) => {
           <Box sx={{ mb: 3 }}>
             <Typography
               variant="subtitle2"
-              sx={{ color: "#6b7280", mb: 1 }}
+              sx={{ color: "#6b7280", mb: 1, fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
             >
               Number of Products
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}>
               {category.productsCount || 0} products
             </Typography>
           </Box>
@@ -84,7 +91,7 @@ const CategoryDetailsModal = ({ open, onClose, category }) => {
           <Box sx={{ mb: 3 }}>
             <Typography
               variant="subtitle2"
-              sx={{ color: "#6b7280", mb: 1 }}
+              sx={{ color: "#6b7280", mb: 1, fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
             >
               Status
             </Typography>
@@ -108,13 +115,14 @@ const CategoryDetailsModal = ({ open, onClose, category }) => {
       </DialogContent>
       <DialogActions
         sx={{
-          p: 2,
+          p: { xs: 2, sm: 2 },
           borderTop: "1px solid #e5e7eb",
         }}
       >
         <Button
           onClick={onClose}
           variant="outlined"
+          fullWidth={fullScreen}
           sx={{
             color: "#6b7280",
             borderColor: "#d1d5db",

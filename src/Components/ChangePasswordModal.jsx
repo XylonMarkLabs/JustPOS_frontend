@@ -10,7 +10,9 @@ import {
   IconButton,
   InputAdornment,
   Typography,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Visibility,
@@ -21,6 +23,8 @@ import ApiCall from '../Services/ApiCall';
 
 const ChangePasswordModal = ({ open, onClose, logo }) => {
     const { showSuccess, showError } = useAlert()
+    const theme = useTheme()
+    const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
     
     const [passwordForm, setPasswordForm] = useState({
         oldPassword: '',
@@ -157,29 +161,31 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
             onClose={handleClose}
             maxWidth="sm"
             fullWidth
+            fullScreen={fullScreen}
             PaperProps={{
                 sx: {
-                    borderRadius: 2,
-                    minHeight: '400px'
+                    borderRadius: { xs: 0, sm: 2 },
+                    minHeight: { xs: 'auto', sm: '400px' }
                 }
             }}
         >
-            <DialogTitle sx={{ pb: 1, pt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <DialogTitle sx={{ pb: 1, pt: { xs: 2, sm: 3 }, px: { xs: 2, sm: 3 }, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {logo && (
                     <Box sx={{ mb: 2 }}>
                         <img 
                             src={logo} 
                             alt="JUSTPOS Logo" 
-                            style={{ height: '60px', objectFit: 'contain' }}
+                            style={{ height: '48px', objectFit: 'contain' }}
+                            className="sm:!h-[60px]"
                         />
                     </Box>
                 )}
-                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a', fontSize: { xs: '1.15rem', sm: '1.5rem' } }}>
                     Change Password
                 </Typography>
             </DialogTitle>
 
-            <DialogContent sx={{ pt: 2 }}>
+            <DialogContent sx={{ pt: 2, px: { xs: 2, sm: 3 } }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {/* Current Password */}
                     <Box>
@@ -313,10 +319,10 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
                     {/* Password Requirements Alert */}
                     {passwordForm.newPassword && !validatePassword(passwordForm.newPassword).isValid && (
                         <Alert severity="info" sx={{ mt: 1 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                                 Password Requirements:
                             </Typography>
-                            <Typography variant="body2" component="div">
+                            <Typography variant="body2" component="div" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                                 • At least 8 characters<br />
                                 • One uppercase letter<br />
                                 • One lowercase letter<br />
@@ -328,10 +334,18 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
                 </Box>
             </DialogContent>
 
-            <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+            <DialogActions
+                sx={{
+                    p: { xs: 2, sm: 3 },
+                    pt: 2,
+                    gap: { xs: 1, sm: 2 },
+                    flexDirection: { xs: 'column-reverse', sm: 'row' }
+                }}
+            >
                 <Button
                     onClick={handleClose}
                     variant="outlined"
+                    fullWidth={fullScreen}
                     sx={{
                         color: '#6b7280',
                         borderColor: '#d1d5db',
@@ -351,6 +365,7 @@ const ChangePasswordModal = ({ open, onClose, logo }) => {
                     onClick={handleSubmitPasswordChange}
                     variant="contained"
                     disabled={!isFormValid()}
+                    fullWidth={fullScreen}
                     sx={{
                         backgroundColor: '#b0a892',
                         '&:hover': { backgroundColor: '#e0dac5' },
