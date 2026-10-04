@@ -12,11 +12,6 @@ import {
 } from '@mui/material'
 import AdminPageShell from '../Components/AdminPageShell'
 
-// NOTE: Inventory is a live snapshot (current stock levels right now), not
-// a period-based total like Sales — the timePeriod dropdown in ReportTabs
-// doesn't actually affect it. Worth deciding whether to hide/disable that
-// control while the Inventory tab is active, or just leave it inert for now.
-
 const Reports = () => {
     const [activeTab, setActiveTab] = useState(0)
     const [timePeriod, setTimePeriod] = useState('Last 7 days')
@@ -83,7 +78,7 @@ const Reports = () => {
         <AdminPageShell>
             <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
                 {/* Content */}
-                <Box id="report-content" sx={{ flex: 1, overflow: 'auto' }}>
+                <Box id="report-content" sx={{ flex: 1, overflow: 'auto', px: { xs: 0.5, sm: 0 } }}>
                     {/* Tabs and Time Period */}
                     <ReportTabs
                         activeTab={activeTab}
@@ -96,7 +91,7 @@ const Reports = () => {
                     {/* Report Content */}
                     {activeTab === 0 ? (
                         salesLoading || !salesData ? (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', py: { xs: 6, sm: 8 } }}>
                                 <CircularProgress sx={{ color: '#b0a892' }} />
                             </Box>
                         ) : (
@@ -104,7 +99,7 @@ const Reports = () => {
                         )
                     ) : (
                         inventoryLoading || !inventoryData ? (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', py: { xs: 6, sm: 8 } }}>
                                 <CircularProgress sx={{ color: '#b0a892' }} />
                             </Box>
                         ) : (

@@ -7,9 +7,14 @@ import {
   Button,
   TextField,
   Box,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 const EditCategoryModal = ({ open, onClose, onEditCategory, category }) => {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [categoryData, setCategoryData] = useState({
     categoryId: "",
     categoryName: "",
@@ -81,25 +86,26 @@ const EditCategoryModal = ({ open, onClose, onEditCategory, category }) => {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: "8px",
+          borderRadius: { xs: 0, sm: "8px" },
         },
       }}
     >
       <DialogTitle
         sx={{
-          fontSize: "1.25rem",
+          fontSize: { xs: "1.1rem", sm: "1.25rem" },
           fontWeight: "bold",
           color: "#1a1a1a",
           borderBottom: "1px solid #e5e7eb",
-          p: 2,
+          p: { xs: 1.5, sm: 2 },
         }}
       >
         Edit Category
       </DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent sx={{ p: 2 }}>
+        <DialogContent sx={{ p: { xs: 1.5, sm: 2 } }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             <TextField
               name="categoryName"
@@ -108,6 +114,7 @@ const EditCategoryModal = ({ open, onClose, onEditCategory, category }) => {
               onChange={handleChange}
               fullWidth
               required
+              size="small"
               error={!!errors.categoryName}
               helperText={errors.categoryName}
             />
@@ -119,18 +126,22 @@ const EditCategoryModal = ({ open, onClose, onEditCategory, category }) => {
               fullWidth
               multiline
               rows={3}
+              size="small"
             />
           </Box>
         </DialogContent>
         <DialogActions
           sx={{
-            p: 2,
+            p: { xs: 2, sm: 2 },
             borderTop: "1px solid #e5e7eb",
+            gap: { xs: 1, sm: 1 },
+            flexDirection: { xs: "column-reverse", sm: "row" },
           }}
         >
           <Button
             onClick={handleClose}
             variant="outlined"
+            fullWidth={fullScreen}
             sx={{
               color: "#6b7280",
               borderColor: "#d1d5db",
@@ -145,6 +156,7 @@ const EditCategoryModal = ({ open, onClose, onEditCategory, category }) => {
           <Button
             type="submit"
             variant="contained"
+            fullWidth={fullScreen}
             sx={{
               bgcolor: "#b0a892",
               color: "black",

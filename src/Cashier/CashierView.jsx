@@ -159,15 +159,21 @@ const CashierView = () => {
   };
 
   return (
-    <div className="lg:flex gap-5  p-5 ">
+    <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 p-3 sm:p-5">
       {/* <Sidebar /> */}
-      <section className="space-y-5 border-primary h-[calc(90vh-2.5rem)]   lg:w-[80%] p-5 bg-background rounded-lg shadow-slate-400 shadow-lg">
-        {/*search bar and fltters  */}
-        <div className="flex-none ">
-          <div className="flex gap-4 items-center">
+      <section
+        className="space-y-4 sm:space-y-5 border-primary
+                   h-[70vh] sm:h-[75vh] lg:h-[calc(90vh-2.5rem)]
+                   w-full lg:w-[80%] p-3 sm:p-5
+                   bg-background rounded-lg shadow-slate-400 shadow-lg
+                   flex flex-col"
+      >
+        {/* search bar and filters */}
+        <div className="flex-none">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
             {/* search bar */}
-            <div className="relative flex-grow">
-              <div className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <div className="relative flex-grow w-full">
+              <div className="absolute left-3 sm:left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
                 <ManageSearchIcon color="primary" fontSize="large" />
               </div>
               <input
@@ -175,12 +181,12 @@ const CashierView = () => {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
+                className="w-full pl-12 sm:pl-16 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent"
               />
             </div>
 
             {/* filters */}
-            <div className="w-64">
+            <div className="w-full sm:w-56 md:w-64 flex-shrink-0">
               <FormControl fullWidth variant="filled" size="small">
                 <InputLabel
                   id="category-select-label"
@@ -240,10 +246,10 @@ const CashierView = () => {
           </div>
         </div>
 
-        {/* product catelog */}
+        {/* product catalog */}
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 overflow-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
               {paginatedProducts.map((product) => (
                 <ProductCard
                   key={`${product.productCode}_${product.sellingPrice}_${product.discountId || "none"}`}
@@ -255,7 +261,7 @@ const CashierView = () => {
           </div>
 
           {pageCount > 1 && (
-            <div className="flex-none pt-2 flex justify-end border-t ">
+            <div className="flex-none pt-2 flex justify-center sm:justify-end border-t overflow-x-auto">
               <Pagination
                 count={pageCount}
                 page={currentPage}
@@ -269,10 +275,16 @@ const CashierView = () => {
       </section>
 
       {/* cart */}
-      <section className="space-y-5 lg:w-[20%] p-5 rounded-lg bg-background shadow-slate-400 shadow-lg h-[calc(90vh-2.5rem)] flex flex-col">
+      <section
+        className="space-y-4 sm:space-y-5 w-full lg:w-[20%]
+                   p-3 sm:p-5 rounded-lg bg-background
+                   shadow-slate-400 shadow-lg
+                   h-[60vh] lg:h-[calc(90vh-2.5rem)]
+                   flex flex-col"
+      >
         <div className="flex-none">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between mb-2 sm:mb-4">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Badge
                 badgeContent={cart.reduce(
                   (total, item) => total + item.product.quantity,
@@ -282,7 +294,9 @@ const CashierView = () => {
               >
                 <ShoppingCartIcon fontSize="large" />
               </Badge>
-              <h2 className="text-2xl font-bold">Shopping Cart</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
+                Shopping Cart
+              </h2>
             </div>
             {cart.length > 0 && (
               <Tooltip title="Clear Cart">
@@ -301,20 +315,20 @@ const CashierView = () => {
 
         <div className="flex-1 overflow-auto min-h-0">
           {cart.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4 h-full">
+            <div className="flex flex-col items-center justify-center py-6 sm:py-8 space-y-3 sm:space-y-4 h-full">
               <ShoppingCartIcon
-                sx={{ fontSize: 60 }}
+                sx={{ fontSize: { xs: 44, sm: 60 } }}
                 className="text-gray-300"
               />
-              <p className="text-xl font-medium text-gray-500">
+              <p className="text-base sm:text-xl font-medium text-gray-500 text-center">
                 Your cart is empty
               </p>
-              <p className="text-sm text-gray-400 text-center">
+              <p className="text-xs sm:text-sm text-gray-400 text-center">
                 Add some items from the catalog to start your order
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {cart.map((item) => (
                 <CartItem
                   key={`${item.product.productId}_${item.product.stockItemId || "none"}`}
@@ -336,21 +350,21 @@ const CashierView = () => {
           )}
         </div>
 
-        <div className="flex-none border-t pt-4">
+        <div className="flex-none border-t pt-3 sm:pt-4">
           {cart.length > 0 && (
             <>
-              <div className="flex justify-between items-center text-xl font-bold">
+              <div className="flex justify-between items-center text-base sm:text-lg md:text-xl font-bold">
                 <span>Total:</span>
                 <span className="text-green-600">
                   Rs.{calculateTotal().toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between items-center text-sm text-gray-500">
+              <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500">
                 <span>Save:</span>
                 <span>Rs.{calculateSavedAmount().toFixed(2)}</span>
               </div>
               <button
-                className="w-full mt-4 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors"
+                className="w-full mt-3 sm:mt-4 bg-primary text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors text-sm sm:text-base"
                 onClick={handleCheckout}
               >
                 Proceed to Checkout

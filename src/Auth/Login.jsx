@@ -15,13 +15,19 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import ApiCall, {baseURL} from "../Services/ApiCall";
+import ApiCall, { baseURL } from "../Services/ApiCall";
 import { AuthContext } from "../Services/AuthContext";
 
 const ROLE_HOME_PATH = {
   Admin: "/admin/dashboard",
   Manager: "/manager/dashboard",
   Cashier: "/cashier",
+};
+
+const fieldSx = {
+  m: 1,
+  width: "100%",
+  maxWidth: 360,
 };
 
 const Login = () => {
@@ -78,17 +84,19 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-[#292929] via-[#5c5b5a] to-[#FBF8EF]">
-      <div className="flex h-3/4 w-auto shadow-md rounded-lg">
-        {/* Left Logo Panel */}
-        <div className="bg-secondary flex justify-center items-center rounded-l-lg px-5 w-96">
-          <div>
-            <img src={logo} className="w-full" alt="Logo" />
-          </div>
+    <div className="min-h-screen w-full flex justify-center items-center bg-gradient-to-r from-[#292929] via-[#5c5b5a] to-[#FBF8EF] px-4 py-8">
+      <div className="flex flex-col md:flex-row h-auto md:h-[500px] lg:h-[500px] w-full max-w-sm md:max-w-3xl shadow-md rounded-lg overflow-hidden">
+        {/* Logo Panel */}
+        <div className="bg-secondary flex justify-center items-center p-6 md:p-5 w-full md:w-96">
+          <img
+            src={logo}
+            className="w-40 sm:w-52 md:w-full"
+            alt="Logo"
+          />
         </div>
 
-        {/* Right Form Panel */}
-        <div className="bg-primary flex flex-col justify-center items-center rounded-r-lg px-5 mx- w-96">
+        {/* Form Panel */}
+        <div className="bg-primary flex flex-col justify-center items-center px-6 sm:px-8 md:px-5 py-8 md:py-5 w-full md:w-96">
           <Box sx={{ textAlign: "center", mb: 3 }}>
             <Typography
               variant="h4"
@@ -96,6 +104,7 @@ const Login = () => {
                 color: "#FBF8EF",
                 fontWeight: "bold",
                 letterSpacing: 1,
+                fontSize: { xs: "1.75rem", sm: "2.125rem" },
               }}
             >
               Welcome to{" "}
@@ -109,7 +118,7 @@ const Login = () => {
                 color: "#FBF8EF",
                 mt: 1,
                 fontStyle: "italic",
-                fontSize: "0.95rem",
+                fontSize: { xs: "0.85rem", sm: "0.95rem" },
               }}
             >
               Powering your sales with speed and simplicity
@@ -127,7 +136,7 @@ const Login = () => {
 
           {/* Username Input */}
           <FormControl
-            sx={{ m: 1, width: "40ch" }}
+            sx={fieldSx}
             variant="outlined"
             color="primary"
           >
@@ -165,7 +174,7 @@ const Login = () => {
 
           {/* Password Input */}
           <FormControl
-            sx={{ m: 1, width: "40ch" }}
+            sx={fieldSx}
             variant="outlined"
             color="primary"
           >
@@ -221,7 +230,7 @@ const Login = () => {
           <Button
             variant="contained"
             color="secondary"
-            sx={{ mt: 2, width: "44ch", py: 2 }}
+            sx={{ ...fieldSx, mt: 2, py: 2 }}
             onClick={handleLogin}
           >
             <Typography variant="button" sx={{ color: "black", fontWeight: "bold" , fontSize: "1.1rem" }}>

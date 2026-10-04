@@ -12,6 +12,8 @@ import {
     Box,
     Typography,
     Divider,
+    useMediaQuery,
+    useTheme,
 } from "@mui/material";
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -24,6 +26,8 @@ import ApiCall from "../Services/ApiCall";
 
 const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
     const { showSuccess, showInfo } = useAlert();
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [paymentMethod, setPaymentMethod] = useState("cash");
     const [cashReceived, setCashReceived] = useState("");
@@ -235,18 +239,20 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
 
     const renderPaymentMethodSelection = () => (
         <>
-            <DialogTitle>Select Payment Method</DialogTitle>
+            <DialogTitle sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
+                Select Payment Method
+            </DialogTitle>
             <DialogContent>
                 <RadioGroup
                     value={paymentMethod}
                     onChange={handlePaymentMethodChange}
-                    sx={{ width: "100%", mt: 2 }}
+                    sx={{ width: "100%", mt: { xs: 1, sm: 2 } }}
                 >
                     <Box
                         sx={{
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
-                            gap: 2,
+                            gap: { xs: 1.5, sm: 2 },
                             width: "100%",
                         }}
                     >
@@ -260,14 +266,16 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                                         borderColor:
                                             paymentMethod === "cash" ? "primary.main" : "grey.300",
                                         borderRadius: 1,
-                                        p: 2,
+                                        p: { xs: 1.25, sm: 2 },
                                         display: "flex",
                                         alignItems: "center",
                                         gap: 1,
+                                        fontSize: { xs: "0.875rem", sm: "1rem" },
                                     }}
                                 >
                                     <MonetizationOnIcon
                                         color={paymentMethod === "cash" ? "primary" : "action"}
+                                        fontSize="small"
                                     />
                                     Cash
                                 </Box>
@@ -285,14 +293,16 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                                         borderColor:
                                             paymentMethod === "card" ? "primary.main" : "grey.300",
                                         borderRadius: 1,
-                                        p: 2,
+                                        p: { xs: 1.25, sm: 2 },
                                         display: "flex",
                                         alignItems: "center",
                                         gap: 1,
+                                        fontSize: { xs: "0.875rem", sm: "1rem" },
                                     }}
                                 >
                                     <PaymentIcon
                                         color={paymentMethod === "card" ? "primary" : "action"}
+                                        fontSize="small"
                                     />
                                     Card
                                 </Box>
@@ -303,7 +313,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                     </Box>
                 </RadioGroup>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 2 } }}>
                 <Button onClick={onClose}>Cancel</Button>
                 <Button
                     onClick={handleNext}
@@ -319,44 +329,65 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
 
     const renderOrderSummary = () => (
         <>
-            <DialogTitle>Order Summary</DialogTitle>
+            <DialogTitle sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
+                Order Summary
+            </DialogTitle>
             <DialogContent>
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom>
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                    <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}>
                         Items
                     </Typography>
-                    {cart.map((item) => (
-                        <Box
-                            key={item.product.productCode}
-                            sx={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                mb: 1,
-                            }}
-                        >
-                            <Typography>
-                                {item.product.name} x {item.product.quantity}
-                            </Typography>
-                            <Typography>
-                                Rs.{(item.product.unitPrice * item.product.quantity).toFixed(2)}
-                            </Typography>
-                        </Box>
-                    ))}
-                    <Divider sx={{ my: 2 }} />
+                    <Box
+                        sx={{
+                            maxHeight: { xs: "30vh", sm: "none" },
+                            overflowY: { xs: "auto", sm: "visible" },
+                            pr: { xs: 0.5, sm: 0 },
+                        }}
+                    >
+                        {cart.map((item) => (
+                            <Box
+                                key={item.product.productCode}
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: 1,
+                                    mb: 1,
+                                }}
+                            >
+                                <Typography sx={{ fontSize: { xs: "0.85rem", sm: "1rem" }, wordBreak: "break-word" }}>
+                                    {item.product.name} x {item.product.quantity}
+                                </Typography>
+                                <Typography sx={{ fontSize: { xs: "0.85rem", sm: "1rem" }, whiteSpace: "nowrap" }}>
+                                    Rs.{(item.product.unitPrice * item.product.quantity).toFixed(2)}
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Box>
+                    <Divider sx={{ my: { xs: 1.5, sm: 2 } }} />
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                            <Typography>Subtotal:</Typography>
-                            <Typography>Rs.{(total + parseFloat(discount)).toFixed(2)}</Typography>
+                            <Typography sx={{ fontSize: { xs: "0.85rem", sm: "1rem" } }}>Subtotal:</Typography>
+                            <Typography sx={{ fontSize: { xs: "0.85rem", sm: "1rem" } }}>
+                                Rs.{(total + parseFloat(discount)).toFixed(2)}
+                            </Typography>
                         </Box>
                         {parseFloat(discount) > 0 && (
                             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                                <Typography color="success.main">Total Discount:</Typography>
-                                <Typography color="success.main">- Rs.{discount}</Typography>
+                                <Typography color="success.main" sx={{ fontSize: { xs: "0.85rem", sm: "1rem" } }}>
+                                    Total Discount:
+                                </Typography>
+                                <Typography color="success.main" sx={{ fontSize: { xs: "0.85rem", sm: "1rem" } }}>
+                                    - Rs.{discount}
+                                </Typography>
                             </Box>
                         )}
                         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-                            <Typography variant="h6" color="primary">Total</Typography>
-                            <Typography variant="h6" color="primary">Rs.{total.toFixed(2)}</Typography>
+                            <Typography variant="h6" color="primary" sx={{ fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                                Total
+                            </Typography>
+                            <Typography variant="h6" color="primary" sx={{ fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                                Rs.{total.toFixed(2)}
+                            </Typography>
                         </Box>
                     </Box>
 
@@ -368,7 +399,8 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                                 value={cashReceived}
                                 onChange={handleCashReceivedChange}
                                 type="number"
-                                sx={{ mb: 2 }}
+                                size={fullScreen ? "small" : "medium"}
+                                sx={{ mb: 2, mt: 2 }}
                                 InputProps={{
                                     startAdornment: <Typography sx={{ mr: 1 }}>Rs.</Typography>,
                                 }}
@@ -376,10 +408,13 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                             <Box
                                 sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
                             >
-                                <Typography variant="h6">Change</Typography>
+                                <Typography variant="h6" sx={{ fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                                    Change
+                                </Typography>
                                 <Typography
                                     variant="h6"
                                     color={change < 0 ? "error" : "inherit"}
+                                    sx={{ fontSize: { xs: "1.05rem", sm: "1.25rem" } }}
                                 >
                                     Rs.{change}
                                 </Typography>
@@ -388,7 +423,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                     )}
                 </Box>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 2 } }}>
                 <Button onClick={handleBack}>Back</Button>
                 <Button
                     onClick={handleCheckout}
@@ -408,7 +443,9 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
 
     const renderReceiptStep = () => (
         <>
-            <DialogTitle>Payment Complete</DialogTitle>
+            <DialogTitle sx={{ fontSize: { xs: "1.1rem", sm: "1.25rem" } }}>
+                Payment Complete
+            </DialogTitle>
             <DialogContent>
                 <Box
                     sx={{
@@ -416,25 +453,44 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                         flexDirection: "column",
                         alignItems: "center",
                         gap: 1,
-                        py: 3,
+                        py: { xs: 2, sm: 3 },
+                        textAlign: "center",
                     }}
                 >
-                    <CheckCircleIcon color="success" sx={{ fontSize: 56 }} />
-                    <Typography variant="h6">Sale recorded successfully!</Typography>
-                    <Typography color="text.secondary">
+                    <CheckCircleIcon color="success" sx={{ fontSize: { xs: 44, sm: 56 } }} />
+                    <Typography variant="h6" sx={{ fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                        Sale recorded successfully!
+                    </Typography>
+                    <Typography color="text.secondary" sx={{ fontSize: { xs: "0.85rem", sm: "1rem" } }}>
                         Total charged: Rs.{total.toFixed(2)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontSize: { xs: "0.75rem", sm: "0.875rem" } }}>
                         Print or download the receipt below, or just close this window.
                     </Typography>
                 </Box>
             </DialogContent>
-            <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
-                <Box sx={{ display: "flex", gap: 1 }}>
+            <DialogActions
+                sx={{
+                    flexDirection: { xs: "column-reverse", sm: "row" },
+                    alignItems: "stretch",
+                    justifyContent: { sm: "space-between" },
+                    gap: { xs: 1, sm: 0 },
+                    px: { xs: 2, sm: 3 },
+                    pb: 2,
+                }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: 1,
+                        width: { xs: "100%", sm: "auto" },
+                    }}
+                >
                     <Button
                         startIcon={<PrintIcon />}
                         onClick={handlePrint}
                         variant="outlined"
+                        fullWidth={fullScreen}
                     >
                         Print
                     </Button>
@@ -442,6 +498,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                         startIcon={<DownloadIcon />}
                         onClick={handleDownload}
                         variant="outlined"
+                        fullWidth={fullScreen}
                     >
                         Download
                     </Button>
@@ -453,7 +510,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
                     }}
                     variant="contained"
                     color="primary"
-                    sx={{ color: "white" }}
+                    sx={{ color: "white", width: { xs: "100%", sm: "auto" } }}
                 >
                     Done
                 </Button>
@@ -470,6 +527,7 @@ const CheckoutModal = ({ open, onClose, cart, total, discount }) => {
             }} 
             maxWidth="sm" 
             fullWidth
+            fullScreen={fullScreen}
         >
             {step === 1 && renderPaymentMethodSelection()}
             {step === 2 && renderOrderSummary()}

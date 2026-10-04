@@ -37,6 +37,9 @@ import {
 import ApiCall from "../Services/ApiCall";
 import AdminPageShell from "../Components/AdminPageShell";
 
+const hideOnXs = { display: { xs: "none", sm: "table-cell" } };
+const hideOnXsSm = { display: { xs: "none", md: "table-cell" } };
+
 const UserManagement = () => {
   const { showSuccess, showInfo } = useAlert();
 
@@ -223,14 +226,16 @@ const UserManagement = () => {
           <Box
             sx={{
               display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
               justifyContent: "space-between",
-              alignItems: "center",
-              mb: 3,
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: { xs: 1.5, sm: 0 },
+              mb: { xs: 2, sm: 3 },
             }}
           >
             <Typography
               variant="h5"
-              sx={{ fontWeight: "bold", color: "#1a1a1a" }}
+              sx={{ fontWeight: "bold", color: "#1a1a1a", fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
             >
               User Management
             </Typography>
@@ -245,6 +250,7 @@ const UserManagement = () => {
                 fontWeight: "bold",
                 px: 3,
                 py: 1,
+                alignSelf: { xs: "stretch", sm: "auto" },
               }}
             >
               Add User
@@ -252,12 +258,21 @@ const UserManagement = () => {
           </Box>
 
           {/* Search and Filters */}
-          <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: 2,
+              mb: { xs: 2, sm: 3 },
+              flexWrap: { md: "wrap" },
+            }}
+          >
             <TextField
               placeholder="Search users..."
               value={searchTerm}
               onChange={handleSearchChange}
-              sx={{ flex: 1, minWidth: "300px" }}
+              size="small"
+              sx={{ flex: 1, minWidth: { xs: "100%", md: "260px" } }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -266,31 +281,33 @@ const UserManagement = () => {
                 ),
               }}
             />
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>Role</InputLabel>
-              <Select
-                value={roleFilter}
-                label="Role"
-                onChange={handleRoleChange}
-              >
-                <MenuItem value="All Roles">All Roles</MenuItem>
-                <MenuItem value="Admin">Admin</MenuItem>
-                <MenuItem value="Manager">Manager</MenuItem>
-                <MenuItem value="Cashier">Cashier</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={statusFilter}
-                label="Status"
-                onChange={handleStatusChange}
-              >
-                <MenuItem value="All Status">All Status</MenuItem>
-                <MenuItem value={1}>Active</MenuItem>
-                <MenuItem value={0}>Inactive</MenuItem>
-              </Select>
-            </FormControl>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <FormControl size="small" sx={{ minWidth: { xs: "calc(50% - 8px)", sm: 120 }, flex: { xs: 1, sm: "none" } }}>
+                <InputLabel>Role</InputLabel>
+                <Select
+                  value={roleFilter}
+                  label="Role"
+                  onChange={handleRoleChange}
+                >
+                  <MenuItem value="All Roles">All Roles</MenuItem>
+                  <MenuItem value="Admin">Admin</MenuItem>
+                  <MenuItem value="Manager">Manager</MenuItem>
+                  <MenuItem value="Cashier">Cashier</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl size="small" sx={{ minWidth: { xs: "calc(50% - 8px)", sm: 120 }, flex: { xs: 1, sm: "none" } }}>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label="Status"
+                  onChange={handleStatusChange}
+                >
+                  <MenuItem value="All Status">All Status</MenuItem>
+                  <MenuItem value={1}>Active</MenuItem>
+                  <MenuItem value={0}>Inactive</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
           </Box>
 
           {/* Users Table */}
@@ -311,6 +328,7 @@ const UserManagement = () => {
                 size="small"
                 sx={{
                   "& .MuiTableCell-root": { borderBottom: "1px solid #f3f4f6" },
+                  minWidth: 640,
                 }}
               >
                 <TableHead>
@@ -333,6 +351,7 @@ const UserManagement = () => {
                         textTransform: "uppercase",
                         fontSize: "0.75rem",
                         py: 1.5,
+                        ...hideOnXs,
                       }}
                     >
                       USERNAME
@@ -366,6 +385,7 @@ const UserManagement = () => {
                         textTransform: "uppercase",
                         fontSize: "0.75rem",
                         py: 1.5,
+                        ...hideOnXsSm,
                       }}
                     >
                       CREATED
@@ -387,8 +407,8 @@ const UserManagement = () => {
                 <TableBody>
                   {paginatedUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} align="center">
-                        <div className="text-xl text-gray-500 h-80 flex justify-center items-center">
+                      <TableCell colSpan={6} align="center">
+                        <div className="text-base sm:text-xl text-gray-500 h-60 sm:h-80 flex justify-center items-center text-center px-4">
                           No users found.
                         </div>
                       </TableCell>
@@ -407,7 +427,7 @@ const UserManagement = () => {
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            gap: 1.5,
+                            gap: { xs: 1, sm: 1.5 },
                           }}
                         >
                           <Avatar
@@ -418,6 +438,7 @@ const UserManagement = () => {
                               fontSize: "0.875rem",
                               fontWeight: "bold",
                               color: "white",
+                              flexShrink: 0,
                             }}
                           >
                             {user.name
@@ -426,24 +447,36 @@ const UserManagement = () => {
                               .join("")
                               .toUpperCase()}
                           </Avatar>
-                          <Box>
+                          <Box sx={{ minWidth: 0 }}>
                             <Typography
                               variant="body2"
-                              sx={{ fontWeight: "medium", lineHeight: 1.2 }}
+                              sx={{ fontWeight: "medium", lineHeight: 1.2, fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
+                              noWrap
                             >
                               {user.name}
                             </Typography>
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ lineHeight: 1 }}
+                              sx={{ lineHeight: 1, fontSize: { xs: "0.65rem", sm: "0.75rem" } }}
+                              noWrap
+                              component="div"
                             >
                               {user.email}
+                            </Typography>
+                            {/* Username shown inline on mobile since that column is hidden */}
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ display: { xs: "block", sm: "none" }, fontSize: "0.65rem" }}
+                              noWrap
+                            >
+                              @{user.username}
                             </Typography>
                           </Box>
                         </Box>
                       </TableCell>
-                      <TableCell sx={{ py: 1 }}>
+                      <TableCell sx={{ py: 1, ...hideOnXs }}>
                         <Typography variant="body2" color="text.secondary">
                           {user.username}
                         </Typography>
@@ -501,16 +534,16 @@ const UserManagement = () => {
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ py: 1 }}>
+                      <TableCell sx={{ py: 1, ...hideOnXsSm }}>
                         <Typography variant="body2" color="text.secondary">
                           {user.createdAt}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 1 }}>
-                        <Box sx={{ display: "flex", gap: 0.5 }}>
+                        <Box sx={{ display: "flex", gap: 0.25 }}>
                           <IconButton
                             size="small"
-                            sx={{ color: "#2563eb", padding: "4px" }}
+                            sx={{ color: "#2563eb", padding: { xs: "2px", sm: "4px" } }}
                             onClick={() => handleOpenEditModal(user)}
                             title="Edit User"
                           >
@@ -520,7 +553,7 @@ const UserManagement = () => {
                             size="small"
                             sx={{
                               color: user.status === 1 ? "#f59e0b" : "#10b981",
-                              padding: "4px",
+                              padding: { xs: "2px", sm: "4px" },
                             }}
                             onClick={() => handleToggleStatus(user)}
                             title={
@@ -537,7 +570,7 @@ const UserManagement = () => {
                           </IconButton>
                           <IconButton
                             size="small"
-                            sx={{ color: "#ef4444", padding: "4px" }}
+                            sx={{ color: "#ef4444", padding: { xs: "2px", sm: "4px" } }}
                             onClick={() => handleDeleteUser(user)}
                             title="Delete User"
                           >
@@ -569,19 +602,26 @@ const UserManagement = () => {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 rowsPerPageOptions={[5, 10, 25, 50]}
+                labelRowsPerPage={
+                  <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+                    Rows per page:
+                  </Box>
+                }
                 sx={{
                   "& .MuiTablePagination-toolbar": {
-                    paddingLeft: 2,
-                    paddingRight: 2,
+                    paddingLeft: { xs: 1, sm: 2 },
+                    paddingRight: { xs: 1, sm: 2 },
                     minHeight: 56,
+                    flexWrap: { xs: "wrap", sm: "nowrap" },
+                    justifyContent: { xs: "center", sm: "flex-end" },
                   },
                   "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
                     {
-                      fontSize: "0.875rem",
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
                       color: "#6b7280",
                     },
                   "& .MuiTablePagination-select": {
-                    fontSize: "0.875rem",
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
                   },
                   "& .MuiTablePagination-actions": {
                     color: "#6b7280",
