@@ -12,11 +12,11 @@ import {
   MenuItem,
   InputAdornment,
   Chip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useAlert } from "../Components/AlertProvider";
 
-// Shared styling for the compact form inputs, kept consistent with the
-// rest of the app's forms.
 const fieldSx = {
   "& .MuiOutlinedInput-root": {
     backgroundColor: "#f9fafb",
@@ -39,6 +39,8 @@ const STATUS_STYLES = {
 
 const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
   const { showError, showWarning } = useAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [discountType, setDiscountType] = useState("percentage");
   const [discountValue, setDiscountValue] = useState("");
@@ -132,16 +134,17 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          minHeight: "420px",
+          borderRadius: { xs: 0, sm: 2 },
+          minHeight: { xs: "auto", sm: "420px" },
         },
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+          <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a", fontSize: { xs: "1.15rem", sm: "1.5rem" } }}>
             Edit Discount
           </Typography>
           <Chip
@@ -156,7 +159,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
           {/* Discount ID */}
-          <Box sx={{ maxWidth: 220 }}>
+          <Box sx={{ maxWidth: { xs: "100%", sm: 220 } }}>
             <Typography
               variant="body2"
               sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -173,7 +176,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
           </Box>
 
           {/* Product / batch (locked) */}
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
             <Box sx={{ flex: 1 }}>
               <Typography
                 variant="body2"
@@ -228,7 +231,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
           </Box>
 
           {/* Discount type + value */}
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
             <Box sx={{ flex: 1 }}>
               <Typography
                 variant="body2"
@@ -278,7 +281,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
           </Box>
 
           {/* Quantity */}
-          <Box sx={{ maxWidth: 260 }}>
+          <Box sx={{ maxWidth: { xs: "100%", sm: 260 } }}>
             <Typography
               variant="body2"
               sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -305,7 +308,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
           </Box>
 
           {/* Dates */}
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
             <Box sx={{ flex: 1 }}>
               <Typography
                 variant="body2"
@@ -344,10 +347,18 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+      <DialogActions
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pt: 2,
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: "column-reverse", sm: "row" },
+        }}
+      >
         <Button
           onClick={handleClose}
           variant="outlined"
+          fullWidth={fullScreen}
           sx={{
             color: "#6b7280",
             borderColor: "#d1d5db",
@@ -366,6 +377,7 @@ const EditDiscountModal = ({ open, onClose, onEditDiscount, discount }) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
+          fullWidth={fullScreen}
           sx={{
             backgroundColor: "#b0a892",
             "&:hover": { backgroundColor: "#e0dac5" },

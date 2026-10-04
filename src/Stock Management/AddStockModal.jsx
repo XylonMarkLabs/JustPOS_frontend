@@ -17,6 +17,8 @@ import {
   TableContainer,
   Paper,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -25,8 +27,6 @@ import {
 import { useAlert } from "../Components/AlertProvider";
 import ApiCall from "../Services/ApiCall";
 
-// Shared styling for the compact form inputs, kept consistent with the
-// rest of the app's forms.
 const fieldSx = {
   "& .MuiOutlinedInput-root": {
     backgroundColor: "#f9fafb",
@@ -40,11 +40,6 @@ const fieldSx = {
   },
 };
 
-// Products (and suppliers) from the API may key their unique identifier
-// differently (id, _id, productCode/supplierId, ...). Fall back through
-// the common options so the Select always has a truly unique value per
-// row, rather than every option silently matching the same (or
-// undefined) id.
 const getProductId = (product, index) =>
   product?.id ?? product?._id ?? product?.productCode ?? `idx-${index}`;
 
@@ -54,9 +49,6 @@ const getSupplierId = (supplier, index) =>
 const STOCK_ID_PREFIX = "STK_";
 const STOCK_ID_DIGITS = 4;
 
-// Looks at the existing stock records' IDs (e.g. STK_0001, STK_0002) and
-// returns the next one in sequence. Falls back to STK_0001 when there
-// are no stock records yet, or none of them match the expected pattern.
 const generateNextStockId = (stocks = []) => {
   const pattern = new RegExp(`^${STOCK_ID_PREFIX}(\\d+)$`);
 
@@ -87,6 +79,8 @@ const createEmptyRow = () => ({
 
 const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
   const { showError, showWarning } = useAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [products, setProducts] = useState([]);
   const [rows, setRows] = useState([createEmptyRow()]);
@@ -263,23 +257,24 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
       onClose={handleClose}
       maxWidth="md"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          minHeight: "450px",
+          borderRadius: { xs: 0, sm: 2 },
+          minHeight: { xs: "auto", sm: "450px" },
         },
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a" }}>
+        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a", fontSize: { xs: "1.15rem", sm: "1.5rem" } }}>
           Add Stock
         </Typography>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent sx={{ pt: 2, px: { xs: 1.5, sm: 3 } }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {/* Stock ID */}
-          <Box sx={{ maxWidth: 220 }}>
+          <Box sx={{ maxWidth: { xs: "100%", sm: 220 }, px: { xs: 0.5, sm: 0 } }}>
             <Typography
               variant="body2"
               sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -300,16 +295,22 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
           <Box>
             <Typography
               variant="body2"
-              sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
+              sx={{ mb: 1, fontWeight: "medium", color: "#374151", px: { xs: 0.5, sm: 0 } }}
             >
               Products
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ display: { xs: "block", sm: "none" }, color: "#9ca3af", mb: 1, px: 0.5 }}
+            >
+              Scroll sideways to see all columns →
             </Typography>
             <TableContainer
               component={Paper}
               variant="outlined"
-              sx={{ borderRadius: 2, boxShadow: "none" }}
+              sx={{ borderRadius: 2, boxShadow: "none", overflowX: "auto" }}
             >
-              <Table size="small">
+              <Table size="small" sx={{ minWidth: 700 }}>
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#f9fafb" }}>
                     <TableCell sx={{ fontWeight: "bold" }}>
@@ -438,6 +439,7 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
               startIcon={<AddIcon />}
               sx={{
                 mt: 1,
+                ml: { xs: 0.5, sm: 0 },
                 textTransform: "none",
                 fontWeight: "medium",
                 color: "#374151",
@@ -448,8 +450,8 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
           </Box>
 
           {/* Stock receipt details */}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, px: { xs: 0.5, sm: 0 } }}>
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
               <Box sx={{ flex: 1 }}>
                 <Typography
                   variant="body2"
@@ -495,7 +497,7 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
               </Box>
             </Box>
 
-            <Box sx={{ display: "flex", gap: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 2 }}>
               <Box sx={{ flex: 1 }}>
                 <Typography
                   variant="body2"
@@ -551,10 +553,18 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+      <DialogActions
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pt: 2,
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: "column-reverse", sm: "row" },
+        }}
+      >
         <Button
           onClick={handleClose}
           variant="outlined"
+          fullWidth={fullScreen}
           sx={{
             color: "#6b7280",
             borderColor: "#d1d5db",
@@ -573,6 +583,7 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
+          fullWidth={fullScreen}
           sx={{
             backgroundColor: "#b0a892",
             "&:hover": { backgroundColor: "#e0dac5" },

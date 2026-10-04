@@ -38,6 +38,9 @@ import {
 import ApiCall from "../Services/ApiCall";
 import AdminPageShell from "../Components/AdminPageShell";
 
+const hideOnXs = { display: { xs: "none", sm: "table-cell" } };
+const hideOnXsSm = { display: { xs: "none", md: "table-cell" } };
+
 const CategoryManagement = () => {
   const { showSuccess, showInfo } = useAlert();
 
@@ -219,14 +222,16 @@ const CategoryManagement = () => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: { xs: 1.5, sm: 0 },
+            mb: { xs: 2, sm: 3 },
           }}
         >
           <Typography
             variant="h5"
-            sx={{ fontWeight: "bold", color: "#1a1a1a" }}
+            sx={{ fontWeight: "bold", color: "#1a1a1a", fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
           >
             Category Management
           </Typography>
@@ -241,6 +246,7 @@ const CategoryManagement = () => {
               fontWeight: "bold",
               px: 3,
               py: 1,
+              alignSelf: { xs: "stretch", sm: "auto" },
             }}
           >
             Add Category
@@ -248,12 +254,21 @@ const CategoryManagement = () => {
         </Box>
 
         {/* Search and Filters */}
-        <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+            mb: { xs: 2, sm: 3 },
+            flexWrap: { sm: "wrap" },
+          }}
+        >
           <TextField
             placeholder="Search category by name"
             value={searchTerm}
             onChange={handleSearchChange}
-            sx={{ flex: 1, minWidth: "300px" }}
+            size="small"
+            sx={{ flex: 1, minWidth: { xs: "100%", sm: "260px" } }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -262,7 +277,7 @@ const CategoryManagement = () => {
               ),
             }}
           />
-          <FormControl sx={{ minWidth: 120 }}>
+          <FormControl size="small" sx={{ minWidth: { xs: "100%", sm: 120 } }}>
             <InputLabel>Status</InputLabel>
             <Select
               value={statusFilter}
@@ -291,6 +306,7 @@ const CategoryManagement = () => {
               size="small"
               sx={{
                 "& .MuiTableCell-root": { borderBottom: "1px solid #f3f4f6" },
+                minWidth: 560,
               }}
             >
               <TableHead>
@@ -313,6 +329,7 @@ const CategoryManagement = () => {
                       textTransform: "uppercase",
                       fontSize: "0.75rem",
                       py: 1.5,
+                      ...hideOnXsSm,
                     }}
                   >
                     DESCRIPTION
@@ -324,6 +341,7 @@ const CategoryManagement = () => {
                       textTransform: "uppercase",
                       fontSize: "0.75rem",
                       py: 1.5,
+                      ...hideOnXs,
                     }}
                   >
                     PRODUCTS COUNT
@@ -364,17 +382,27 @@ const CategoryManagement = () => {
                     <TableCell sx={{ py: 1 }}>
                       <Typography
                         variant="body2"
-                        sx={{ fontWeight: "medium", lineHeight: 1.2 }}
+                        sx={{ fontWeight: "medium", lineHeight: 1.2, fontSize: { xs: "0.8rem", sm: "0.875rem" } }}
                       >
                         {category.categoryName}
                       </Typography>
+                      {/* Description + count shown inline on mobile since those columns are hidden */}
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ display: { xs: "block", md: "none" }, fontSize: "0.65rem" }}
+                        noWrap
+                      >
+                        {category.description}
+                        {category.productsCount != null ? ` • ${category.productsCount} products` : ""}
+                      </Typography>
                     </TableCell>
-                    <TableCell sx={{ py: 1 }}>
+                    <TableCell sx={{ py: 1, ...hideOnXsSm }}>
                       <Typography variant="body2" color="text.secondary">
                         {category.description}
                       </Typography>
                     </TableCell>
-                    <TableCell sx={{ py: 1 }}>
+                    <TableCell sx={{ py: 1, ...hideOnXs }}>
                       <Typography variant="body2" color="text.secondary">
                         {category.productsCount || 0}
                       </Typography>
@@ -397,10 +425,10 @@ const CategoryManagement = () => {
                       />
                     </TableCell>
                     <TableCell sx={{ py: 1 }}>
-                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                      <Box sx={{ display: "flex", gap: 0.25 }}>
                         <IconButton
                           size="small"
-                          sx={{ color: "#4b5563", padding: "4px" }}
+                          sx={{ color: "#4b5563", padding: { xs: "2px", sm: "4px" } }}
                           onClick={() => {
                             setSelectedCategory(category);
                             setDetailsModalOpen(true);
@@ -411,7 +439,7 @@ const CategoryManagement = () => {
                         </IconButton>
                         <IconButton
                           size="small"
-                          sx={{ color: "#2563eb", padding: "4px" }}
+                          sx={{ color: "#2563eb", padding: { xs: "2px", sm: "4px" } }}
                           onClick={() => handleOpenEditModal(category)}
                           title="Edit Category"
                         >
@@ -422,7 +450,7 @@ const CategoryManagement = () => {
                           sx={{
                             color:
                               category.status === 1 ? "#f59e0b" : "#10b981",
-                            padding: "4px",
+                            padding: { xs: "2px", sm: "4px" },
                           }}
                           onClick={() => handleToggleStatus(category)}
                           title={
@@ -439,7 +467,7 @@ const CategoryManagement = () => {
                         </IconButton>
                         <IconButton
                           size="small"
-                          sx={{ color: "#ef4444", padding: "4px" }}
+                          sx={{ color: "#ef4444", padding: { xs: "2px", sm: "4px" } }}
                           onClick={() => handleDeleteCategory(category)}
                           title="Delete Category"
                         >
@@ -471,19 +499,26 @@ const CategoryManagement = () => {
               rowsPerPage={rowsPerPage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               rowsPerPageOptions={[5, 10, 25, 50]}
+              labelRowsPerPage={
+                <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+                  Rows per page:
+                </Box>
+              }
               sx={{
                 "& .MuiTablePagination-toolbar": {
-                  paddingLeft: 2,
-                  paddingRight: 2,
+                  paddingLeft: { xs: 1, sm: 2 },
+                  paddingRight: { xs: 1, sm: 2 },
                   minHeight: 48,
+                  flexWrap: { xs: "wrap", sm: "nowrap" },
+                  justifyContent: { xs: "center", sm: "flex-end" },
                 },
                 "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
                   {
-                    fontSize: "0.875rem",
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
                     color: "#6b7280",
                   },
                 "& .MuiTablePagination-select": {
-                  fontSize: "0.875rem",
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
                 },
                 "& .MuiTablePagination-actions": {
                   color: "#6b7280",

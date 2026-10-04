@@ -28,6 +28,9 @@ import {
 import ApiCall from '../Services/ApiCall'
 import AdminPageShell from '../Components/AdminPageShell'
 
+const hideOnXs = { display: { xs: 'none', sm: 'table-cell' } };
+const hideOnXsSm = { display: { xs: 'none', md: 'table-cell' } };
+
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [paymentFilter, setPaymentFilter] = useState('All')
@@ -123,19 +126,28 @@ const Orders = () => {
     <AdminPageShell>
           <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 2, sm: 3 } }}>
+              <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
                 Order Management
               </Typography>
             </Box>
 
             {/* Search and Filters */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                gap: 2,
+                mb: { xs: 2, sm: 3 },
+                flexWrap: { md: 'wrap' },
+              }}
+            >
               <TextField
                 placeholder="Search orders..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                sx={{ flex: 1, minWidth: '300px' }}
+                size="small"
+                sx={{ flex: 1, minWidth: { xs: '100%', md: '260px' } }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -144,35 +156,38 @@ const Orders = () => {
                   ),
                 }}
               />
-              <FormControl sx={{ minWidth: 120 }}>
-                <InputLabel>Payment Type</InputLabel>
-                <Select
-                  value={paymentFilter}
-                  label="Payment Type"
-                  onChange={handlePaymentChange}
-                >
-                  <MenuItem value="All">All</MenuItem>
-                  <MenuItem value="cash">Cash</MenuItem>
-                  <MenuItem value="card">Card</MenuItem>
-                </Select>
-              </FormControl>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <FormControl size="small" sx={{ minWidth: { xs: 'calc(50% - 8px)', sm: 120 }, flex: { xs: 1, sm: 'none' } }}>
+                  <InputLabel>Payment Type</InputLabel>
+                  <Select
+                    value={paymentFilter}
+                    label="Payment Type"
+                    onChange={handlePaymentChange}
+                  >
+                    <MenuItem value="All">All</MenuItem>
+                    <MenuItem value="cash">Cash</MenuItem>
+                    <MenuItem value="card">Card</MenuItem>
+                  </Select>
+                </FormControl>
 
-              <TextField
-                type="date"
-                value={dateFilter}
-                onChange={handleDateChange}
-                sx={{ minWidth: 200 }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                label="Filter by Date"
-              />
+                <TextField
+                  type="date"
+                  value={dateFilter}
+                  onChange={handleDateChange}
+                  size="small"
+                  sx={{ minWidth: { xs: 'calc(50% - 8px)', sm: 200 }, flex: { xs: 1, sm: 'none' } }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  label="Filter by Date"
+                />
+              </Box>
             </Box>
 
             {/* Orders Table */}
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <TableContainer component={Paper} sx={{ flex: 1, overflow: 'auto' }}>
-                <Table stickyHeader size="small" sx={{ '& .MuiTableCell-root': { borderBottom: '1px solid #f3f4f6' } }}>
+                <Table stickyHeader size="small" sx={{ '& .MuiTableCell-root': { borderBottom: '1px solid #f3f4f6' }, minWidth: 640 }}>
                   <TableHead>
                     <TableRow sx={{ height: 48 }}>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
@@ -181,19 +196,19 @@ const Orders = () => {
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         CUSTOMER
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5, ...hideOnXsSm }}>
                         ITEMS
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         TOTAL
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5, ...hideOnXsSm }}>
                         PAYMENT
                       </TableCell>
                       {/* <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
                         STATUS
                       </TableCell> */}
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5, ...hideOnXs }}>
                         DATE
                       </TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', py: 1.5 }}>
@@ -208,26 +223,37 @@ const Orders = () => {
                         height: 60
                       }}>
                         <TableCell sx={{ py: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                             {order.orderId}
+                          </Typography>
+                          {/* Items + Payment + Date shown inline on mobile since those columns are hidden */}
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: { xs: 'block', md: 'none' }, fontSize: '0.65rem' }}
+                          >
+                            {order.items.length} {order.items.length === 1 ? 'item' : 'items'} • {order.paymentMethod}
+                            <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+                              {' '}• {new Date(order.date).toISOString().slice(0, 10)}
+                            </Box>
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                             {order.username}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ py: 1 }}>
+                        <TableCell sx={{ py: 1, ...hideOnXsSm }}>
                           <Typography variant="body2" color="text.secondary">
                             {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                             Rs.{order.totalAmount.toFixed(2)}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ py: 1 }}>
+                        <TableCell sx={{ py: 1, ...hideOnXsSm }}>
                           <Typography variant="body2" color="text.secondary">
                             {order.paymentMethod}
                           </Typography>
@@ -256,7 +282,7 @@ const Orders = () => {
                             }}
                           />
                         </TableCell> */}
-                        <TableCell sx={{ py: 1 }}>
+                        <TableCell sx={{ py: 1, ...hideOnXs }}>
                           <Typography variant="body2" color="text.secondary">
                             {new Date(order.date).toISOString().slice(0, 10)}
                           </Typography>
@@ -264,7 +290,7 @@ const Orders = () => {
                         <TableCell sx={{ py: 1 }}>
                           <IconButton 
                             size="small" 
-                            sx={{ color: '#2563eb', padding: '4px' }}
+                            sx={{ color: '#2563eb', padding: { xs: '2px', sm: '4px' } }}
                             onClick={() => handleViewOrder(order)}
                             title="View Order Details"
                           >
@@ -292,18 +318,25 @@ const Orders = () => {
                   rowsPerPage={rowsPerPage}
                   onRowsPerPageChange={handleChangeRowsPerPage}
                   rowsPerPageOptions={[5, 10, 25, 50]}
+                  labelRowsPerPage={
+                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                      Rows per page:
+                    </Box>
+                  }
                   sx={{
                     '& .MuiTablePagination-toolbar': {
-                      paddingLeft: 2,
-                      paddingRight: 2,
+                      paddingLeft: { xs: 1, sm: 2 },
+                      paddingRight: { xs: 1, sm: 2 },
                       minHeight: 56,
+                      flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                      justifyContent: { xs: 'center', sm: 'flex-end' },
                     },
                     '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-                      fontSize: '0.875rem',
+                      fontSize: { xs: '0.75rem', sm: '0.875rem' },
                       color: '#6b7280',
                     },
                     '& .MuiTablePagination-select': {
-                      fontSize: '0.875rem',
+                      fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     },
                     '& .MuiTablePagination-actions': {
                       color: '#6b7280',

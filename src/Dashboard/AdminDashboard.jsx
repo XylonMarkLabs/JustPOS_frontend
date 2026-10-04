@@ -38,6 +38,9 @@ const STATUS_STYLES = {
   'Low Stock': { backgroundColor: '#fffbeb', borderColor: '#fef3c7', color: '#d97706' },
 };
 
+const hideOnXs = { display: { xs: 'none', sm: 'table-cell' } };
+const hideOnXsSm = { display: { xs: 'none', md: 'table-cell' } };
+
 const AdminDashboard = () => {
   const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -84,7 +87,7 @@ const AdminDashboard = () => {
   if (loading || !overview) {
     return (
       <AdminPageShell>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: { xs: 6, sm: 10 } }}>
           <CircularProgress sx={{ color: '#b0a892' }} />
         </Box>
       </AdminPageShell>
@@ -95,17 +98,17 @@ const AdminDashboard = () => {
     <AdminPageShell>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
+        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
             Admin Dashboard
           </Typography>
-          <Typography variant="body2" sx={{ color: '#6b7280', mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#6b7280', mt: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
             Business-wide overview — {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </Typography>
         </Box>
 
         {/* Metrics Grid */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 3, sm: 4 } }}>
           <Grid item xs={12} sm={6} lg={3}>
             <MetricCard
               title="Today's Revenue"
@@ -141,22 +144,22 @@ const AdminDashboard = () => {
         </Grid>
 
         {/* Recent Orders + Low Stock Alerts */}
-        <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 2, sm: 3 } }}>
           <Grid item xs={12} lg={8}>
-            <Paper sx={{ p: 3, height: '100%', minHeight: 400, borderRadius: 2 }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+            <Paper sx={{ p: { xs: 2, sm: 3 }, height: '100%', minHeight: { xs: 'auto', lg: 400 }, borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Recent Orders
               </Typography>
-              <TableContainer>
+              <TableContainer sx={{ overflowX: 'auto' }}>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>Order #</TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>Cashier</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }} align="center">Items</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>Payment</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', ...hideOnXs }} align="center">Items</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', ...hideOnXsSm }}>Payment</TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }} align="right">Total</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }} align="right">Time</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', ...hideOnXsSm }} align="right">Time</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -172,23 +175,23 @@ const AdminDashboard = () => {
                       overview.recentOrders.map((order) => (
                         <TableRow key={order._id} sx={{ '&:hover': { backgroundColor: '#f9fafb' } }}>
                           <TableCell>
-                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>#{order.orderId}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>#{order.orderId}</Typography>
                           </TableCell>
                           <TableCell>
-                            <Typography variant="body2" color="text.secondary">{order.username}</Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{order.username}</Typography>
                           </TableCell>
-                          <TableCell align="center">
+                          <TableCell align="center" sx={hideOnXs}>
                             <Typography variant="body2" color="text.secondary">{order.itemCount}</Typography>
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={hideOnXsSm}>
                             <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'capitalize' }}>
                               {order.paymentMethod}
                             </Typography>
                           </TableCell>
                           <TableCell align="right">
-                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Rs.{money(order.totalAmount)}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Rs.{money(order.totalAmount)}</Typography>
                           </TableCell>
-                          <TableCell align="right">
+                          <TableCell align="right" sx={hideOnXsSm}>
                             <Typography variant="body2" color="text.secondary">{formatTime(order.date)}</Typography>
                           </TableCell>
                         </TableRow>
@@ -201,9 +204,9 @@ const AdminDashboard = () => {
           </Grid>
 
           <Grid item xs={12} lg={4}>
-            <Paper sx={{ p: 3, height: '100%', minHeight: 400, borderRadius: 2 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+            <Paper sx={{ p: { xs: 2, sm: 3 }, height: '100%', minHeight: { xs: 'auto', lg: 400 }, borderRadius: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, gap: 1, flexWrap: 'wrap' }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                   Low Stock Alerts
                 </Typography>
                 {(overview.lowStock + overview.outOfStock) > 0 && (
@@ -219,7 +222,7 @@ const AdminDashboard = () => {
                   All stock levels look healthy.
                 </Typography>
               ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, maxHeight: { xs: 260, lg: 'none' }, overflowY: { xs: 'auto', lg: 'visible' } }}>
                   {overview.lowStockItems.map((item) => (
                     <Box
                       key={item.productCode}
@@ -227,13 +230,16 @@ const AdminDashboard = () => {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
+                        gap: 1,
                         p: 1.5,
                         borderRadius: 1,
                         backgroundColor: '#f9fafb',
                       }}
                     >
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>{item.name}</Typography>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '0.875rem' } }} noWrap>
+                          {item.name}
+                        </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {item.currentStock} / {item.minimumStock} min
                         </Typography>
@@ -242,7 +248,7 @@ const AdminDashboard = () => {
                         label={item.status}
                         size="small"
                         variant="outlined"
-                        sx={{ height: 22, fontSize: '0.7rem', ...(STATUS_STYLES[item.status] || {}) }}
+                        sx={{ height: 22, fontSize: '0.7rem', flexShrink: 0, ...(STATUS_STYLES[item.status] || {}) }}
                       />
                     </Box>
                   ))}
@@ -253,10 +259,10 @@ const AdminDashboard = () => {
         </Grid>
 
         {/* Top Products + Sales Trend */}
-        <Grid container spacing={3}>
+        <Grid container spacing={{ xs: 2, sm: 3 }}>
           <Grid item xs={12} lg={5}>
-            <Paper sx={{ p: 3, height: '100%', minHeight: 320, borderRadius: 2 }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+            <Paper sx={{ p: { xs: 2, sm: 3 }, height: '100%', minHeight: { xs: 'auto', lg: 320 }, borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Top Products (7 days)
               </Typography>
               {overview.topProducts.length === 0 ? (
@@ -266,15 +272,19 @@ const AdminDashboard = () => {
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   {overview.topProducts.map((product, index) => (
-                    <Box key={product.productCode} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Typography variant="body2" sx={{ color: '#9ca3af', width: 16 }}>{index + 1}</Typography>
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>{product.name}</Typography>
+                    <Box key={product.productCode} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ color: '#9ca3af', width: 16, flexShrink: 0 }}>{index + 1}</Typography>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '0.875rem' } }} noWrap>
+                            {product.name}
+                          </Typography>
                           <Typography variant="caption" color="text.secondary">{product.unitsSold} units sold</Typography>
                         </Box>
                       </Box>
-                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>Rs.{money(product.revenue)}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 'medium', flexShrink: 0, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
+                        Rs.{money(product.revenue)}
+                      </Typography>
                     </Box>
                   ))}
                 </Box>
@@ -283,23 +293,24 @@ const AdminDashboard = () => {
           </Grid>
 
           <Grid item xs={12} lg={7}>
-            <Paper sx={{ p: 3, height: '100%', minHeight: 320, borderRadius: 2 }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+            <Paper sx={{ p: { xs: 2, sm: 3 }, height: '100%', minHeight: { xs: 'auto', lg: 320 }, borderRadius: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Sales Trend (7 days)
               </Typography>
-              <ResponsiveContainer width="100%" height={240}>
+              <ResponsiveContainer width="100%" height={220} minWidth={0}>
                 <LineChart data={overview.salesTrend} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                   <XAxis
                     dataKey="date"
                     tickFormatter={formatTrendLabel}
-                    tick={{ fontSize: 12, fill: '#6b7280' }}
+                    tick={{ fontSize: 11, fill: '#6b7280' }}
                     axisLine={{ stroke: '#e5e7eb' }}
                   />
                   <YAxis
-                    tick={{ fontSize: 12, fill: '#6b7280' }}
+                    tick={{ fontSize: 11, fill: '#6b7280' }}
                     axisLine={{ stroke: '#e5e7eb' }}
                     tickFormatter={(v) => `Rs.${v}`}
+                    width={56}
                   />
                   <Tooltip
                     formatter={(value) => [`Rs.${money(value)}`, 'Revenue']}

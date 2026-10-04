@@ -12,6 +12,8 @@ import {
   MenuItem,
   Typography,
   Grid,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useAlert } from "../Components/AlertProvider";
 import ValidateInput from "../Validation/ValidateInput";
@@ -54,6 +56,8 @@ const generateNextSupplierId = (suppliers = []) => {
 
 const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
   const { showError, showSuccess } = useAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [formData, setFormData] = useState({
     supplierId: "",
@@ -173,15 +177,16 @@ const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          minHeight: "450px",
+          borderRadius: { xs: 0, sm: 2 },
+          minHeight: { xs: "auto", sm: "450px" },
         },
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a" }}>
+        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a", fontSize: { xs: "1.15rem", sm: "1.5rem" } }}>
           Add New Supplier
         </Typography>
       </DialogTitle>
@@ -190,7 +195,7 @@ const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {/* Supplier Id and Supplier Name */}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -207,7 +212,7 @@ const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
                 sx={fieldSx}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -228,7 +233,7 @@ const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
 
           {/* Contact Person and Contact Number */}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -245,7 +250,7 @@ const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
                 sx={fieldSx}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -294,10 +299,18 @@ const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+      <DialogActions
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pt: 2,
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: "column-reverse", sm: "row" },
+        }}
+      >
         <Button
           onClick={handleClose}
           variant="outlined"
+          fullWidth={fullScreen}
           sx={{
             color: "#6b7280",
             borderColor: "#d1d5db",
@@ -316,6 +329,7 @@ const AddSupplierModal = ({ open, onClose, onAddSupplier, suppliers = [] }) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
+          fullWidth={fullScreen}
           sx={{
             backgroundColor: "#b0a892",
             "&:hover": { backgroundColor: "#e0dac5" },
