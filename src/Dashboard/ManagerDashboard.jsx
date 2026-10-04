@@ -29,6 +29,11 @@ const STATUS_STYLES = {
   'Low Stock': { backgroundColor: '#fffbeb', borderColor: '#fef3c7', color: '#d97706' },
 };
 
+// Columns hidden on smaller screens so the low-stock table doesn't force
+// awkward horizontal scrolling inside its card on a phone/tablet.
+const hideOnXs = { display: { xs: 'none', sm: 'table-cell' } };
+const hideOnXsSm = { display: { xs: 'none', md: 'table-cell' } };
+
 const ManagerDashboard = () => {
   const [overview, setOverview] = useState(null);
   const [inventory, setInventory] = useState(null);
@@ -70,7 +75,7 @@ const ManagerDashboard = () => {
   if (loading || !overview || !inventory) {
     return (
       <AdminPageShell>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: { xs: 6, sm: 10 } }}>
           <CircularProgress sx={{ color: '#b0a892' }} />
         </Box>
       </AdminPageShell>
@@ -83,17 +88,17 @@ const ManagerDashboard = () => {
     <AdminPageShell>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
+        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
             Manager Dashboard
           </Typography>
-          <Typography variant="body2" sx={{ color: '#6b7280', mt: 0.5 }}>
+          <Typography variant="body2" sx={{ color: '#6b7280', mt: 0.5, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
             {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </Typography>
         </Box>
 
         {/* Metrics Grid */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: { xs: 3, sm: 4 } }}>
           <Grid item xs={12} sm={6} lg={3}>
             <MetricCard
               title="Today's Orders"
@@ -129,29 +134,29 @@ const ManagerDashboard = () => {
         </Grid>
 
         {/* Low Stock Products + Recent Orders */}
-        <Grid container spacing={3} sx={{ flex: 1, minHeight: 0 }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ flex: 1, minHeight: 0 }}>
           <Grid item xs={12} lg={7}>
             <Paper
               sx={{
-                p: 3,
+                p: { xs: 2, sm: 3 },
                 backgroundColor: 'background.paper',
                 borderRadius: 2,
                 height: '100%',
-                minHeight: 400,
+                minHeight: { xs: 'auto', lg: 400 },
                 overflow: 'auto'
               }}
             >
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Low Stock Products
               </Typography>
-              <TableContainer>
+              <TableContainer sx={{ overflowX: 'auto' }}>
                 <Table size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>Product Name</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>Category</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', ...hideOnXsSm }}>Category</TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }} align="right">Current Stock</TableCell>
-                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }} align="right">Min. Stock</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem', ...hideOnXs }} align="right">Min. Stock</TableCell>
                       <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>Status</TableCell>
                     </TableRow>
                   </TableHead>
@@ -168,15 +173,19 @@ const ManagerDashboard = () => {
                       inventory.lowStockItems.map((product) => (
                         <TableRow key={product.productCode} sx={{ '&:hover': { backgroundColor: '#f9fafb' } }}>
                           <TableCell>
-                            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>{product.name}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                              {product.name}
+                            </Typography>
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={hideOnXsSm}>
                             <Typography variant="body2" color="text.secondary">{product.category}</Typography>
                           </TableCell>
                           <TableCell align="right">
-                            <Typography variant="body2" color="text.secondary">{product.currentStock}</Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                              {product.currentStock}
+                            </Typography>
                           </TableCell>
-                          <TableCell align="right">
+                          <TableCell align="right" sx={hideOnXs}>
                             <Typography variant="body2" color="text.secondary">{product.minimumStock}</Typography>
                           </TableCell>
                           <TableCell>
@@ -199,15 +208,15 @@ const ManagerDashboard = () => {
           <Grid item xs={12} lg={5}>
             <Paper
               sx={{
-                p: 3,
+                p: { xs: 2, sm: 3 },
                 backgroundColor: 'background.paper',
                 borderRadius: 2,
                 height: '100%',
-                minHeight: 400,
+                minHeight: { xs: 'auto', lg: 400 },
                 overflow: 'auto'
               }}
             >
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Recent Orders
               </Typography>
               {overview.recentOrders.length === 0 ? (
@@ -223,20 +232,21 @@ const ManagerDashboard = () => {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
+                        gap: 1,
                         p: 1.5,
                         borderRadius: 1,
                         backgroundColor: '#f9fafb',
                       }}
                     >
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '0.875rem' } }} noWrap>
                           #{order.orderId} &bull; {order.username}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                           {order.itemCount} item{order.itemCount === 1 ? '' : 's'} &bull; {formatTime(order.date)}
                         </Typography>
                       </Box>
-                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 'medium', flexShrink: 0, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                         Rs.{money(order.totalAmount)}
                       </Typography>
                     </Box>

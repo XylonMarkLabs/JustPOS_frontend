@@ -15,6 +15,8 @@ import {
   Avatar,
   IconButton,
   Chip,
+  useMediaQuery,
+  useTheme
 } from "@mui/material";
 import {
   PhotoCamera as PhotoCameraIcon,
@@ -39,6 +41,9 @@ const fieldSx = {
 
 const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
   const { showError, showWarning, showSuccess } = useAlert();
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [formData, setFormData] = useState({
     productType: "INVENTORY",
@@ -249,15 +254,16 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          minHeight: "450px",
+          borderRadius: { xs: 0, sm: 2},
+          minHeight: { xs: "auto", sm: "450px" },
         },
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a" }}>
+        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a1a1a", fontSize: { xs: "1.15rem", sm: "1.5rem" } }}>
           Edit Product
         </Typography>
       </DialogTitle>
@@ -272,7 +278,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
             >
               Product Type
             </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, gap: 1.5, fontSize: { xs: "0.75rem", sm: "0.8125rem" }, }}>
               <Chip
                 label={isInventory ? "Inventory (from supplier)" : "Made to order"}
                 sx={{
@@ -307,7 +313,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
               }}
             >
               {formData.imagePreview ? (
-                <Box sx={{ position: "relative" }}>
+                <Box sx={{ position: "relative", flexShrink: 0 }}>
                   <Avatar
                     src={formData.imagePreview}
                     sx={{
@@ -334,13 +340,13 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                 </Box>
               ) : (
                 <Avatar
-                  sx={{ width: 50, height: 50, backgroundColor: "#e5e7eb" }}
+                  sx={{ width: 50, height: 50, backgroundColor: "#e5e7eb", flexShrink: 0 }}
                 >
                   <ImageIcon sx={{ fontSize: 24, color: "#9ca3af" }} />
                 </Avatar>
               )}
 
-              <Box sx={{ flex: 1 }}>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
                 <input
                   accept="image/*"
                   style={{ display: "none" }}
@@ -401,7 +407,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
 
           {/* Barcode (locked) + Category */}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -418,7 +424,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                 sx={fieldSx}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -454,7 +460,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
 
           {/* Type-specific fields */}
           {isInventory ? (
-            <Box sx={{ maxWidth: "50%", pr: 1 }}>
+            <Box sx={{ maxWidth: { xs: "100%", sm: "50%" }, pr: { xs: 0, sm: 1 } }}>
               <Typography
                 variant="body2"
                 sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -477,7 +483,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
             </Box>
           ) : (
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Typography
                   variant="body2"
                   sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -498,7 +504,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
                   sx={fieldSx}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <Typography
                   variant="body2"
                   sx={{ mb: 1, fontWeight: "medium", color: "#374151" }}
@@ -524,10 +530,18 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+      <DialogActions 
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pt: 2,
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: "column-reverse", sm: "row" },
+        }}
+      >
         <Button
           onClick={handleClose}
           variant="outlined"
+          fullWidth={fullScreen}
           sx={{
             color: "#6b7280",
             borderColor: "#d1d5db",
@@ -546,6 +560,7 @@ const EditProductModal = ({ open, onClose, onEditProduct, product }) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
+          fullWidth={fullScreen}
           sx={{
             backgroundColor: "#b0a892",
             "&:hover": { backgroundColor: "#e0dac5" },

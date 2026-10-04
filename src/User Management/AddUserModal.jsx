@@ -14,7 +14,9 @@ import {
   InputAdornment,
   Typography,
   Grid,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material'
 import {
   Visibility,
@@ -25,6 +27,8 @@ import ValidateInput from '../Validation/ValidateInput'
 
 const AddUserModal = ({ open, onClose, onAddUser }) => {
   const { showError, showWarning, showSuccess } = useAlert()
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
   
   const [formData, setFormData] = useState({
     name: '',
@@ -180,15 +184,16 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={fullScreen}
       PaperProps={{
         sx: {
-          borderRadius: 2,
-          minHeight: '500px'
+          borderRadius: { xs: 0, sm: 2 },
+          minHeight: { xs: 'auto', sm: '500px' }
         }
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a', fontSize: { xs: '1.15rem', sm: '1.5rem' } }}>
           Add New User
         </Typography>
       </DialogTitle>
@@ -255,7 +260,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
 
           {/* Username and Role */}
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
                 Username
               </Typography>
@@ -283,7 +288,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
                 }}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="body2" sx={{ mb: 1, fontWeight: 'medium', color: '#374151' }}>
                 Role
               </Typography>
@@ -399,10 +404,10 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
           {/* Password Requirements Alert */}
           {formData.password && !validatePassword(formData.password).isValid && (
             <Alert severity="info" sx={{ mt: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+              <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                 Password Requirements:
               </Typography>
-              <Typography variant="body2" component="div">
+              <Typography variant="body2" component="div" sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                 • At least 8 characters<br />
                 • One uppercase letter<br />
                 • One lowercase letter<br />
@@ -414,10 +419,18 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 2, gap: 2 }}>
+      <DialogActions
+        sx={{
+          p: { xs: 2, sm: 3 },
+          pt: 2,
+          gap: { xs: 1, sm: 2 },
+          flexDirection: { xs: 'column-reverse', sm: 'row' }
+        }}
+      >
         <Button
           onClick={handleClose}
           variant="outlined"
+          fullWidth={fullScreen}
           sx={{
             color: '#6b7280',
             borderColor: '#d1d5db',
@@ -436,6 +449,7 @@ const AddUserModal = ({ open, onClose, onAddUser }) => {
         <Button
           onClick={handleSubmit}
           variant="contained"
+          fullWidth={fullScreen}
           sx={{
             backgroundColor: '#b0a892',
             '&:hover': { backgroundColor: '#e0dac5' },

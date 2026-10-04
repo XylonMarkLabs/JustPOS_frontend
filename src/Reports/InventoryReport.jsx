@@ -64,8 +64,8 @@ const InventoryReport = ({ data }) => {
   )
   return (
     <Box>
-      <Grid container spacing={3} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={showFinancials ? 3 : 4}>
+      <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: 2 }}>
+        <Grid item xs={12} sm={6} md={showFinancials ? 3 : 4}>
           <MetricCard
             title="Total Products"
             value={data.totalProducts}
@@ -73,7 +73,7 @@ const InventoryReport = ({ data }) => {
             color="primary"
           />
         </Grid>
-        <Grid item xs={12} md={showFinancials ? 3 : 4}>
+        <Grid item xs={12} sm={6} md={showFinancials ? 3 : 4}>
           <MetricCard
             title="Low Stock"
             value={data.lowStock}
@@ -81,7 +81,7 @@ const InventoryReport = ({ data }) => {
             color="warning"
           />
         </Grid>
-        <Grid item xs={12} md={showFinancials ? 3 : 4}>
+        <Grid item xs={12} sm={6} md={showFinancials ? 3 : 4}>
           <MetricCard
             title="Out of Stock"
             value={data.outOfStock}
@@ -90,7 +90,7 @@ const InventoryReport = ({ data }) => {
           />
         </Grid>
         {showFinancials && (
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} sm={6} md={3}>
             <MetricCard
               title="Total Value"
               value={`Rs.${money(data.totalValue)}`}
@@ -102,25 +102,25 @@ const InventoryReport = ({ data }) => {
       </Grid>
 
       <Card>
-        <CardContent sx={{ px: 3, pb: 0 }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+        <CardContent sx={{ px: { xs: 1.5, sm: 3 }, pb: 0 }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, px: { xs: 1, sm: 0 }, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
             Low Stock Alert
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <TableContainer component={Box} sx={{ flex: 1, overflow: 'auto' }}>
-              <Table>
+              <Table sx={{ minWidth: 480 }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
                       Product
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
                       Current Stock
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
                       Minimum Stock
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: '0.75rem' }}>
+                    <TableCell sx={{ fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
                       Status
                     </TableCell>
                   </TableRow>
@@ -141,17 +141,17 @@ const InventoryReport = ({ data }) => {
                         height: 40
                       }}>
                         <TableCell sx={{ py: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                             {item.name}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                             {item.currentStock}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 1 }}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                             {item.minimumStock}
                           </Typography>
                         </TableCell>
@@ -193,19 +193,26 @@ const InventoryReport = ({ data }) => {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 rowsPerPageOptions={[5, 10, 25]}
+                labelRowsPerPage={
+                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                    Rows per page:
+                  </Box>
+                }
                 sx={{
                   '& .MuiTablePagination-toolbar': {
-                    paddingLeft: 0,
-                    paddingRight: 0,
+                    paddingLeft: { xs: 1, sm: 0 },
+                    paddingRight: { xs: 1, sm: 0 },
                     minHeight: 50,
                     margin: 0,
+                    flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                    justifyContent: { xs: 'center', sm: 'flex-end' },
                   },
                   '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     color: '#6b7280',
                   },
                   '& .MuiTablePagination-select': {
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                   },
                   '& .MuiTablePagination-actions': {
                     color: '#6b7280',
