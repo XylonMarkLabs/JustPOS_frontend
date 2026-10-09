@@ -54,6 +54,7 @@ const createRowFromItem = (item = {}) => ({
   currentStock: item.currentStock ?? "",
   quantityReceived: item.quantityReceived ?? "",
   unitCost: item.unitCost ?? "",
+  sellingPrice: item.sellingPrice ?? "",
   originalQuantityReceived: item.quantityReceived ?? 0,
 });
 
@@ -230,6 +231,7 @@ const EditStockModal = ({ open, onClose, onEditStock, stock }) => {
         currentStock: row.currentStock,
         quantityReceived: parseInt(row.quantityReceived),
         unitCost: parseFloat(row.unitCost),
+        sellingPrice: parseFloat(row.sellingPrice),
         totalCost: rowTotal(row),
       })),
       supplierId,
