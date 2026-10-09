@@ -440,14 +440,14 @@ const StockManagement = () => {
                             >
                               <EditIcon fontSize="small" />
                             </IconButton>
-                            <IconButton
+                            {/* <IconButton
                               size="small"
                               sx={{ color: "#ef4444", padding: { xs: "2px", sm: "4px" } }}
                               onClick={() => handleDeleteStock(stock)}
                               title="Delete Stock Record"
                             >
                               <DeleteIcon fontSize="small" />
-                            </IconButton>
+                            </IconButton> */}
                           </Box>
                         </TableCell>
                       </TableRow>

@@ -92,6 +92,8 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
   const [invoiceNo, setInvoiceNo] = useState("");
   const [notes, setNotes] = useState("");
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
   useEffect(() => {
     if (open) {
       getProducts();
@@ -235,6 +237,7 @@ const AddStockModal = ({ open, onClose, onAddStock, stocks = [] }) => {
       receivedDate,
       invoiceNo,
       notes,
+      addedBy: user?.username,
     };
 
     onAddStock(stockData);
