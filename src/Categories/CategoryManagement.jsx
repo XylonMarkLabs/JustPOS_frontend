@@ -89,10 +89,10 @@ const CategoryManagement = () => {
 
   // Handle editing category
   const handleEditCategory = async (updatedCategory) => {
-    if (!isAuthorized(userRole)) {
-      showInfo("You are not authorized to edit categories.", "Unauthorized");
-      return;
-    }
+    // if (!isAuthorized(userRole)) {
+    //   showInfo("You are not authorized to edit categories.", "Unauthorized");
+    //   return;
+    // }
 
     const response = await ApiCall.category.editCategory(updatedCategory);
     if (response) {

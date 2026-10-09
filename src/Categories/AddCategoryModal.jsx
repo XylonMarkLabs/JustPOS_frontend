@@ -157,7 +157,7 @@ const AddCategoryModal = ({ open, onClose, onAddCategory }) => {
                             py: 1
                         }}
                     >
-                        Add Product
+                        Add Category
                     </Button>
                 </DialogActions>
         </Dialog>

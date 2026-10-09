@@ -96,7 +96,18 @@ const AdminDashboard = () => {
 
   return (
     <AdminPageShell>
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          pr: 0.5,
+          pb: 3,
+          scrollbarWidth: 'thin',
+        }}
+      >
         {/* Header */}
         <Box sx={{ mb: { xs: 2, sm: 3 } }}>
           <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1a1a1a', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
