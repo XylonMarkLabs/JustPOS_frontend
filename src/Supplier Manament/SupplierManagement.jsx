@@ -142,7 +142,7 @@ const SupplierManagement = () => {
 
   const confirmToggleStatus = async () => {
     const newStatus =
-      supplierToToggle.status === "Active" ? "Inactive" : "Active";
+      supplierToToggle.status === 1 ? 0 : 1;
     const supplierId = supplierToToggle.supplierId;
     const supplierName = supplierToToggle.supplierName;
 
@@ -517,32 +517,32 @@ const SupplierManagement = () => {
                               size="small"
                               sx={{
                                 color:
-                                  supplier.status === "Active"
+                                  supplier.status === 1
                                     ? "#f59e0b"
                                     : "#10b981",
                                 padding: { xs: "2px", sm: "4px" },
                               }}
                               onClick={() => handleToggleStatus(supplier)}
                               title={
-                                supplier.status === "Active"
+                                supplier.status === 1
                                   ? "Deactivate Supplier"
                                   : "Activate Supplier"
                               }
                             >
-                              {supplier.status === "Active" ? (
+                              {supplier.status === 1 ? (
                                 <DeactivateIcon fontSize="small" />
                               ) : (
                                 <ActivateIcon fontSize="small" />
                               )}
                             </IconButton>
-                            <IconButton
+                            {/* <IconButton
                               size="small"
                               sx={{ color: "#ef4444", padding: { xs: "2px", sm: "4px" } }}
                               onClick={() => handleDeleteSupplier(supplier)}
                               title="Delete Supplier"
                             >
                               <DeleteIcon fontSize="small" />
-                            </IconButton>
+                            </IconButton> */}
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -634,13 +634,13 @@ const SupplierManagement = () => {
         onClose={() => setStatusDialogOpen(false)}
         onConfirm={confirmToggleStatus}
         title={`${
-          supplierToToggle?.status === "Active" ? "Deactivate" : "Activate"
+          supplierToToggle?.status === 1 ? "Deactivate" : "Activate"
         } Supplier`}
         message={`Are you sure you want to ${
-          supplierToToggle?.status === "Active" ? "deactivate" : "activate"
+          supplierToToggle?.status === 1 ? "deactivate" : "activate"
         } "${supplierToToggle?.supplierName}"?`}
         confirmText={
-          supplierToToggle?.status === "Active" ? "Deactivate" : "Activate"
+          supplierToToggle?.status === 1 ? "Deactivate" : "Activate"
         }
         cancelText="Cancel"
         type="warning"

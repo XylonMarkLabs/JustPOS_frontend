@@ -399,6 +399,23 @@ const ApiCall = {
                 throw error;
             }
         },
+
+        editCategory: async (category) => {
+            try {
+                const response = await axios.put(`${baseURL}/category/edit`, {
+                    categoryId: category.categoryId,
+                    categoryName: category.categoryName,
+                    description: category.description
+                });
+                if (!response.data.success) {
+                    throw new Error('Network response was not ok');
+                }
+                return true;
+            } catch (error) {
+                console.error('Error editing category:', error);
+                throw error;
+            }
+        },
     },
 
     supplier: {
@@ -434,9 +451,9 @@ const ApiCall = {
             }
         },
 
-        updateStatus: async (productCode, status) => {
+        updateStatus: async (supplierId, status) => {
             try {
-                const response = await axios.post(`${baseURL}/product/update-status`, { productCode, status });
+                const response = await axios.post(`${baseURL}/supplier/update-status`, { supplierId, status });
                 if (!response.data.success) {
                     throw new Error('Network reponse was not ok')
                 }
