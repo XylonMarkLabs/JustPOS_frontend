@@ -1,11 +1,15 @@
 import './App.css';
-import { ThemeProvider, CircularProgress, Box } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
+import { ThemeProvider, CircularProgress, Box, Typography, Button } from '@mui/material';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import Theme from './Theme/Theme.js';
 import Navbar from './Components/Navbar.jsx';
 import AlertProvider from './Components/AlertProvider.jsx';
 import AuthProvider, { AuthContext } from './Services/AuthContext.jsx';
+import { baseURL } from './Services/ApiCall';
 import Login from './Auth/Login.jsx';
+import InitialAdminSetup from './Auth/InitialAdminSetup.jsx';
 import BusinessLogin from './Auth/BusinessLogin.jsx';
 import BusinessRegister from './Auth/BusinessRegister.jsx';
 import CashierView from './Cashier/CashierView.jsx';
@@ -17,7 +21,6 @@ import Reports from './Reports/Reports.jsx';
 import AdminDashboard from './Dashboard/AdminDashboard.jsx';
 import ManagerDashboard from './Dashboard/ManagerDashboard.jsx';
 import withAuth from './Services/WithAuth.jsx';
-import { useContext } from 'react';
 import StockManagement from './Stock Management/StockManagement.jsx';
 import SupplierManagement from './Supplier Manament/SupplierManagement.jsx';
 import DiscountManagement from './Discount/DiscountManagement.jsx';
@@ -33,6 +36,86 @@ const ProtectedManagerDashboard = withAuth(ManagerDashboard, ['Manager']);
 const ProtectedStockManagement = withAuth(StockManagement, ['Admin', 'Manager']);
 const ProtectedSupplierManagement = withAuth(SupplierManagement, ['Admin', 'Manager']);
 const ProtectedDiscountManagement = withAuth(DiscountManagement, ['Admin', 'Manager']);
+
+const fetchSetupStatus = async () => {
+  const response = await axios.get(`${baseURL}/setup/status`, { withCredentials: true });
+  return Boolean(response.data?.setupRequired);
+};
+
+let adminExistsCache = false;
+
+const CenteredSpinner = () => (
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <CircularProgress sx={{ color: '#b0a892' }} />
+  </Box>
+);
+
+function SetupGate() {
+  // 'checking' | 'setup' | 'login' | 'error'
+  const [status, setStatus] = useState(adminExistsCache ? 'login' : 'checking');
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    if (adminExistsCache) return;
+
+    let cancelled = false;
+    setStatus('checking');
+
+    fetchSetupStatus()
+      .then((setupRequired) => {
+        if (cancelled) return;
+        if (!setupRequired) adminExistsCache = true;
+        setStatus(setupRequired ? 'setup' : 'login');
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        console.error('Error checking setup status:', error);
+        setStatus('error');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [attempt]);
+
+  if (status === 'checking') return <CenteredSpinner />;
+
+  if (status === 'error') {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          gap: 2,
+          px: 3,
+          textAlign: 'center',
+        }}
+      >
+        <Typography sx={{ color: '#374151', fontSize: { xs: '0.95rem', sm: '1.05rem' } }}>
+          We couldn't reach the server to check your system status.
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={() => setAttempt((a) => a + 1)}
+          sx={{
+            backgroundColor: '#292929',
+            color: '#FBF8EF',
+            textTransform: 'none',
+            fontWeight: 'bold',
+            '&:hover': { backgroundColor: '#1a1a1a' },
+          }}
+        >
+          Try again
+        </Button>
+      </Box>
+    );
+  }
+
+  return status === 'setup' ? <InitialAdminSetup /> : <Login />;
+}
 
 function AppContent() {
   const { isAuthenticated, authLoading, user } = useContext(AuthContext);
@@ -54,18 +137,19 @@ function AppContent() {
   };
 
   if (authLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress sx={{ color: '#b0a892' }} />
-      </Box>
-    );
+    return <CenteredSpinner />;
   }
 
   return (
     <>
       {isAuthenticated && location.pathname.startsWith('/cashier') && <Navbar />}
       <Routes>
-        <Route path="/" element={<Login />} />
+        {/* "/" shows either first-time admin setup or Login, depending on
+            whether the backend reports that an admin already exists. */}
+        <Route path="/" element={<SetupGate />} />
+        {/* InitialAdminSetup redirects here on success / already-set-up.
+            Bounce to "/" so SetupGate re-checks and renders Login. */}
+        <Route path="/login" element={<Navigate to="/" replace />} />
         <Route path="/home" element={getHomePage()} />
         
         {/* Admin Routes */}
